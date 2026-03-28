@@ -2372,9 +2372,9 @@
       financial_advisor:['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
       agent:            ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
       manager:          ['overview','deals','training','addagents','agentapprovals','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      executive:        ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
-      managing_partner: ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions'],
-      admin:            ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions'],
+      executive:        ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','commissions'],
+      managing_partner: ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
+      admin:            ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
     };
 
     var LLFG_TAB_LABELS = {
@@ -4301,18 +4301,32 @@
       <div class="dash-body">
         <div class="dash-welcome">
           <h2>Agent <em>Permissions</em></h2>
-          <p>Manage access levels for agents in your organization.</p>
+          <p>Grant or revoke portal access levels. Your role determines which levels you can assign.</p>
         </div>
+
+        <!-- Permission rules by role -->
+        <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+          <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:0.6rem 1rem;font-size:0.7rem;">
+            <div style="color:var(--gold);font-weight:600;margin-bottom:3px;">Executive</div>
+            <div style="color:var(--gray);">Can grant up to <strong style="color:var(--cream);">Manager</strong></div>
+          </div>
+          <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:0.6rem 1rem;font-size:0.7rem;">
+            <div style="color:var(--gold);font-weight:600;margin-bottom:3px;">Managing Partner</div>
+            <div style="color:var(--gray);">Can grant up to <strong style="color:var(--cream);">Executive</strong></div>
+          </div>
+          <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:0.6rem 1rem;font-size:0.7rem;">
+            <div style="color:var(--gold);font-weight:600;margin-bottom:3px;">Admin</div>
+            <div style="color:var(--gray);">Can grant <strong style="color:var(--cream);">any level</strong> including Admin</div>
+          </div>
+        </div>
+
         <div class="dash-section" style="margin-bottom:1.5rem;max-width:600px;">
           <div class="dash-section-title">Grant Permission</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
             <div class="cal-field"><label>Agent Email</label><input type="email" id="permEmail" placeholder="agent&#64;llfg.us"/></div>
             <div class="cal-field"><label>Permission Level</label>
               <select id="permLevel">
-                <option value="agent">Agent</option>
-                <option value="manager">Manager</option>
-                <option value="executive">Executive</option>
-                <option value="admin">Admin</option>
+                <!-- Options populated dynamically based on granter's role -->
               </select>
             </div>
             <div style="display:flex;align-items:flex-end;">
@@ -5828,7 +5842,7 @@ Legacy Life Financial Group`
     const ROLE_TABS = {
       financial_advisor: ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
       manager:           ['overview','deals','training','addagents','agentapprovals','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      executive:         ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
+      executive:         ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','commissions'],
       managing_partner:  ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
       admin:             ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
       agent:             ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
@@ -6156,6 +6170,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if(tab === 'calendar')       { renderPortalCal(); }
       if(tab === 'emailtemplates') { renderEmailTemplates(); }
       if(tab === 'commissions')    { renderCommissionsTab(); }
+      if(tab === 'permissions')    { renderPermissionsOptions(); }
       if(tab === 'bizcard') {
         // Pre-fill with current user's info
         const u = currentUser || window._llfgCurrentUser;
@@ -8515,16 +8530,52 @@ This request requires Managing Partner approval.`
     }
 
     // ─── Permissions ───
+    // ── Permission level options by granter role ──
+    const PERMISSION_LEVELS = {
+      executive:        [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'}],
+      managing_partner: [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'}],
+      admin:            [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'},{value:'managing_partner',label:'Managing Partner'},{value:'admin',label:'Admin'}],
+    };
+
+    function renderPermissionsOptions() {
+      const role = currentUser?.role || 'admin';
+      const select = document.getElementById('permLevel');
+      if (!select) return;
+      const levels = PERMISSION_LEVELS[role] || PERMISSION_LEVELS.admin;
+      select.innerHTML = levels.map(l => `<option value="${l.value}">${l.label}</option>`).join('');
+      renderPermTable();
+    }
+
     window.__R_grantPermission = window.grantPermission = function() {
       const email = document.getElementById('permEmail').value.trim().toLowerCase();
       const level = document.getElementById('permLevel').value;
-      if (!email) { alert('Email required.'); return; }
+      const granterRole = currentUser?.role || 'admin';
+
+      if (!email) { alert('Please enter an agent email.'); return; }
+
+      // Enforce role-based permission limits
+      const allowed = PERMISSION_LEVELS[granterRole]?.map(l=>l.value) || [];
+      if (!allowed.includes(level)) {
+        alert('You do not have permission to grant the ' + level + ' role. Your role only allows granting up to: ' + allowed[allowed.length-1]);
+        return;
+      }
+
+      // Apply permission
       runtimePermissions[email] = level;
+      if (window.LLFG_USERS && window.LLFG_USERS[email]) {
+        window.LLFG_USERS[email].role = level;
+      }
       if (USERS[email]) USERS[email].role = level;
-      permGrants.push({ email, level, by: currentUser?.name || 'Admin', date: new Date().toLocaleDateString() });
+
+      permGrants.push({
+        email, level,
+        by: currentUser?.name || 'Admin',
+        date: new Date().toLocaleDateString()
+      });
+
       document.getElementById('permEmail').value = '';
       renderPermTable();
-    }
+    };
 
     function renderPermTable() {
       const tbody = document.getElementById('permTableBody');
