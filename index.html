@@ -2422,6 +2422,10 @@
       var session = window._loadSession();
       if (session && LLFG_USERS[session.email]) {
         var user = Object.assign({}, LLFG_USERS[session.email], {email: session.email});
+        /* Admin/managing partner remembered session goes straight to their full portal */
+        if (user.role === 'admin' || user.role === 'managing_partner') {
+          user._goToPortal = true;
+        }
         window._llfgCurrentUser = user;
         var toast = document.createElement('div');
         toast.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:rgba(10,10,10,0.95);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:0.7rem 1.6rem;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;z-index:9999;font-family:"Raleway",sans-serif;white-space:nowrap;';
@@ -5891,13 +5895,12 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
     window._appLaunchPortal = function launchPortal(user) {
       // Admins and managing partners go to admin dashboard by default
-      // But admin can also switch into any role portal view
-      if ((user.role === 'admin' || user.role === 'managing_partner') && !user._viewAsRole) {
+      if ((user.role === 'admin' || user.role === 'managing_partner') && !user._viewAsRole && !user._goToPortal) {
         document.getElementById('adminDash').classList.add('open');
         renderApplications();
         renderOverviewRecent();
 
-        // Inject "View As" switcher into admin nav
+        // Inject "View As" switcher + "My Portal" button into admin nav
         const adminNav = document.querySelector('#adminDash .dash-nav-right');
         if (adminNav && !document.getElementById('viewAsSwitcher')) {
           const sw = document.createElement('div');
@@ -5907,6 +5910,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
             `<option value="${email}">${u.name} (${ROLE_DISPLAY[u.role]||u.role})</option>`
           ).join('');
           sw.innerHTML = `
+            <button onclick="adminGoToPortal()" style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:0.28rem 0.8rem;font-family:'Raleway',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;margin-right:0.3rem;">My Portal</button>
             <span style="font-size:0.58rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;">View As:</span>
             <select onchange="adminViewAs(this.value)" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.2);color:var(--cream);padding:0.25rem 0.5rem;font-family:'Raleway',sans-serif;font-size:0.62rem;outline:none;cursor:pointer;max-width:200px;">
               <option value="">— Select Portal —</option>
@@ -5925,15 +5929,15 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         return;
       }
 
-      // Launch agent portal (normal or admin viewing as role)
+      // Launch agent portal (admin "My Portal", normal agent, or admin viewing as role)
       document.getElementById('agentDash').classList.add('open');
       document.getElementById('agentName').textContent = user.name;
       document.getElementById('agentFirstName').textContent = user.name.split(' ')[0];
 
-      const roleLabel = ROLE_DISPLAY[user._viewAsRole || user.role] || user.role;
+      const effectiveRole = user._viewAsRole || user.role;
+      const roleLabel = ROLE_DISPLAY[effectiveRole] || effectiveRole;
       document.getElementById('portalRoleLabel').textContent = roleLabel;
       const badge = document.getElementById('portalBadge');
-      const effectiveRole = user._viewAsRole || user.role;
       if (effectiveRole !== 'financial_advisor' && effectiveRole !== 'agent') {
         badge.textContent = roleLabel + (user._viewAsRole ? ' (Admin Preview)' : '');
         badge.style.display = 'inline-block';
@@ -5941,38 +5945,51 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         badge.style.color = user._viewAsRole ? '#c084fc' : '';
       } else { badge.style.display = 'none'; }
 
-      // Show "Back to Admin" button if admin is previewing
-      if (user._viewAsRole) {
+      // Show "Back to Admin" button for admin users in portal
+      const isAdminUser = (user.role === 'admin' || user.role === 'managing_partner');
+      if (isAdminUser) {
         const dashNav = document.querySelector('#agentDash .dash-nav-right');
         if (dashNav && !document.getElementById('backToAdminBtn')) {
           const btn = document.createElement('button');
           btn.id = 'backToAdminBtn';
-          btn.textContent = '← Back to Admin';
-          btn.style.cssText = 'background:rgba(192,132,252,0.15);border:1px solid rgba(192,132,252,0.3);color:#c084fc;padding:0.28rem 0.7rem;font-family:"Raleway",sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;';
+          btn.textContent = '← Admin Dashboard';
+          btn.style.cssText = 'background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:0.28rem 0.7rem;font-family:"Raleway",sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;';
           btn.onclick = function() {
             document.getElementById('agentDash').classList.remove('open');
             currentUser._viewAsRole = null;
+            currentUser._goToPortal = false;
             document.getElementById('adminDash').classList.add('open');
-            document.getElementById('backToAdminBtn').remove();
+            const b = document.getElementById('backToAdminBtn');
+            if (b) b.remove();
           };
           dashNav.insertBefore(btn, dashNav.firstChild);
         }
       }
 
-      // Build tabs based on effective role
+      // Build tabs — admin gets ALL tabs
       const tabs = ROLE_TABS[effectiveRole] || ROLE_TABS.financial_advisor;
       const tabsEl = document.getElementById('portalTabs');
       tabsEl.innerHTML = tabs.map((t,i) =>
         `<button class="admin-tab ${i===0?'active':''}" onclick="showPortalTab('${t}',this)">${TAB_LABELS[t]}</button>`
       ).join('');
 
-      // Use a proxy user with effective role for building UI
       const proxyUser = Object.assign({}, user, { role: effectiveRole });
       buildPortalOverview(proxyUser);
       configureRoleUI(proxyUser);
       initMsgContacts(proxyUser);
       const commSub = document.getElementById('dealCommSub');
       if (commSub) commSub.textContent = `Advance × ${user.comm}%`;
+    };
+
+    window.__R_adminGoToPortal = window.adminGoToPortal = function() {
+      document.getElementById('adminDash').classList.remove('open');
+      document.getElementById('agentDash').classList.remove('open');
+      document.getElementById('portalTabs').innerHTML = '';
+      const existing = document.getElementById('backToAdminBtn');
+      if (existing) existing.remove();
+      currentUser._goToPortal = true;
+      currentUser._viewAsRole = null;
+      window._appLaunchPortal(currentUser);
     };
 
     window.__R_adminViewAs = window.adminViewAs = function(val) {
