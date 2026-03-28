@@ -1,0 +1,28 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
+
+# Force HTTPS on all requests
+[[redirects]]
+  from = "http://llfg.us/*"
+  to   = "https://llfg.us/:splat"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from = "http://www.llfg.us/*"
+  to   = "https://llfg.us/:splat"
+  status = 301
+  force  = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options            = "DENY"
+    X-Content-Type-Options     = "nosniff"
+    Referrer-Policy            = "strict-origin-when-cross-origin"
+    Content-Security-Policy    = "upgrade-insecure-requests"
