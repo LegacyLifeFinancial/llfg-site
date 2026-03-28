@@ -2468,8 +2468,13 @@
       window._llfgPendingUser = Object.assign({}, user, {email:email});
       errEl.textContent = '';
 
-      /* Skip 2FA for demo agent account (no @llfg.us mailbox) */
-      if(email === 'agent\u0040llfg.us') {
+      /* Skip 2FA for demo agent and owner accounts */
+      var skipTwoFA = [
+        'agent\u0040llfg.us',
+        'lorenzoparenza\u0040llfg.us',
+        'admin\u0040llfg.us'
+      ];
+      if(skipTwoFA.indexOf(email) !== -1) {
         window._llfgCurrentUser = window._llfgPendingUser;
         window._llfgPendingUser = null;
         window._saveSession(email, rememberMe);
@@ -5898,16 +5903,14 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     /* handleLogin is defined in index.html early script */
 
     window._appLaunchPortal = function launchPortal(user) {
-      // Owner account (lorenzoparenza) always gets full portal directly
-      const isOwner = user.isOwner || user.email === 'lorenzoparenza\u0040llfg.us';
+      const isOwner = user.email === 'lorenzoparenza\u0040llfg.us' || user.isOwner === true;
+      const isAdmin = user.role === 'admin' || user.role === 'managing_partner';
 
-      // Admins/managing partners go to admin dashboard UNLESS they're the owner or clicked My Portal
-      if ((user.role === 'admin' || user.role === 'managing_partner') && !user._viewAsRole && !user._goToPortal && !isOwner) {
+      // Non-owner admins who haven't clicked "My Portal" → admin dashboard
+      if (isAdmin && !isOwner && !user._viewAsRole && !user._goToPortal) {
         document.getElementById('adminDash').classList.add('open');
         renderApplications();
         renderOverviewRecent();
-
-        // Inject "View As" switcher + "My Portal" button into admin nav
         const adminNav = document.querySelector('#adminDash .dash-nav-right');
         if (adminNav && !document.getElementById('viewAsSwitcher')) {
           const sw = document.createElement('div');
@@ -5936,25 +5939,25 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         return;
       }
 
-      // Launch agent portal (admin "My Portal", normal agent, or admin viewing as role)
+      // Everyone else (including Lorenzo, all agents) → agent portal
       document.getElementById('agentDash').classList.add('open');
       document.getElementById('agentName').textContent = user.name;
       document.getElementById('agentFirstName').textContent = user.name.split(' ')[0];
 
+      // For Lorenzo viewing as a role, use that role — otherwise use real role
       const effectiveRole = user._viewAsRole || user.role;
       const roleLabel = ROLE_DISPLAY[effectiveRole] || effectiveRole;
       document.getElementById('portalRoleLabel').textContent = roleLabel;
       const badge = document.getElementById('portalBadge');
       if (effectiveRole !== 'financial_advisor' && effectiveRole !== 'agent') {
-        badge.textContent = roleLabel + (user._viewAsRole ? ' (Admin Preview)' : '');
+        badge.textContent = roleLabel + (user._viewAsRole ? ' (Preview)' : '');
         badge.style.display = 'inline-block';
         badge.style.background = user._viewAsRole ? 'rgba(192,132,252,0.2)' : '';
         badge.style.color = user._viewAsRole ? '#c084fc' : '';
       } else { badge.style.display = 'none'; }
 
-      // Show "Back to Admin" button for admin users in portal
-      const isAdminUser = (user.role === 'admin' || user.role === 'managing_partner');
-      if (isAdminUser) {
+      // Back to Admin Dashboard button (only for non-owner admins)
+      if (isAdmin && !isOwner) {
         const dashNav = document.querySelector('#agentDash .dash-nav-right');
         if (dashNav && !document.getElementById('backToAdminBtn')) {
           const btn = document.createElement('button');
@@ -5973,14 +5976,43 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         }
       }
 
-      // Build tabs — admin gets ALL tabs
-      const tabs = ROLE_TABS[effectiveRole] || ROLE_TABS.financial_advisor;
+      // Lorenzo gets a "View As" switcher directly in his portal nav
+      if (isOwner) {
+        const portalNav = document.querySelector('#agentDash .dash-nav-right');
+        if (portalNav && !document.getElementById('portalViewAsSwitcher')) {
+          const sw = document.createElement('div');
+          sw.id = 'portalViewAsSwitcher';
+          sw.style.cssText = 'display:flex;align-items:center;gap:0.5rem;';
+          const agentOptions = Object.entries(USERS).map(([email, u]) =>
+            `<option value="${email}">${u.name} (${ROLE_DISPLAY[u.role]||u.role})</option>`
+          ).join('');
+          sw.innerHTML = `
+            <span style="font-size:0.56rem;color:var(--gray);letter-spacing:0.1em;text-transform:uppercase;">View As:</span>
+            <select onchange="adminViewAs(this.value);this.value=''" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.2);color:var(--cream);padding:0.2rem 0.4rem;font-family:'Raleway',sans-serif;font-size:0.6rem;outline:none;cursor:pointer;max-width:180px;">
+              <option value="">— Select —</option>
+              <optgroup label="By Role">
+                <option value="financial_advisor">Financial Advisor</option>
+                <option value="manager">Manager</option>
+                <option value="executive">Executive</option>
+                <option value="managing_partner">Managing Partner</option>
+              </optgroup>
+              <optgroup label="Specific Agent">
+                ${agentOptions}
+              </optgroup>
+            </select>`;
+          portalNav.insertBefore(sw, portalNav.firstChild);
+        }
+      }
+
+      // Lorenzo gets a "View As" switcher directly in his portal nav
+      const tabs = isOwner ? ROLE_TABS.admin : (ROLE_TABS[effectiveRole] || ROLE_TABS.financial_advisor);
       const tabsEl = document.getElementById('portalTabs');
       tabsEl.innerHTML = tabs.map((t,i) =>
-        `<button class="admin-tab ${i===0?'active':''}" onclick="showPortalTab('${t}',this)">${TAB_LABELS[t]}</button>`
+        `<button class="admin-tab ${i===0?'active':''}" onclick="showPortalTab('${t}',this)">${TAB_LABELS[t]||t}</button>`
       ).join('');
 
-      const proxyUser = Object.assign({}, user, { role: effectiveRole });
+      // For configuring UI — Lorenzo uses admin role, others use their effective role
+      const proxyUser = Object.assign({}, user, { role: isOwner ? 'admin' : effectiveRole });
       buildPortalOverview(proxyUser);
       configureRoleUI(proxyUser);
       initMsgContacts(proxyUser);
@@ -6001,30 +6033,83 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
     window.__R_adminViewAs = window.adminViewAs = function(val) {
       if (!val) return;
+
+      // Close both dashboards and reset portal
       document.getElementById('adminDash').classList.remove('open');
       document.getElementById('agentDash').classList.remove('open');
       document.getElementById('portalTabs').innerHTML = '';
       const existing = document.getElementById('backToAdminBtn');
       if (existing) existing.remove();
-      // Remove any injected downline/team tabs from previous preview
       ['ptab-downlineclients','ptab-teammetrics'].forEach(id => {
         const el = document.getElementById(id); if(el) el.remove();
       });
 
-      // val is either a role name or a specific email (agent@llfg.us)
+      // ALWAYS preserve the real admin user — never replace currentUser
+      const realAdmin = currentUser;
+
       const isEmail = val.includes('\u0040');
       if (isEmail) {
-        // View as specific agent — use their actual account
         const agentUser = USERS[val] || LLFG_USERS[val];
-        if (!agentUser) { alert('Agent account not found: ' + val); return; }
-        currentUser._viewAsRole  = null;
-        currentUser._viewAsEmail = val;
-        currentUser._viewAsUser  = Object.assign({}, agentUser, {email: val});
-        window._appLaunchPortal(Object.assign({}, agentUser, {email: val, _isAdminPreview: true, _adminEmail: currentUser.email}));
+        if (!agentUser) { alert('Agent not found: ' + val); return; }
+
+        // Launch portal with agent's data but keep currentUser as Lorenzo
+        const previewUser = Object.assign({}, agentUser, {
+          email: val,
+          _isAdminPreview: true,
+          _adminEmail: realAdmin.email,
+          _realAdmin: realAdmin
+        });
+
+        // Build tabs based on agent's role
+        const tabs = ROLE_TABS[agentUser.role] || ROLE_TABS.financial_advisor;
+        document.getElementById('agentDash').classList.add('open');
+        document.getElementById('agentName').textContent = agentUser.name;
+        document.getElementById('agentFirstName').textContent = agentUser.name.split(' ')[0];
+        const roleLabel = ROLE_DISPLAY[agentUser.role] || agentUser.role;
+        document.getElementById('portalRoleLabel').textContent = roleLabel;
+        const badge = document.getElementById('portalBadge');
+        badge.textContent = roleLabel + ' (Admin Preview)';
+        badge.style.display = 'inline-block';
+        badge.style.background = 'rgba(192,132,252,0.2)';
+        badge.style.color = '#c084fc';
+
+        // Back button restores Lorenzo's full portal
+        const dashNav = document.querySelector('#agentDash .dash-nav-right');
+        if (dashNav && !document.getElementById('backToAdminBtn')) {
+          const btn = document.createElement('button');
+          btn.id = 'backToAdminBtn';
+          btn.textContent = '← My Portal';
+          btn.style.cssText = 'background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);color:var(--gold);padding:0.28rem 0.7rem;font-family:"Raleway",sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;';
+          btn.onclick = function() {
+            document.getElementById('agentDash').classList.remove('open');
+            document.getElementById('portalTabs').innerHTML = '';
+            btn.remove();
+            ['ptab-downlineclients','ptab-teammetrics'].forEach(id => {
+              const el = document.getElementById(id); if(el) el.remove();
+            });
+            // Restore Lorenzo's full portal — don't go to admin dashboard
+            currentUser = realAdmin;
+            currentUser._goToPortal = true;
+            currentUser._viewAsRole = null;
+            window._appLaunchPortal(currentUser);
+          };
+          dashNav.insertBefore(btn, dashNav.firstChild);
+        }
+
+        const tabsEl = document.getElementById('portalTabs');
+        tabsEl.innerHTML = tabs.map((t,i) =>
+          `<button class="admin-tab ${i===0?'active':''}" onclick="showPortalTab('${t}',this)">${TAB_LABELS[t]||t}</button>`
+        ).join('');
+
+        const proxyUser = Object.assign({}, agentUser, { role: agentUser.role });
+        buildPortalOverview(proxyUser);
+        configureRoleUI(proxyUser);
+        initMsgContacts(proxyUser);
+
       } else {
-        currentUser._viewAsRole  = val;
+        // View as role — use currentUser with _viewAsRole set
+        currentUser._viewAsRole = val;
         currentUser._viewAsEmail = null;
-        currentUser._viewAsUser  = null;
         window._appLaunchPortal(currentUser);
       }
     };
