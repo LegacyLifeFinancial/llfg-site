@@ -2359,7 +2359,7 @@
       'manager\u0040llfg.us':        {password:'mgr123',     role:'manager',           name:'Marcus Reid',     comm:100 },
       'executive\u0040llfg.us':      {password:'exec123',    role:'executive',         name:'Sofia Lane',      comm:120 },
       'partner\u0040llfg.us':        {password:'partner123', role:'managing_partner',  name:'Diana Walsh',     comm:140 },
-      'lorenzoparenza\u0040llfg.us': {password:'admin123',   role:'admin',             name:'Lorenzo Parenza', comm:140 },
+      'lorenzoparenza\u0040llfg.us': {password:'admin123',   role:'admin',             name:'Lorenzo Parenza', comm:140, isOwner:true },
       'admin\u0040llfg.us':          {password:'admin123',   role:'admin',             name:'Admin',           comm:140 },
     };
 
@@ -2422,7 +2422,11 @@
       var session = window._loadSession();
       if (session && LLFG_USERS[session.email]) {
         var user = Object.assign({}, LLFG_USERS[session.email], {email: session.email});
-        /* Admin/managing partner remembered session goes straight to their full portal */
+        /* Owner (Lorenzo) always goes to full portal */
+        if (session.email === 'lorenzoparenza\u0040llfg.us' || user.isOwner) {
+          user._goToPortal = true;
+        }
+        /* Other admin/managing partner remembered session goes to full portal too */
         if (user.role === 'admin' || user.role === 'managing_partner') {
           user._goToPortal = true;
         }
@@ -5836,7 +5840,7 @@ Legacy Life Financial Group`
       'manager\u0040llfg.us':         { password:'mgr123',     role:'manager',           name:'Marcus Reid',      comm:100 },
       'executive\u0040llfg.us':       { password:'exec123',    role:'executive',         name:'Sofia Lane',       comm:120 },
       'partner\u0040llfg.us':         { password:'partner123', role:'managing_partner',  name:'Diana Walsh',      comm:140 },
-      'lorenzoparenza\u0040llfg.us':  { password:'admin123',   role:'admin',             name:'Lorenzo Parenza',  comm:140 },
+      'lorenzoparenza\u0040llfg.us':  { password:'admin123',   role:'admin',             name:'Lorenzo Parenza',  comm:140, isOwner:true },
       'admin\u0040llfg.us':           { password:'admin123',   role:'admin',             name:'Admin',            comm:140 },
     };
 
@@ -5894,8 +5898,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     /* handleLogin is defined in index.html early script */
 
     window._appLaunchPortal = function launchPortal(user) {
-      // Admins and managing partners go to admin dashboard by default
-      if ((user.role === 'admin' || user.role === 'managing_partner') && !user._viewAsRole && !user._goToPortal) {
+      // Owner account (lorenzoparenza) always gets full portal directly
+      const isOwner = user.isOwner || user.email === 'lorenzoparenza\u0040llfg.us';
+
+      // Admins/managing partners go to admin dashboard UNLESS they're the owner or clicked My Portal
+      if ((user.role === 'admin' || user.role === 'managing_partner') && !user._viewAsRole && !user._goToPortal && !isOwner) {
         document.getElementById('adminDash').classList.add('open');
         renderApplications();
         renderOverviewRecent();
