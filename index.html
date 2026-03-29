@@ -952,6 +952,36 @@
     }
     .portal-dropdown div:last-child { border-bottom: none !important; }
 
+    .promo-tier-row {
+      display: grid;
+      grid-template-columns: 1fr 100px 1fr;
+      align-items: center;
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: background 0.15s;
+    }
+    .promo-tier-row:hover { background: rgba(201,168,76,0.03); }
+    .promo-tier-row.promo-milestone {
+      background: rgba(201,168,76,0.04);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+    }
+    .promo-tier-row.you-are-here {
+      background: rgba(201,168,76,0.09) !important;
+      border-left: 3px solid var(--gold);
+      position: relative;
+    }
+    .tier-badge {
+      font-size: 0.54rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid;
+    }
+    .tier-badge.fa   { color: var(--gray);  border-color: rgba(255,255,255,0.1);  background: rgba(255,255,255,0.03); }
+    .tier-badge.mgr  { color: #6ea8fe;      border-color: rgba(110,168,254,0.25); background: rgba(110,168,254,0.06); }
+    .tier-badge.exec { color: #c084fc;      border-color: rgba(192,132,252,0.25); background: rgba(192,132,252,0.06); }
+    .tier-badge.mp   { color: var(--gold);  border-color: rgba(201,168,76,0.3);   background: rgba(201,168,76,0.08); }
+
     .report-period-btn {
       background: none;
       border: 1px solid rgba(201,168,76,0.2);
@@ -2672,6 +2702,7 @@
     <ul>
       <li><a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'}); return false;">Who We Are</a></li>
       <li><a href="#why" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'}); return false;">Why Join</a></li>
+      <li><a href="#agency" onclick="document.getElementById('agency').scrollIntoView({behavior:'smooth'}); return false;">Agencies</a></li>
       <li><a href="#apply" onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'}); return false;" class="nav-cta">Join Our Team</a></li>
     </ul>
     <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
@@ -2890,6 +2921,160 @@
     </div>
   </section>
 
+  <!-- AGENCY PARTNERSHIP -->
+  <section id="agency" style="padding:8rem 4rem;border-top:1px solid rgba(201,168,76,0.1);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;max-width:1100px;margin:0 auto;align-items:center;">
+      <div>
+        <p class="section-tag">Agency Partnerships</p>
+        <h2>Bring Your Entire<br><em>Agency to LLFG</em></h2>
+        <div class="gold-divider"></div>
+        <p class="body-text">If you lead an established agency or independent team, Legacy Life Financial Group offers a dedicated partnership track designed specifically for agency owners and team leaders looking to elevate their entire operation.</p>
+        <p class="body-text" style="margin-top:1rem;">Whether you have a team of 5 or 500, we provide the infrastructure, carrier access, compliance support, and compensation structure to help your agency grow — under your leadership, with our backing.</p>
+        <div style="margin-top:2rem;display:flex;flex-direction:column;gap:0.8rem;">
+          <div style="display:flex;align-items:flex-start;gap:0.9rem;">
+            <div style="width:6px;height:6px;background:var(--gold);border-radius:50%;margin-top:0.4rem;flex-shrink:0;"></div>
+            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;"><strong style="color:var(--cream);">Teams over 40 agents</strong> — Partnered directly with a Managing Partner for enterprise-level onboarding and support.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.9rem;">
+            <div style="width:6px;height:6px;background:var(--gold);border-radius:50%;margin-top:0.4rem;flex-shrink:0;"></div>
+            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;"><strong style="color:var(--cream);">Teams under 40 agents</strong> — Partnered with an Executive for personalized integration and team development.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.9rem;">
+            <div style="width:6px;height:6px;background:var(--gold);border-radius:50%;margin-top:0.4rem;flex-shrink:0;"></div>
+            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;"><strong style="color:var(--cream);">Referral routing</strong> — If you were referred by an LLFG agent, your onboarding is coordinated directly with them.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.9rem;">
+            <div style="width:6px;height:6px;background:var(--gold);border-radius:50%;margin-top:0.4rem;flex-shrink:0;"></div>
+            <div style="font-size:0.78rem;color:var(--gray);line-height:1.6;"><strong style="color:var(--cream);">Highest available contracts</strong> — Your agents enter at competitive levels based on their individual production history.</div>
+          </div>
+        </div>
+        <div style="margin-top:2.5rem;display:flex;gap:1rem;">
+          <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'});setTimeout(()=>switchApplyType('owner'),300);" class="btn-primary">Apply as Agency</button>
+          <button onclick="openContactPage()" class="btn-ghost">Schedule a Call</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.2rem;">
+        <div style="border:1px solid rgba(201,168,76,0.15);padding:1.5rem;background:rgba(201,168,76,0.04);">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;">40+</div>
+          <div style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);">Agents on Your Team?</div>
+          <div style="font-size:0.75rem;color:var(--cream);margin-top:0.6rem;line-height:1.6;">You'll be paired with a Managing Partner who specializes in enterprise agency integration and nationwide expansion.</div>
+        </div>
+        <div style="border:1px solid rgba(201,168,76,0.12);padding:1.5rem;background:rgba(201,168,76,0.02);">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;">Under 40</div>
+          <div style="font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);">Agents on Your Team?</div>
+          <div style="font-size:0.75rem;color:var(--cream);margin-top:0.6rem;line-height:1.6;">An Executive will personally oversee your onboarding, training integration, and carrier contracting setup.</div>
+        </div>
+        <div style="border:1px solid rgba(201,168,76,0.1);padding:1.2rem;background:rgba(0,0,0,0.2);">
+          <div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.4rem;">What We Bring to Your Agency</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem 1rem;">
+            <div style="font-size:0.68rem;color:var(--gray);">✓ 30+ A-rated carriers</div>
+            <div style="font-size:0.68rem;color:var(--gray);">✓ Highest contract levels</div>
+            <div style="font-size:0.68rem;color:var(--gray);">✓ Agent portal access</div>
+            <div style="font-size:0.68rem;color:var(--gray);">✓ Full training library</div>
+            <div style="font-size:0.68rem;color:var(--gray);">✓ Back-office support</div>
+            <div style="font-size:0.68rem;color:var(--gray);">✓ Override income</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY MODAL -->
+  <div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:2rem;">
+    <div style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.2);max-width:700px;width:100%;max-height:85vh;overflow-y:auto;position:relative;">
+      <button onclick="closePrivacyModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;z-index:1;">×</button>
+      <div style="padding:2.5rem 3rem;">
+        <div style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Legal</div>
+        <h2 style="margin-bottom:0.5rem;">Privacy Policy &amp; <em>Data Security</em></h2>
+        <div style="width:32px;height:2px;background:var(--gold);margin-bottom:2rem;"></div>
+
+        <div style="font-size:0.78rem;color:var(--gray);line-height:1.9;display:flex;flex-direction:column;gap:1.4rem;">
+          <div>
+            <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--cream);margin-bottom:0.5rem;">Your Privacy Is Protected</div>
+            <p>Legacy Life Financial Group is committed to maintaining the highest standards of data privacy and security in full compliance with all applicable federal and state regulations, including the Gramm-Leach-Bliley Act (GLBA), the Health Insurance Portability and Accountability Act (HIPAA) where applicable, and applicable state insurance privacy laws. We collect only the information necessary to facilitate insurance transactions, agent onboarding, and organizational operations.</p>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--cream);margin-bottom:0.5rem;">Encryption &amp; Data Security</div>
+            <p>All agent and client information collected through Legacy Life Financial Group platforms — including personal identification details, financial data, health information, and policy records — is protected using industry-standard 256-bit SSL/TLS encryption. Data is transmitted securely at all times and stored in encrypted environments accessible only to authorized personnel. We employ strict access controls, multi-factor authentication, and regular security audits to ensure the ongoing integrity of all data systems.</p>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--cream);margin-bottom:0.5rem;">Prohibition on Data Sale — Legal Consequences</div>
+            <p style="color:var(--cream);font-weight:500;">Legacy Life Financial Group does not sell, rent, lease, or trade any agent or client personal information to third parties under any circumstances. Any unauthorized disclosure, sale, or commercial exploitation of agent or client data — whether by employees, contractors, affiliated agents, or any third party — constitutes a material breach of our terms of engagement and applicable law.</p>
+            <p style="margin-top:0.6rem;">Individuals found to have sold, disclosed without authorization, or otherwise misappropriated agent or client data will be subject to immediate termination of their contract, civil litigation for damages, and referral to the appropriate state and federal regulatory authorities. Violations may result in substantial civil penalties and criminal prosecution under applicable federal and state statutes.</p>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--cream);margin-bottom:0.5rem;">Information We Collect</div>
+            <p>We collect information provided directly by agents and clients through our secure portal, application forms, and communication channels. This includes name, contact information, professional licensing details, financial information for commission processing, and policy-related data necessary for carrier contracting and client service. We do not collect unnecessary personal information and do not retain data beyond the period required by regulatory and business obligations.</p>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--cream);margin-bottom:0.5rem;">Your Rights</div>
+            <p>Agents and clients have the right to request access to their personal information, request corrections to inaccurate data, and request deletion of data subject to regulatory retention requirements. To exercise any of these rights, contact our compliance team at <span style="color:var(--gold);">support@llfg.us</span>.</p>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:1rem;">
+            <p style="font-size:0.68rem;color:var(--gray);">This policy is effective as of January 1, 2026 and is reviewed annually to ensure continued compliance with evolving regulatory requirements. Legacy Life Financial Group reserves the right to update this policy with appropriate notice to affected parties. For questions or concerns, contact <span style="color:var(--gold);">support@llfg.us</span>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT PAGE OVERLAY -->
+  <div id="contactPage" style="display:none;position:fixed;inset:0;background:#080808;z-index:9998;overflow-y:auto;">
+    <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;">
+      <button onclick="closeContactPage()" style="position:fixed;top:1.5rem;left:1.5rem;background:none;border:none;color:var(--gray);font-size:0.72rem;cursor:pointer;letter-spacing:0.12em;text-transform:uppercase;display:flex;align-items:center;gap:0.4rem;">← Back</button>
+      <div style="max-width:600px;width:100%;">
+        <div style="text-align:center;margin-bottom:3rem;">
+          <p class="section-tag" style="display:inline-block;">Get in Touch</p>
+          <h2>Contact <em>Legacy Life</em></h2>
+          <p class="body-text" style="margin-top:1rem;">Whether you have questions about joining, agency partnerships, or anything else — our team responds within one business day.</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label>First Name</label><input type="text" id="ctFirst" placeholder="Jane"/></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="ctLast" placeholder="Smith"/></div>
+          </div>
+          <div class="form-group"><label>Email Address</label><input type="email" id="ctEmail" placeholder="jane&#64;email.com"/></div>
+          <div class="form-group"><label>Phone (optional)</label><input type="tel" id="ctPhone" placeholder="(555) 000-0000"/></div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="ctSubject" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.85rem 1rem;font-family:'Raleway',sans-serif;font-size:0.85rem;outline:none;width:100%;-webkit-appearance:none;">
+              <option value="">Select a topic</option>
+              <option>General Inquiry</option>
+              <option>Agent Opportunity</option>
+              <option>Agency Partnership</option>
+              <option>Commission Questions</option>
+              <option>Licensing Support</option>
+              <option>Technical / Portal Support</option>
+              <option>Media &amp; Press</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Message</label><textarea id="ctMessage" placeholder="Tell us how we can help..." style="height:120px;resize:vertical;"></textarea></div>
+          <button onclick="submitContactForm()" class="btn-primary" style="width:100%;padding:1.1rem;font-size:0.78rem;">Send Message</button>
+          <p id="ctSuccess" style="display:none;text-align:center;color:#6ecf6e;font-size:0.78rem;margin-top:0.5rem;">✓ Message sent! We'll be in touch within one business day.</p>
+          <p style="text-align:center;font-size:0.68rem;color:var(--gray);margin-top:0.5rem;">Or email us directly: <a href="mailto:support&#64;llfg.us" style="color:var(--gold);">support&#64;llfg.us</a></p>
+        </div>
+
+        <!-- Contact cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:3rem;">
+          <div style="border:1px solid rgba(201,168,76,0.1);padding:1.2rem;text-align:center;">
+            <div style="font-size:1.2rem;margin-bottom:0.5rem;">📧</div>
+            <div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.3rem;">Email</div>
+            <div style="font-size:0.78rem;color:var(--cream);">support@llfg.us</div>
+            <div style="font-size:0.62rem;color:var(--gray);margin-top:0.2rem;">Response within 24 hours</div>
+          </div>
+          <div style="border:1px solid rgba(201,168,76,0.1);padding:1.2rem;text-align:center;">
+            <div style="font-size:1.2rem;margin-bottom:0.5rem;">🌐</div>
+            <div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.3rem;">Portal</div>
+            <div style="font-size:0.78rem;color:var(--cream);">llfg.us</div>
+            <div style="font-size:0.62rem;color:var(--gray);margin-top:0.2rem;">Agent portal &amp; resources</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- APPLY -->
   <section id="apply">
     <div class="apply-inner">
@@ -3060,9 +3245,9 @@
     </div>
     <div class="footer-copy">© 2026 Legacy Life Financial Group. All rights reserved.</div>
     <div class="footer-links">
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
+      <a href="#" onclick="openPrivacyModal();return false;">Privacy Policy</a>
+      <a href="#" onclick="openPrivacyModal();return false;">Data Security</a>
+      <a href="#" onclick="openContactPage();return false;">Contact Us</a>
     </div>
   </footer>
 
@@ -3093,7 +3278,10 @@
       <div class="sidebar-section-label" style="margin-bottom:1rem;">Navigation</div>
       <a href="#about" onclick="closeSidebar(); document.getElementById('about').scrollIntoView({behavior:'smooth'}); return false;">Who We Are</a>
       <a href="#why" onclick="closeSidebar(); document.getElementById('why').scrollIntoView({behavior:'smooth'}); return false;">Why Join</a>
+      <a href="#agency" onclick="closeSidebar(); document.getElementById('agency').scrollIntoView({behavior:'smooth'}); return false;">Agency Partnerships</a>
       <a href="#apply" onclick="closeSidebar(); document.getElementById('apply').scrollIntoView({behavior:'smooth'}); return false;">Apply Now</a>
+      <a href="#" onclick="closeSidebar(); openContactPage(); return false;">Contact Us</a>
+      <a href="#" onclick="closeSidebar(); openPrivacyModal(); return false;">Privacy Policy</a>
     </div>
 
     <button class="sidebar-cta" onclick="closeSidebar(); document.getElementById('apply').scrollIntoView({behavior:'smooth'})">Join Our Team</button>
@@ -3980,6 +4168,88 @@
               </thead>
               <tbody id="orgCommTableBody"></tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Promotion Guide -->
+        <div class="dash-section" style="margin-top:1.5rem;">
+          <div class="dash-section-title">Promotion Guide <span style="font-size:0.62rem;color:var(--gray);font-weight:400;">Commission Tiers &amp; Advancement</span></div>
+          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.7;">Your commission level advances automatically as you hit monthly AP milestones. Each tier is reviewed monthly. Promotions to Manager, Executive, and Managing Partner include team override income and expanded carrier access.</p>
+
+          <div style="border:1px solid rgba(201,168,76,0.12);overflow:hidden;margin-bottom:1rem;">
+            <!-- Table header -->
+            <div style="display:grid;grid-template-columns:1fr 100px 1fr;background:rgba(201,168,76,0.06);padding:0.7rem 1.2rem;border-bottom:1px solid rgba(201,168,76,0.1);">
+              <div style="font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);">Monthly AP Milestone</div>
+              <div style="font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);text-align:center;">Comp %</div>
+              <div style="font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);text-align:right;">Tier</div>
+            </div>
+
+            <!-- Tier rows -->
+            <div id="promoGuideCurrentMarker"></div>
+
+            <div class="promo-tier-row" data-comm="65">
+              <div><div style="font-size:0.82rem;color:var(--cream);">Starting Level</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">New Agent — Entry Level</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);">65%</div>
+              <div style="text-align:right;"><span class="tier-badge fa">Financial Advisor</span></div>
+            </div>
+
+            <div class="promo-tier-row" data-comm="70">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$5,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">5K Production</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);">70%</div>
+              <div style="text-align:right;"><span class="tier-badge fa">Financial Advisor</span></div>
+            </div>
+
+            <div class="promo-tier-row" data-comm="80">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$20,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">20K Production</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);">80%</div>
+              <div style="text-align:right;"><span class="tier-badge fa">Financial Advisor</span></div>
+            </div>
+
+            <div class="promo-tier-row" data-comm="90">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$50,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">50K Production</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);">90%</div>
+              <div style="text-align:right;"><span class="tier-badge fa">Financial Advisor</span></div>
+            </div>
+
+            <div class="promo-tier-row promo-milestone" data-comm="100">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$150,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gold);margin-top:1px;">🏆 Manager Promotion</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--gold);">100%</div>
+              <div style="text-align:right;"><span class="tier-badge mgr">Manager</span></div>
+            </div>
+
+            <div class="promo-tier-row" data-comm="110">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$250,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">250K Production</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);">110%</div>
+              <div style="text-align:right;"><span class="tier-badge mgr">Manager</span></div>
+            </div>
+
+            <div class="promo-tier-row promo-milestone" data-comm="120">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$500,000 AP / Month</div><div style="font-size:0.6rem;color:#c084fc;margin-top:1px;">🏆 Executive Promotion</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:#c084fc;">120%</div>
+              <div style="text-align:right;"><span class="tier-badge exec">Executive</span></div>
+            </div>
+
+            <div class="promo-tier-row" data-comm="130">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$1,000,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gray);margin-top:1px;">1 Million Production</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#c084fc;">130%</div>
+              <div style="text-align:right;"><span class="tier-badge exec">Executive</span></div>
+            </div>
+
+            <div class="promo-tier-row promo-milestone" data-comm="140">
+              <div><div style="font-size:0.82rem;color:var(--cream);">$3,000,000 AP / Month</div><div style="font-size:0.6rem;color:var(--gold);margin-top:1px;">🏆 Managing Partner</div></div>
+              <div style="text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--gold);">140%</div>
+              <div style="text-align:right;"><span class="tier-badge mp">Managing Partner</span></div>
+            </div>
+
+            <!-- Beyond 140 — not disclosed -->
+            <div style="padding:0.8rem 1.2rem;background:rgba(201,168,76,0.03);border-top:1px solid rgba(201,168,76,0.08);text-align:center;">
+              <div style="font-size:0.62rem;color:var(--gray);letter-spacing:0.06em;">Further advancement milestones beyond the Managing Partner tier are reserved for top leadership and disclosed during executive onboarding.</div>
+            </div>
+          </div>
+
+          <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.9rem 1.2rem;">
+            <div style="font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.4rem;">How It Works</div>
+            <p style="font-size:0.72rem;color:var(--gray);line-height:1.8;">Commission levels advance automatically when you hit monthly AP milestones. Each tier is reviewed monthly based on your personal production. Promotion to Manager, Executive, and Managing Partner tiers includes team override income, expanded carrier contract access, and organizational leadership responsibilities.</p>
           </div>
         </div>
       </div>
@@ -5028,6 +5298,52 @@
   </div><!-- end admin dashboard -->
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+    // ─── Privacy Modal ───
+    window.openPrivacyModal = function() {
+      const m = document.getElementById('privacyModal');
+      if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    };
+    window.closePrivacyModal = function() {
+      const m = document.getElementById('privacyModal');
+      if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
+    };
+    document.addEventListener('click', function(e) {
+      const m = document.getElementById('privacyModal');
+      if (m && e.target === m) window.closePrivacyModal();
+    });
+
+    // ─── Contact Page ───
+    window.openContactPage = function() {
+      const p = document.getElementById('contactPage');
+      if (p) { p.style.display = 'block'; document.body.style.overflow = 'hidden'; window.scrollTo(0,0); }
+    };
+    window.closeContactPage = function() {
+      const p = document.getElementById('contactPage');
+      if (p) { p.style.display = 'none'; document.body.style.overflow = ''; }
+    };
+    window.submitContactForm = function() {
+      const first   = document.getElementById('ctFirst')?.value.trim();
+      const last    = document.getElementById('ctLast')?.value.trim();
+      const email   = document.getElementById('ctEmail')?.value.trim();
+      const phone   = document.getElementById('ctPhone')?.value.trim();
+      const subject = document.getElementById('ctSubject')?.value;
+      const message = document.getElementById('ctMessage')?.value.trim();
+      if (!first || !email || !message) { alert('Please fill in your name, email, and message.'); return; }
+      const subj = encodeURIComponent(`LLFG Contact: ${subject||'General Inquiry'} — ${first} ${last}`);
+      const body = encodeURIComponent(
+`Name: ${first} ${last}
+Email: ${email}
+Phone: ${phone||'Not provided'}
+Subject: ${subject||'General Inquiry'}
+
+Message:
+${message}`);
+      window.location.href = `mailto:support\u0040llfg.us?subject=${subj}&body=${body}`;
+      const succ = document.getElementById('ctSuccess');
+      if (succ) { succ.style.display = 'block'; }
+      ['ctFirst','ctLast','ctEmail','ctPhone','ctMessage'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    };
+
     // ─── Application Type Toggle ───
     window.switchApplyType = function(type) {
       const agentForm = document.getElementById('applyForm');
@@ -5103,13 +5419,22 @@ ${message}`
       const referral = document.getElementById('ownerReferral').value.trim();
       const goal     = document.getElementById('ownerGoal').value;
 
-      const routingNote = referral
-        ? `Referred by LLFG agent: ${referral} — Coordinate onboarding with that agent.`
-        : `No referral — assign to Managing Partner for interview and onboarding.`;
+      // Routing logic: referral → that agent, 40+ → Managing Partner, under 40 → Executive
+      let routingNote = '';
+      if (referral) {
+        routingNote = `REFERRED BY: ${referral} — Route directly to that LLFG agent for onboarding coordination.`;
+      } else {
+        const isLargeTeam = agents.includes('50+') || agents.includes('16–50');
+        if (isLargeTeam) {
+          routingNote = `TEAM SIZE: ${agents} agents — Route to MANAGING PARTNER (40+ agent threshold). Assign for enterprise onboarding.`;
+        } else {
+          routingNote = `TEAM SIZE: ${agents} agents — Route to EXECUTIVE (under 40 agent threshold). Assign for personalized agency integration.`;
+        }
+      }
 
-      const subject = encodeURIComponent(`Agency Owner Application — ${first} ${last} (${agency})`);
+      const subject = encodeURIComponent(`Agency Partnership Application — ${first} ${last} | ${agency} | ${agents} Agents`);
       const body = encodeURIComponent(
-`Agency Owner Partnership Application
+`Agency Partnership Application
 =====================================
 Name:          ${first} ${last}
 Agency:        ${agency}
@@ -5121,9 +5446,9 @@ Monthly AP:    ${ap}
 Carriers:      ${carriers || 'Not listed'}
 Referral:      ${referral || 'None'}
 
-ROUTING: ${routingNote}
+ROUTING INSTRUCTION: ${routingNote}
 
-Goals:
+Partnership Goals:
 ${goal}`
       );
       window.location.href = `mailto:lorenzoparenza\u0040llfg.us?subject=${subject}&body=${body}`;
@@ -7121,11 +7446,29 @@ ${reportSections}
     function renderCommissionsTab() {
       const u    = currentUser || window._llfgCurrentUser;
       const role = u?.role || 'financial_advisor';
-      const comm = (u?.comm || 75) / 100;
-      const commPct = u?.comm || 75;
+      const comm = (u?.comm || 65) / 100;
+      const commPct = u?.comm || 65;
       const isAgent   = role === 'financial_advisor' || role === 'agent';
       const isManager = role === 'manager';
       const isExecPlus= ['executive','managing_partner','admin'].includes(role);
+
+      // Highlight current tier in promotion guide
+      document.querySelectorAll('.promo-tier-row').forEach(row => {
+        const rowComm = parseInt(row.dataset.comm || '0');
+        row.classList.remove('you-are-here');
+        // Remove any existing badge
+        const existing = row.querySelector('.you-here-tag');
+        if (existing) existing.remove();
+        if (rowComm === commPct) {
+          row.classList.add('you-are-here');
+          const tag = document.createElement('span');
+          tag.className = 'you-here-tag';
+          tag.style.cssText = 'position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:0.5rem;background:var(--gold);color:var(--black);padding:0.15rem 0.5rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;';
+          tag.textContent = 'You Are Here';
+          row.style.position = 'relative';
+          row.appendChild(tag);
+        }
+      });
 
       // Update subtitle
       const sub = document.getElementById('commissionsSubtitle');
