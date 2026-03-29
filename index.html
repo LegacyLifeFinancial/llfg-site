@@ -941,10 +941,31 @@
       margin-bottom: -1px;
       transition: color 0.2s, border-color 0.2s;
       position: relative;
+      white-space: nowrap;
     }
 
     .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
     .admin-tab:hover { color: var(--cream); }
+
+    .portal-dropdown {
+      animation: fadeUp 0.15s ease both;
+    }
+    .portal-dropdown div:last-child { border-bottom: none !important; }
+
+    .report-period-btn {
+      background: none;
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--gray);
+      padding: 0.35rem 0.9rem;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .report-period-btn:hover { color: var(--cream); border-color: rgba(201,168,76,0.4); }
+    .report-period-btn.active { background: rgba(201,168,76,0.12); border-color: var(--gold); color: var(--gold); }
 
     .unread-badge {
       display: inline-block;
@@ -2369,21 +2390,22 @@
     };
 
     var LLFG_ROLE_TABS = {
-      financial_advisor:['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
-      agent:            ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
-      manager:          ['overview','deals','training','addagents','agentapprovals','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      executive:        ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      managing_partner: ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
-      admin:            ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
+      financial_advisor:['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','commissions'],
+      agent:            ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','commissions'],
+      manager:          ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      executive:        ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      managing_partner: ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      admin:            ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
     };
 
     var LLFG_TAB_LABELS = {
       overview:'Overview', deals:'My Deals', training:'Training',
+      recruiting:'Recruiting ▾', management:'Management ▾',
       addagents:'Add Agents', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
       applications:'Applications', bizcard:'Business Card', calendar:'Calendar',
       messages:'Messages', dataforms:'Data Collection',
-      commreq:'Commission Request', permissions:'Permissions',
-      commissions:'Commissions',
+      commreq:'Commission Request', permissions:'Permissions', commissions:'Commissions',
+      teammetrics:'Team Metrics', downlineclients:'All Clients', reports:'Reports',
     };
 
     /* ── Remember Me session storage ── */
@@ -2874,9 +2896,16 @@
       <p class="section-tag">Start Your Journey</p>
       <h2>Ready to <em>Join the Team?</em></h2>
       <p class="body-text">
-        Fill out the form below and a member of our recruiting team will reach out within one business day to walk you through the opportunity.
+        Choose the path that fits you. Whether you're starting fresh as a Financial Advisor or bringing an established agency, we have a place for you at Legacy Life Financial Group.
       </p>
 
+      <!-- Application Type Toggle -->
+      <div style="display:flex;gap:0;margin-bottom:2rem;border:1px solid rgba(201,168,76,0.25);overflow:hidden;">
+        <button id="applyTypeAgent" onclick="switchApplyType('agent')" style="flex:1;padding:0.9rem;background:var(--gold);color:var(--black);border:none;font-family:'Raleway',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;">Financial Advisor</button>
+        <button id="applyTypeOwner" onclick="switchApplyType('owner')" style="flex:1;padding:0.9rem;background:transparent;color:var(--gold);border:none;border-left:1px solid rgba(201,168,76,0.25);font-family:'Raleway',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;">Agency Owner</button>
+      </div>
+
+      <!-- FINANCIAL ADVISOR APPLICATION -->
       <form id="applyForm" onsubmit="handleSubmit(event)">
         <div class="form-group">
           <label for="fname">First Name</label>
@@ -2930,8 +2959,9 @@
           </select>
         </div>
         <div class="form-group full">
-          <label for="referral">How did you hear about us? (Referral Name if applicable)</label>
-          <input type="text" id="referral" placeholder="e.g. Referred by John Smith, Instagram, Google..." />
+          <label for="referral">Referred by (Agent Name or Code)</label>
+          <input type="text" id="referral" placeholder="e.g. Lorenzo Parenza, or leave blank if none" />
+          <p style="font-size:0.65rem;color:var(--gray);margin-top:0.3rem;line-height:1.5;">If you were referred by an LLFG agent, enter their name. You'll be linked directly to them. Without a referral you'll be assigned to a Managing Partner.</p>
         </div>
         <div class="form-group full">
           <label for="message">Why are you interested in Legacy Life?</label>
@@ -2942,6 +2972,78 @@
           <p class="form-note">Your information is kept strictly confidential. We never sell your data.</p>
         </div>
       </form>
+
+      <!-- AGENCY OWNER APPLICATION -->
+      <form id="ownerForm" onsubmit="handleOwnerSubmit(event)" style="display:none;">
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:1rem 1.2rem;margin-bottom:1.5rem;">
+          <p style="font-size:0.75rem;color:var(--gold);font-weight:600;margin-bottom:0.3rem;">Agency Owner / FMO Partnership</p>
+          <p style="font-size:0.7rem;color:var(--gray);line-height:1.6;">For established agency owners, IMOs, and independent producers looking to partner with LLFG for higher contract levels, overrides, and full back-office support. A Managing Partner will personally interview and onboard you.</p>
+        </div>
+        <div class="form-group">
+          <label for="ownerFirst">First Name</label>
+          <input type="text" id="ownerFirst" placeholder="John" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerLast">Last Name</label>
+          <input type="text" id="ownerLast" placeholder="Smith" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerEmail">Business Email</label>
+          <input type="email" id="ownerEmail" placeholder="john&#64;agencyname.com" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerPhone">Phone</label>
+          <input type="tel" id="ownerPhone" placeholder="(555) 000-0000" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerAgency">Agency / Business Name</label>
+          <input type="text" id="ownerAgency" placeholder="Smith Insurance Group LLC" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerState">State(s) Licensed</label>
+          <input type="text" id="ownerState" placeholder="e.g. IL, TX, FL, GA" required />
+        </div>
+        <div class="form-group">
+          <label for="ownerAgents">Number of Agents Under You</label>
+          <select id="ownerAgents">
+            <option value="" disabled selected>Select range</option>
+            <option>Just me (solo)</option>
+            <option>2–5 agents</option>
+            <option>6–15 agents</option>
+            <option>16–50 agents</option>
+            <option>50+ agents</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ownerAP">Monthly AP Volume</label>
+          <select id="ownerAP">
+            <option value="" disabled selected>Select range</option>
+            <option>Under $25,000</option>
+            <option>$25,000 – $75,000</option>
+            <option>$75,000 – $200,000</option>
+            <option>$200,000 – $500,000</option>
+            <option>$500,000+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ownerCarriers">Current Carrier Relationships</label>
+          <input type="text" id="ownerCarriers" placeholder="e.g. Mutual of Omaha, Transamerica, Americo..." />
+        </div>
+        <div class="form-group full">
+          <label for="ownerReferral">Referred by (LLFG Agent Name, or leave blank)</label>
+          <input type="text" id="ownerReferral" placeholder="e.g. Lorenzo Parenza" />
+          <p style="font-size:0.65rem;color:var(--gray);margin-top:0.3rem;line-height:1.5;">Without a referral, a Managing Partner will be assigned to interview and onboard your agency.</p>
+        </div>
+        <div class="form-group full">
+          <label for="ownerGoal">What are you looking to gain from partnering with LLFG?</label>
+          <textarea id="ownerGoal" placeholder="Higher contracts, recruiting support, back-office, branding, overrides..."></textarea>
+        </div>
+        <div class="form-submit">
+          <button type="submit" class="btn-primary">Submit Agency Application</button>
+          <p class="form-note">All agency partnership inquiries are reviewed by a Managing Partner within 24 hours.</p>
+        </div>
+      </form>
+
     </div>
   </section>
 
@@ -3197,456 +3299,197 @@
       <div class="dash-body">
         <div class="dash-welcome">
           <h2>Agent <em>Training</em></h2>
-          <p>Product knowledge, sales psychology, and the proven 5-step close. Click any section to expand.</p>
+          <p>Structured curriculum across three chapters — from fundamentals to leadership. Click any chapter to expand.</p>
         </div>
 
-        <!-- PRODUCT BREAKDOWNS -->
-        <div class="dash-section" style="margin-bottom:1.5rem;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Product Knowledge</div>
-
+        <!-- CHAPTER 1 -->
+        <div class="dash-section" style="margin-bottom:1.2rem;">
           <div class="training-doc">
             <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">📋</div>
-              <div class="training-doc-title">Term Life Insurance</div>
-              <div class="training-doc-meta">Core Product</div>
+              <div class="training-doc-icon">📖</div>
+              <div style="flex:1;"><div class="training-doc-title">Chapter 1 — Foundations of Insurance Sales</div><div class="training-doc-meta">Products · Sales Process · Psychology · Carrier Knowledge</div></div>
               <div class="training-doc-chevron">▾</div>
             </div>
             <div class="training-doc-body">
-              <h4>What it is</h4>
-              <p>Term life provides a death benefit for a set period — typically 10, 20, or 30 years. It is the most affordable and straightforward life insurance product. If the insured passes during the term, the beneficiary receives the face amount tax-free.</p>
-              <h4>Who it's for</h4>
-              <ul><li>Young families needing income replacement</li><li>Homeowners with a mortgage</li><li>Business owners with key-person exposure</li><li>Anyone who needs maximum coverage at the lowest cost</li></ul>
-              <h4>Key selling points</h4>
-              <ul><li>Lowest premium for the highest death benefit</li><li>Simple to understand — easy to explain and close</li><li>Many carriers offer living benefits (critical illness, chronic illness riders) at no extra cost</li><li>Convertible term can be upgraded to permanent later</li></ul>
-              <h4>Sales Psychology</h4>
-              <p>Lead with protection. Ask: <em>"If something happened to you tomorrow, would your family be okay financially?"</em> Most people say no. Term gives them peace of mind at a price that feels manageable. Anchor against their monthly expenses — $250,000 in coverage for less than a Netflix subscription per day.</p>
-              <h4>Objection Handling</h4>
-              <ul><li><strong>"I'll think about it"</strong> — "I understand. Let me ask — what specifically would you want to think about?" Then address that one concern directly.</li><li><strong>"It's too expensive"</strong> — Reframe to daily cost. A $500K policy might be $28/month — less than a dinner out.</li><li><strong>"I have coverage through work"</strong> — "Group coverage typically ends when you leave. Is that a risk you're comfortable with?"</li></ul>
-            </div>
-          </div>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">📋</div>
-              <div class="training-doc-title">Whole Life Insurance</div>
-              <div class="training-doc-meta">Permanent Protection</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What it is</h4>
-              <p>Whole life is permanent coverage that lasts a lifetime. It builds guaranteed cash value over time that the policyholder can borrow against. Premiums are fixed and never increase. The death benefit is guaranteed as long as premiums are paid.</p>
-              <h4>Who it's for</h4>
-              <ul><li>Final expense and burial planning (smaller policies $5K–$25K)</li><li>Parents buying for children to lock in low rates early</li><li>High-income earners using it as a tax-advantaged savings vehicle</li><li>Business succession planning</li></ul>
-              <h4>Key selling points</h4>
-              <ul><li>Coverage never expires — guaranteed for life</li><li>Cash value grows tax-deferred</li><li>Fixed premiums — no surprises</li><li>Dividends (participating policies) can increase cash value or reduce premiums</li></ul>
-              <h4>Sales Psychology</h4>
-              <p>Whole life sells on permanence and certainty. Use the phrase: <em>"Term is renting, whole life is owning."</em> Clients who have had term expire appreciate this. For final expense, make it emotional: <em>"This covers your funeral so your family only has to grieve — not worry about money."</em></p>
-            </div>
-          </div>
+              <h4>Term Life Insurance</h4>
+              <p>Term life provides a death benefit for a set period — typically 10, 20, or 30 years. The most affordable and straightforward product. If the insured passes during the term, the beneficiary receives the face amount tax-free.</p>
+              <p><strong>Who it's for:</strong> Young families, homeowners with a mortgage, business owners, anyone who needs maximum coverage at the lowest cost.</p>
+              <p><strong>Key selling points:</strong> Lowest premium for highest death benefit. Simple to understand. Many carriers offer living benefits (critical/chronic illness riders) at no extra cost. Convertible term can upgrade to permanent later.</p>
+              <p><em>Sales psychology:</em> Lead with protection. "If something happened to you tomorrow, would your family be okay financially?" Anchor against monthly expenses — $250,000 coverage for less than a Netflix subscription per day.</p>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">📋</div>
-              <div class="training-doc-title">Indexed Universal Life (IUL)</div>
-              <div class="training-doc-meta">Premium Product · High Commission</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What it is</h4>
-              <p>IUL is a flexible permanent life insurance product where the cash value growth is tied to a stock market index (like the S&P 500) with a floor (typically 0%) so you never lose money in a down market, and a cap or participation rate on the upside. It offers tax-free growth and tax-free distributions in retirement.</p>
-              <h4>Who it's for</h4>
-              <ul><li>Business owners and high-income earners who have maxed their 401k/IRA</li><li>Clients who want market-like growth without market risk</li><li>People planning for tax-free retirement income</li><li>Parents funding a child's future tax-free</li></ul>
-              <h4>Key selling points</h4>
-              <ul><li>Zero floor — you never lose cash value when markets drop</li><li>Tax-free growth and distributions via policy loans</li><li>Flexible premiums and adjustable death benefit</li><li>Living benefits built in on most carriers</li><li>Not subject to 401k contribution limits</li></ul>
-              <h4>Sales Psychology</h4>
-              <p>IUL sells best as a <em>retirement and wealth tool first, life insurance second.</em> Ask: <em>"Would you like to have a bucket of money in retirement that you can pull from tax-free, that never loses value in a market crash, and also protects your family if something happens?"</em> The answer is always yes. Then connect it to their specific retirement concern.</p>
-              <h4>Common Objections</h4>
-              <ul><li><strong>"It sounds complicated"</strong> — Simplify: "It's like a savings account that grows with the market but has a safety net. You participate in the upside and are protected on the downside."</li><li><strong>"I already have a 401k"</strong> — "Great. This complements it by giving you tax diversification — your 401k is taxed on the way out, this is not."</li></ul>
-            </div>
-          </div>
+              <h4>Whole Life Insurance</h4>
+              <p>Permanent coverage that lasts a lifetime. Builds guaranteed cash value. Premiums are fixed and never increase.</p>
+              <p><strong>Who it's for:</strong> Final expense planning ($5K–$25K), parents locking in rates for children, high-income earners using it as a tax-advantaged savings vehicle, business succession planning.</p>
+              <p><em>Sales psychology:</em> Whole life sells on permanence and certainty. "Term is renting, whole life is owning." For final expense: "This covers your funeral so your family only has to grieve — not worry about money."</p>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">📋</div>
-              <div class="training-doc-title">Annuities</div>
-              <div class="training-doc-meta">Retirement Income</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What it is</h4>
-              <p>An annuity is a contract with an insurance carrier where a client deposits a lump sum and the carrier guarantees either growth, income, or both in return. Fixed Indexed Annuities (FIAs) are the most commonly sold — they offer index-linked growth with a floor of zero, and optional income riders that guarantee lifetime income.</p>
-              <h4>Types to know</h4>
-              <ul><li><strong>Fixed Annuity</strong> — Guaranteed interest rate, no market risk. Simple, predictable.</li><li><strong>Fixed Indexed Annuity (FIA)</strong> — Growth tied to index with 0% floor. Most popular for agents.</li><li><strong>Variable Annuity</strong> — Requires securities license. Avoid unless licensed.</li></ul>
-              <h4>Who it's for</h4>
-              <ul><li>Pre-retirees (age 50–65) rolling over 401k, IRA, or pension</li><li>Anyone afraid of outliving their money</li><li>Clients who want guaranteed income they cannot outlive</li></ul>
-              <h4>Sales Psychology</h4>
-              <p>Annuities solve the #1 retirement fear: <em>"I'm going to run out of money."</em> Position as a personal pension. Ask: <em>"What if I could show you a way to guarantee that you receive a paycheck every single month for the rest of your life — no matter how long you live — and you never have to worry about market crashes wiping it out?"</em></p>
+              <h4>Indexed Universal Life (IUL)</h4>
+              <p>Flexible permanent insurance where cash value growth ties to a stock market index (like S&amp;P 500) with a floor of 0% — you never lose money in a down market. Offers tax-free growth and tax-free distributions in retirement.</p>
+              <p><strong>Who it's for:</strong> Business owners and high-income earners who have maxed 401k/IRA, clients wanting market-like growth without market risk, people planning for tax-free retirement income.</p>
+              <p><em>Key points:</em> Zero floor. Tax-free growth and distributions via policy loans. Not subject to 401k contribution limits. Most carriers include living benefits.</p>
+
+              <h4>Final Expense &amp; Annuities</h4>
+              <p><strong>Final Expense:</strong> Simplified issue whole life for seniors (50–85). No medical exam. Designed to cover burial costs, debts, and end-of-life expenses. Face amounts $5,000–$35,000. Fast to issue, fast commission.</p>
+              <p><strong>Annuities:</strong> Contracts that guarantee income. Fixed annuities provide guaranteed interest. FIAs (Fixed Indexed Annuities) offer index-linked growth with no downside. Ideal for clients worried about outliving their money.</p>
+
+              <h4>The 5-Step Sales Process</h4>
+              <p><strong>Step 1 — Build Rapport:</strong> People buy from people they trust. Spend the first 2 minutes asking about them — their family, their goals, their concerns. Listen more than you talk.</p>
+              <p><strong>Step 2 — Fact Find:</strong> Uncover needs. "Do you have any life insurance currently?" "Who depends on your income?" "If something happened to you, what's your biggest concern for your family?"</p>
+              <p><strong>Step 3 — Present the Solution:</strong> Show one product that solves their specific problem. Don't overwhelm with options. Tie the solution back to what they told you in the fact find.</p>
+              <p><strong>Step 4 — Handle Objections:</strong> Every objection is a request for more information. "I need to think about it" = they're not convinced yet. Ask: "What specifically would you want to think about?" Then address that one thing.</p>
+              <p><strong>Step 5 — Close:</strong> Assume the sale. "Based on everything we've discussed, the best fit for your family is the 20-year term at $X/month. Let's get your application started." Then be quiet and let them respond.</p>
+
+              <h4>B.O.L.T. — Know Your Client Type</h4>
+              <p><strong>Bull:</strong> Confident, assertive, results-driven. Don't waste their time. Get to the point fast. Present numbers and facts. They respect directness.</p>
+              <p><strong>Owl:</strong> Analytical, detail-oriented, skeptical. Give them data, comparisons, and proof. Don't rush them. Answer every question thoroughly.</p>
+              <p><strong>Lamb:</strong> Warm, relationship-driven, avoidant of conflict. Build trust first. Speak slowly and reassuringly. They need to feel safe before they buy.</p>
+              <p><strong>Tiger:</strong> Enthusiastic, big picture, fast mover. Match their energy. Show them the vision. They decide quickly but can change their mind — get the application in fast.</p>
+
+              <h4>Sales Psychology &amp; Objection Handling</h4>
+              <p><strong>"I'll think about it"</strong> — "What specifically would you want to think about?" Address that one concern directly.</p>
+              <p><strong>"It's too expensive"</strong> — Reframe to daily cost. $500K policy might be $28/month — less than a dinner out.</p>
+              <p><strong>"I have coverage through work"</strong> — "Group coverage ends when you leave. Is that a risk you're comfortable with?"</p>
+              <p><strong>"I need to talk to my spouse"</strong> — "Absolutely. Would they be able to jump on a quick call right now so we can all go over this together?"</p>
+              <p><strong>"Let me do some research"</strong> — "What specifically are you looking to research? I may be able to answer that right now and save you time."</p>
+
+              <h4>Carrier Benefits Guide</h4>
+              <p>Know your carriers. Understanding each carrier's strengths, GI qualifications, and ideal client profile separates a good agent from a great one.</p>
+              <div id="carrierTrainingList"></div>
+
+              <h4>Writing Good Business &amp; Avoiding Chargebacks</h4>
+              <p><strong>What is a chargeback?</strong> A chargeback occurs when a policy lapses within the advance period (typically 9 months). The carrier claws back the commission advance, creating a debt to your agency.</p>
+              <p><strong>Prevention tips:</strong> Only write policies clients can genuinely afford. Set draft dates that align with their payday. Send a welcome call 30 days after issue. Always confirm the client has received and understood their policy.</p>
+              <p><strong>Persistency:</strong> Your persistency rate (policies still active after 13 months) is the single most important metric after AP. Below 70% triggers review. Above 85% earns you better contract levels.</p>
             </div>
           </div>
         </div>
 
-        <!-- 5-STEP CLOSE -->
-        <div class="dash-section" style="margin-bottom:1.5rem;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">The 5-Step Sales Process</div>
-          <p style="font-size:0.78rem;color:var(--gray);margin-bottom:1.2rem;line-height:1.7;">Master this process and every appointment becomes consistent, professional, and closable. Click each step to expand.</p>
-
+        <!-- CHAPTER 2 -->
+        <div class="dash-section" style="margin-bottom:1.2rem;">
           <div class="training-doc">
             <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--gold);">1</div>
-              <div class="training-doc-title">Introduction — Build Rapport &amp; Credibility</div>
-              <div class="training-doc-meta">Match energy · Build trust</div>
+              <div class="training-doc-icon">💡</div>
+              <div style="flex:1;"><div class="training-doc-title">Chapter 2 — Mastery: Product Knowledge, Confidence & Roleplay</div><div class="training-doc-meta">Deep Product Knowledge · Confidence Building · Practice Drills</div></div>
               <div class="training-doc-chevron">▾</div>
             </div>
             <div class="training-doc-body">
-              <p>People buy from people they trust. Sales is a transference of energy — your belief, your confidence, and your enthusiasm transfer directly to the client. Match their energy first, then lead them.</p>
-              <ul>
-                <li>Greet warmly and use their first name naturally</li>
-                <li><strong>Match the client's energy:</strong> Relaxed? Be relaxed. Direct? Be direct. People trust people who feel like them</li>
-                <li><strong>Credibility building:</strong> Mention LLFG as an FMO with access to top carriers — Mutual of Omaha, Transamerica, Aetna. You represent multiple divisions so you find the best rate for their situation</li>
-                <li><strong>Carrier partners:</strong> Name 2–3 recognizable carriers. Clients feel reassured by household names</li>
-                <li><strong>Insurance division:</strong> Explain you work across life, health, and retirement — you can address multiple needs</li>
-                <li><strong>Overpayments alert:</strong> <em>"One of the first things I do is check whether you're overpaying for coverage you already have."</em> Positions you as an advisor, not a salesperson</li>
-                <li><strong>High-risk health class alerts:</strong> Let clients know you work with carriers who specialize in conditions like diabetes, heart issues, or tobacco use — many clients have been declined or overcharged elsewhere</li>
-                <li>Smile, be present, and listen more than you talk</li>
-              </ul>
-            </div>
-          </div>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--gold);">2</div>
-              <div class="training-doc-title">Fact Finder — Discover Coverage Needs &amp; Budget</div>
-              <div class="training-doc-meta">Diagnose before you prescribe</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <p>This is the most important step. You cannot prescribe before you diagnose. Ask questions, listen carefully, and take notes.</p>
-              <ul>
-                <li><strong>Coverage questions:</strong> Do they have current coverage? When does it expire? What does it cover?</li>
-                <li><strong>Family/income questions:</strong> Who depends on you financially? What debts need to be paid?</li>
-                <li><strong>Goal questions:</strong> Protecting family? Building wealth? Planning retirement?</li>
-                <li><strong>Budget anchoring:</strong> <em>"Most clients invest between $80–$200/month. Does that feel like a range that works?"</em></li>
-                <li>Use what they share to match the product — don't sell, match</li>
-              </ul>
-            </div>
-          </div>
+              <h4>The Importance of Deep Product Knowledge</h4>
+              <p>Confidence comes from competence. The agents who close the most are not the most charismatic — they're the ones who know their products cold. When you know exactly what you're selling, objections stop feeling like threats and start feeling like opportunities to educate.</p>
+              <p>Study each carrier's underwriting guidelines, living benefit riders, conversion options, and ideal client profile. Know the difference between a participating and non-participating whole life policy. Know when to recommend a GUL vs a 30-year term. Mastery of product is what lets you customize — and customization is what closes deals.</p>
+              <p><strong>Daily study habit:</strong> Spend 15–20 minutes each morning reviewing one product or one carrier. Read carrier product guides, watch underwriting webinars, and shadow experienced agents presenting products you haven't sold yet.</p>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--gold);">3</div>
-              <div class="training-doc-title">Application — SSN, Medical Underwriting &amp; Banking</div>
-              <div class="training-doc-meta">Accuracy protects your commission</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <p>Guide them through the application professionally. Keep the energy positive — this is not bureaucracy, this is protecting their family.</p>
-              <ul>
-                <li><strong>Personal info:</strong> Full legal name, DOB, address, phone, email</li>
-                <li><strong>Social Security Number:</strong> Required by the carrier for identity verification and underwriting</li>
-                <li><strong>Medical underwriting:</strong> Tobacco, height, weight, health conditions, medications. Frame it as the carrier wanting to find the best rate for their health class</li>
-                <li><strong>Banking info:</strong> Routing and account number. <em>"Most clients prefer the 1st or 15th — which works better?"</em> <strong>⚠ Social Security clients:</strong> They receive payment on the 3rd — always draft the 5th or 6th so funds have cleared</li>
-                <li><strong>Beneficiary:</strong> Full name, relationship, DOB, percentage split if multiple</li>
-                <li>Read all information back before submitting — one wrong digit causes a chargeback</li>
-              </ul>
-            </div>
-          </div>
+              <h4>Confidence Building</h4>
+              <p><strong>Confidence is a skill, not a trait.</strong> It is built through repetition, preparation, and action — not through waiting until you "feel ready." You will never feel 100% ready. Act anyway.</p>
+              <p><strong>The identity shift:</strong> Stop saying "I'm new to this." Start saying "I'm a licensed insurance professional helping families protect what matters most." The words you use to describe yourself shape how clients perceive you — and how you perform.</p>
+              <p><strong>Preparation rituals:</strong> Before every call, review the client's profile, know their likely product fit, and anticipate the top two objections you'll face. Rehearse your opening 30 seconds until it flows naturally. Confidence comes from knowing you are prepared for whatever comes next.</p>
+              <p><strong>Post-call review:</strong> After every call — win or lose — ask yourself three questions: What went well? What would I do differently? What's one thing I can apply on my next call? Agents who review their performance consistently improve 3–5x faster than those who don't.</p>
 
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--gold);">4</div>
-              <div class="training-doc-title">Close — Thank, Ask for Referrals &amp; Set Policy Expectations</div>
-              <div class="training-doc-meta">Solidify the relationship</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <p>The application is in. Now solidify the relationship, plant seeds for referrals, and prepare the client for what comes next.</p>
-              <ul>
-                <li><strong>Thank them sincerely:</strong> <em>"I genuinely appreciate you trusting me with something this important."</em></li>
-                <li><strong>Ask for referrals:</strong> <em>"Who else do you know — a family member, coworker, or close friend — who would benefit from a conversation like this?"</em></li>
-                <li><strong>Policy cancellation window:</strong> Explain the free-look period (usually 30 days). If they need to cancel they can do so at no cost — knowing this actually makes them less likely to use it</li>
-                <li>Confirm first draft date and what will appear on their bank statement</li>
-                <li>Leave them feeling confident and cared for — not sold to</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;color:var(--gold);">5</div>
-              <div class="training-doc-title">Follow-Up — Referrals, Retention &amp; Next Check-In</div>
-              <div class="training-doc-meta">Where most agents fail — be the one who doesn't</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <p>The sale doesn't end at the close. Your follow-up determines whether you keep the client long-term and whether they refer others to you.</p>
-              <ul>
-                <li><strong>48-hour call:</strong> Confirm policy was submitted, answer questions, check in on how they're feeling</li>
-                <li><strong>Policy delivery call:</strong> Walk them through what they received — coverage amounts, beneficiary, draft date</li>
-                <li><strong>Ask for referrals again:</strong> <em>"Now that your policy is in place, have you thought of anyone who might benefit from getting covered too?"</em></li>
-                <li><strong>Cancellation watch:</strong> Monitor for NSF or missed drafts — call the same day if a payment fails. Don't wait for the carrier to lapse the policy</li>
-                <li><strong>Next check-in:</strong> <em>"I'd like to check in in about 6 months to make sure your coverage still makes sense as life changes."</em> Opens doors for additional products</li>
-                <li>Send a handwritten thank-you card or personal message within a week</li>
-              </ul>
+              <h4>Roleplay Drills — Practice Until It's Natural</h4>
+              <p>The best athletes in the world practice more than they play. Insurance sales is no different. Roleplay is the practice field. Every cringe-worthy roleplay session is a call you won't fumble in front of a real client.</p>
+              <p><strong>Drill 1 — The 30-Second Opening:</strong> Partner A plays the prospect. Partner B has 30 seconds to build rapport, state their purpose, and earn the right to continue. Rotate until it sounds completely natural.</p>
+              <p><strong>Drill 2 — The Hard Objection Gauntlet:</strong> Partner A fires 5 consecutive objections. Partner B must respond without stumbling. Classic objections: "I'm not interested," "I can't afford it," "I already have coverage," "I need to think about it," "I need to talk to my spouse."</p>
+              <p><strong>Drill 3 — The Close:</strong> Practice asking for the sale out loud. Most agents who don't close are simply afraid to ask. Say these words until they feel comfortable: "Based on what we've discussed, I think [Product] is the right fit. Let's get your application started today."</p>
+              <p><strong>Drill 4 — The Fact Find:</strong> Practice your needs analysis questions until they flow like a conversation, not a checklist. The more natural your fact find feels, the more the client opens up — and the more information you have to customize your solution.</p>
+              <p><strong>Drill 5 — Carrier Pitch:</strong> For each of your top 5 carriers, practice a 60-second pitch explaining why that carrier is the right fit for a specific client type. Know it cold.</p>
             </div>
           </div>
         </div>
 
-        <!-- SALES PSYCHOLOGY -->
-        <div class="dash-section">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Sales Psychology Fundamentals</div>
-
+        <!-- CHAPTER 3 -->
+        <div class="dash-section" style="margin-bottom:1.2rem;">
           <div class="training-doc">
             <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">🧠</div>
-              <div class="training-doc-title">The Psychology of Buying Decisions</div>
-              <div class="training-doc-meta">Core Concept</div>
+              <div class="training-doc-icon">🔥</div>
+              <div style="flex:1;"><div class="training-doc-title">Chapter 3 — Becoming Elite: Shadowing, Resilience & The Power of One More</div><div class="training-doc-meta">Shadowing · Industry Mindset · Staying Resilient · One More</div></div>
               <div class="training-doc-chevron">▾</div>
             </div>
             <div class="training-doc-body">
-              <h4>People buy emotionally, justify logically</h4>
-              <p>The decision to buy insurance is never purely rational. It is driven by fear (what if something happens?), love (protecting the people I care about), and identity (I am someone who is responsible). Your job is to connect the product to those emotions first — then provide the logical justification they need to feel good about the decision.</p>
-              <h4>The Pain-Pleasure Framework</h4>
-              <p>Every purchase is either moving toward pleasure or away from pain. Insurance leans heavily toward pain avoidance. Surface their pain: financial stress on family, debt left behind, funeral costs, lost income. Then position the policy as the specific solution that removes that pain permanently.</p>
-              <h4>Trust before persuasion</h4>
-              <p>People do not buy from people they don't trust. Spend more time building genuine rapport in the first 5 minutes of every appointment than on any pitch. Ask about their family, listen carefully, mirror their language, and never rush. Once trust exists, the sale becomes a conversation instead of a presentation.</p>
-              <h4>Urgency without pressure</h4>
-              <p>Real urgency comes from truth: rates increase with age, health can change without warning, and no one is guaranteed tomorrow. You don't need to manufacture pressure — just be honest. <em>"The rate you qualify for today is based on your health today. If that changes, so does the rate. The best time to lock this in is now."</em></p>
-              <h4>The takeaway close</h4>
-              <p>If a client is hesitant, instead of pushing harder, pull back slightly: <em>"It sounds like this might not be the right time for you — I understand completely. I just want to make sure you're protected. What would need to be true for you to feel comfortable moving forward?"</em> This removes pressure and invites them to tell you their real objection.</p>
+
+              <h4>Shadowing &amp; Becoming a Sponge</h4>
+              <p>The fastest path to mastery is proximity to excellence. Find the top producers in your organization and study them obsessively. How do they open calls? How do they handle silence? How do they present options? How do they close without pressure?</p>
+              <p><strong>How to shadow effectively:</strong> Don't just listen — take notes on exact phrasing, timing, and tone. After the call, debrief with the person you shadowed. Ask: "Why did you say it that way?" "What were you reading in the client at that moment?" Understand the reasoning behind the words.</p>
+              <p><strong>Be a sponge in every environment:</strong> Industry podcasts (Ed Mylett, Andy Elliott, Grant Cardone). Books (The One Thing, Go-Giver, Way of the Wolf by Jordan Belfort). Carrier webinars. National producer conferences. LinkedIn communities. The agents who consume more information consistently become the agents who produce more results.</p>
+              <p><strong>The 90-day immersion:</strong> Treat your first 90 days as a full-time education. Your only job is to learn as much as humanly possible — about products, people, and your own selling style. Write business aggressively and review every interaction. In 90 days of true immersion, you can compress what most agents take 2 years to learn.</p>
+
+              <h4>Staying Resilient</h4>
+              <p>Rejection in insurance sales is not personal — it is statistical. For every 10 people you speak to, 3 will be interested, 1.5 will apply, and 1 will issue. That means 9 out of 10 conversations end in no. Elite agents have made peace with this ratio. They don't chase every no; they move to the next yes.</p>
+              <p><strong>The resilience framework:</strong></p>
+              <p><strong>1. Normalize the no.</strong> Every no is one step closer to a yes. Track your no's with pride — they represent conversations you had the courage to have.</p>
+              <p><strong>2. Control what you control.</strong> You cannot control whether someone buys. You can control your activity, your preparation, and your attitude. Focus exclusively on inputs — number of calls, number of presentations, number of applications submitted.</p>
+              <p><strong>3. Reframe failure as data.</strong> Every lost sale contains information. What objection ended the conversation? What could you have done differently? Was this a prospect problem or a skills gap? Use every loss to sharpen your skills.</p>
+              <p><strong>4. Protect your mindset.</strong> Limit exposure to negativity. Surround yourself with producers, not complainers. Your mental environment shapes your performance more than any technique ever will.</p>
+              <p><strong>5. Have a reset ritual.</strong> When you have a rough day, have a physical ritual to reset — a 10-minute walk, a workout, a review of your wins. Don't carry yesterday's losses into today's calls.</p>
+
+              <h4>The Power of One More</h4>
+              <p>This concept is simple and life-changing: whatever you think your limit is, do one more. One more call. One more presentation. One more follow-up. One more hour of practice.</p>
+              <p>The magic is not in the one more itself — it is in what it does to your identity. Every time you do one more than you thought you could, you prove to yourself that your limits are negotiable. You expand what you believe is possible. And what you believe is possible determines everything.</p>
+              <p><strong>Apply it daily:</strong> Set a daily activity goal. When you hit it, do one more. When the conversation gets uncomfortable, stay one more second. When you want to hang up, ask one more question. When you want to stop prospecting, make one more call.</p>
+              <p><strong>The compound effect of one more:</strong> If you make one more call per day, that's 250 extra calls per year. At a 10% conversion rate, that's 25 extra appointments. At a 50% close rate from appointments, that's 12 extra policies. At an average AP of $3,000, that's $36,000 in additional annual premium — from one more call per day.</p>
+              <p>Ed Mylett says it best: champions are made in the moments when they want to quit but don't. The power of one more is the difference between average and exceptional. Choose exceptional, every single day.</p>
             </div>
           </div>
-        </div>
-
-        <!-- B.O.L.T. -->
-        <div class="dash-section">
-          <div class="dash-section-title" style="margin-bottom:1rem;">B.O.L.T. — Client Personality Framework</div>
-          <p style="font-size:0.78rem;color:var(--gray);line-height:1.8;margin-bottom:1.2rem;"><strong style="color:var(--cream);">B.O.L.T.</strong> stands for <strong style="color:var(--gold);">Bulls, Owls, Lambs, and Tigers</strong> — a framework for identifying a client's personality and communication style so you can adapt your approach in real time. The most successful agents are chameleons: they read the room, mirror the client's style, and adjust their energy, pace, and language accordingly. One size never fits all in sales.</p>
-
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="background:rgba(220,50,50,0.1);border-color:rgba(220,50,50,0.3);color:#e05555;">🐂</div>
-              <div class="training-doc-title">B — Bull</div>
-              <div class="training-doc-meta" style="color:#e05555;">Direct · Dominant · Results-Driven</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>Who they are</h4>
-              <p>Bulls are decisive, confident, and results-oriented. They don't want to waste time and they don't want to be over-explained to. They make decisions quickly and respect people who are equally direct. They are often business owners, executives, or anyone accustomed to being in charge.</p>
-              <h4>How to spot them</h4>
-              <ul><li>They speak fast and get to the point quickly</li><li>They may interrupt or finish your sentences</li><li>They ask direct questions: "What's this going to cost me?" or "How does this work — bottom line?"</li><li>They project authority and confidence in their posture and tone</li></ul>
-              <h4>How to sell to a Bull</h4>
-              <ul><li>Be direct and confident — do not over-explain or ramble</li><li>Lead with the bottom line: what it costs, what they get, and why it makes sense now</li><li>Skip the small talk unless they initiate it — respect their time</li><li>Present options but make a clear recommendation: <em>"Here's what I recommend for your situation and why."</em></li><li>Use data and logic — ROI, cost-per-day, coverage to premium ratio</li><li>Never be soft or apologetic — match their confidence level</li></ul>
-              <h4>What to avoid</h4>
-              <p>Do not repeat yourself, hedge, or be vague. Bulls lose patience with agents who seem unsure. If they push back, hold your ground respectfully — they actually respect people who don't cave immediately.</p>
-            </div>
-          </div>
-
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:var(--gold);">🦉</div>
-              <div class="training-doc-title">O — Owl</div>
-              <div class="training-doc-meta" style="color:var(--gold);">Analytical · Detail-Oriented · Methodical</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>Who they are</h4>
-              <p>Owls are thinkers. They want to understand everything before making a decision. They ask detailed questions, want documentation, and may take notes. They are often engineers, accountants, doctors, or anyone with an analytical mindset. They make excellent clients once sold — they rarely cancel because they've thoroughly researched and committed.</p>
-              <h4>How to spot them</h4>
-              <ul><li>They ask very specific, detailed questions: carrier ratings, exclusions, policy language</li><li>They speak slowly and deliberately</li><li>They may say "I need to think about it" or "Can I see the policy details?"</li><li>They are not impulsive — they weigh everything carefully</li></ul>
-              <h4>How to sell to an Owl</h4>
-              <ul><li>Slow down and match their pace — do not rush</li><li>Give them data: AM Best ratings, carrier history, sample illustrations</li><li>Explain the "why" behind every recommendation</li><li>Offer to send documents, product sheets, or carrier information for review</li><li>Acknowledge their questions positively: <em>"That's a great question — here's exactly how that works."</em></li><li>Build in a natural next step: <em>"Let me put together the details and we can review them together."</em></li></ul>
-              <h4>What to avoid</h4>
-              <p>Never pressure an Owl. Rushing them will cause them to shut down entirely. Be patient — their thoroughness means once they commit, they stay committed.</p>
-            </div>
-          </div>
-
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="background:rgba(110,207,110,0.1);border-color:rgba(110,207,110,0.3);color:#6ecf6e;">🐑</div>
-              <div class="training-doc-title">L — Lamb</div>
-              <div class="training-doc-meta" style="color:#6ecf6e;">Gentle · People-Pleasing · Relationship-First</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>Who they are</h4>
-              <p>Lambs are warm, friendly, and relationship-driven. They want to like you before they do business with you. They are empathetic, non-confrontational, and may agree with you even when they have reservations — which is why follow-through is essential. They are often caregivers, teachers, or people who make decisions based on how something feels emotionally.</p>
-              <h4>How to spot them</h4>
-              <ul><li>Very friendly, warm, and easy to talk to from the start</li><li>They ask personal questions and want to know about you</li><li>They say yes easily — but may back out later if they feel unsure</li><li>They are motivated by protecting their family and being responsible</li></ul>
-              <h4>How to sell to a Lamb</h4>
-              <ul><li>Invest in genuine rapport — this is not optional with a Lamb</li><li>Lead with the emotional story: family protection, legacy, peace of mind</li><li>Use testimonials or personal examples: <em>"I had a client in a similar situation — here's what they did."</em></li><li>Validate their feelings and concerns warmly throughout</li><li>Make it easy and comfortable: <em>"I'll walk you through every step — you don't need to worry about anything."</em></li><li>Follow up promptly and personally — they value the relationship</li></ul>
-              <h4>What to avoid</h4>
-              <p>Do not be high-pressure. Lambs will smile, say yes, and then call to cancel the next day if they felt pushed. The key is genuine care — they can sense inauthenticity immediately. Build the relationship first; the sale follows naturally.</p>
-            </div>
-          </div>
-
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="background:rgba(110,168,254,0.1);border-color:rgba(110,168,254,0.3);color:#6ea8fe;">🐯</div>
-              <div class="training-doc-title">T — Tiger</div>
-              <div class="training-doc-meta" style="color:#6ea8fe;">Expressive · Enthusiastic · Social</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>Who they are</h4>
-              <p>Tigers are energetic, expressive, and love people. They are talkers, storytellers, and often the life of the room. They make decisions based on excitement and connection rather than pure logic. They love new ideas and possibilities. They are often entrepreneurs, salespeople, entertainers, or anyone in a high-energy social role.</p>
-              <h4>How to spot them</h4>
-              <ul><li>They dominate the conversation enthusiastically</li><li>They tell stories and go off topic — and they love when you engage with them</li><li>They are expressive with their hands, voice, and energy</li><li>They get excited easily but may not follow through without a structured close</li></ul>
-              <h4>How to sell to a Tiger</h4>
-              <ul><li>Match their energy — be enthusiastic, expressive, and engaging</li><li>Let them talk and genuinely listen — they love being heard</li><li>Sell the vision and the story, not just the features: <em>"Imagine knowing your family is completely taken care of no matter what happens."</em></li><li>Make them feel special and understood</li><li>Use urgency tied to excitement: <em>"The rate you qualify for right now is excellent — let's lock it in today."</em></li><li>Guide them firmly to the close — Tigers can get distracted by conversation</li></ul>
-              <h4>What to avoid</h4>
-              <p>Don't be boring or overly technical. Tigers will tune out fast if the energy drops. Keep it dynamic, keep it personal, and make sure you direct the conversation back to the close — otherwise you'll have a great conversation and no sale.</p>
-            </div>
-          </div>
-
-          <div class="training-doc" style="border-color:rgba(201,168,76,0.25);">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon" style="background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold);">🦎</div>
-              <div class="training-doc-title">Be the Chameleon</div>
-              <div class="training-doc-meta" style="color:var(--gold);">The Master Sales Principle</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What it means</h4>
-              <p>A chameleon adapts its environment to survive and thrive. The best agents in this industry do exactly the same thing. You are not one personality — you are a professional who can read any room and become what that client needs you to be in order to serve them best.</p>
-              <h4>How to develop it</h4>
-              <ul>
-                <li><strong>Listen in the first 60 seconds:</strong> Before you say almost anything, listen to how they speak. Fast or slow? Warm or direct? Detailed or broad? That tells you almost everything about how to proceed</li>
-                <li><strong>Mirror their pace:</strong> If they speak slowly, slow down. If they're quick, pick up your pace. Pace mismatch is one of the most common reasons clients disengage without knowing why</li>
-                <li><strong>Mirror their language:</strong> Use the words they use. If they say "protect my family," use "protect your family" back — not "provide a death benefit." Their language, not yours</li>
-                <li><strong>Adjust mid-conversation:</strong> Clients aren't always purely one type. A Bull may become a Lamb when you bring up their kids. An Owl may relax into a Tiger once rapport is built. Stay flexible and keep reading the signals</li>
-                <li><strong>Never lose yourself:</strong> Being a chameleon is about connection, not manipulation. Your core values, integrity, and professionalism stay constant. Only your style adapts</li>
-              </ul>
-              <h4>The golden rule</h4>
-              <p style="color:var(--cream);font-style:italic;">"People don't care how much you know until they know how much you care." The chameleon principle is ultimately about genuine empathy — meeting people where they are so they feel truly understood. That is what separates the top 1% from everyone else.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- WRITING GOOD BUSINESS -->
-        <div class="dash-section" style="margin-bottom:1.5rem;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Writing Good Business &amp; Avoiding Chargebacks</div>
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">✅</div>
-              <div class="training-doc-title">Writing Good Business</div>
-              <div class="training-doc-meta">Quality over Quantity</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What is "good business"?</h4>
-              <p>Good business means policies that are accurately written, properly underwritten, and most importantly — that stay on the books. A placed policy that cancels within 9 months creates a chargeback. Your goal is not just to write policies, but to write policies that stick.</p>
-              <h4>Accuracy in the application</h4>
-              <ul>
-                <li>Never guess on health information — ask every question on the application thoroughly</li>
-                <li>If a client has a condition, find the right carrier for that condition</li>
-                <li>Record the correct banking information. Verify routing and account number before submitting — one digit wrong causes NSF and chargeback</li>
-                <li>Confirm the draft date fits the client's pay schedule — Social Security clients always draft on the 5th or 6th</li>
-                <li>Ensure the client understands what they're buying, what they're paying, and when it drafts</li>
-              </ul>
-              <h4>Setting expectations</h4>
-              <ul>
-                <li>Tell the client what happens next — when they'll receive the policy, when the first draft happens, and what to expect on their bank statement</li>
-                <li>Clients who are surprised by their first draft are far more likely to cancel. Eliminate surprises</li>
-                <li>Explain the free-look period — knowing they have an out actually makes them less likely to use it</li>
-              </ul>
-              <h4>Book of Business discipline</h4>
-              <ul>
-                <li>Track every policy number, carrier, draft date, and premium in your Book of Business in this portal</li>
-                <li>Review your book monthly — flag policies approaching their 9-month mark that might be at risk</li>
-                <li>Reach out proactively to clients before renewals and at key life milestones</li>
-              </ul>
-            </div>
-          </div>
-          <div class="training-doc">
-            <div class="training-doc-header" onclick="toggleDoc(this)">
-              <div class="training-doc-icon">⚠️</div>
-              <div class="training-doc-title">Understanding &amp; Avoiding Chargebacks</div>
-              <div class="training-doc-meta">Protect Your Income</div>
-              <div class="training-doc-chevron">▾</div>
-            </div>
-            <div class="training-doc-body">
-              <h4>What is a chargeback?</h4>
-              <p>A chargeback occurs when a policy cancels within the advance period (usually 9–12 months). Since you were paid an advance commission upfront, the carrier claws back a prorated amount. A single chargeback can wipe out weeks of income.</p>
-              <h4>Common causes</h4>
-              <ul>
-                <li><strong>NSF / failed draft:</strong> Wrong banking information. The most common cause — always verify twice</li>
-                <li><strong>Buyer's remorse:</strong> Client didn't fully understand what they bought</li>
-                <li><strong>No follow-up:</strong> Agent disappears after the sale. Stay in touch</li>
-                <li><strong>Wrong product:</strong> Client was sold something they didn't need or couldn't afford</li>
-                <li><strong>Carrier rescission:</strong> Inaccurate health information on the application</li>
-              </ul>
-              <h4>How to avoid chargebacks</h4>
-              <ul>
-                <li>Verify banking info on every application — read it back to the client</li>
-                <li>Call within 48 hours to confirm welcome letter received</li>
-                <li>Call again when the first draft hits — proactively</li>
-                <li>If a draft fails, call the same day. Offer to update banking immediately</li>
-                <li>Build genuine relationships — clients who like you don't cancel on you</li>
-                <li>Never misrepresent a product, premium, or coverage terms</li>
-              </ul>
-              <h4>If a chargeback happens</h4>
-              <p>Contact the carrier immediately. Some carriers allow policy replacement if the client re-enrolls. If it's a banking issue, resubmit with corrected info. Act fast — most chargebacks can be resolved if caught early.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARRIER BENEFITS -->
-        <div class="dash-section" style="margin-bottom:1.5rem;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Carrier Benefits &amp; Product Guide</div>
-          <p style="font-size:0.78rem;color:var(--gray);margin-bottom:1rem;line-height:1.7;">Know your carriers. Understanding each carrier's strengths, GI qualifications, and ideal client profile is what separates a good agent from a great one.</p>
-          <div id="carrierTrainingList"></div>
         </div>
 
         <!-- MANAGER TRAINING -->
-        <div class="dash-section training-manager-only" style="margin-bottom:1.5rem;display:none;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Manager Training — Leadership &amp; Team Development</div>
+        <div class="dash-section training-manager-only" style="margin-bottom:1.2rem;display:none;">
           <div class="training-doc">
             <div class="training-doc-header" onclick="toggleDoc(this)">
               <div class="training-doc-icon">👑</div>
-              <div class="training-doc-title">How to Become a True Leader</div>
-              <div class="training-doc-meta">Manager Tier</div>
+              <div style="flex:1;"><div class="training-doc-title">Manager Training — Building a High-Level Producing Team, LLC Formation &amp; Licensing</div><div class="training-doc-meta">Leadership · Team Building · LLC Steps · Licensing</div></div>
               <div class="training-doc-chevron">▾</div>
             </div>
             <div class="training-doc-body">
-              <h4>Leadership vs. Management</h4>
-              <p>Management is a title. Leadership is earned. Your agents don't work for you — they work with you. Your job is to create an environment where they can succeed, and to show them daily why success is possible.</p>
-              <h4>Lead by example</h4>
-              <ul><li>Your agents watch everything you do. If you're not writing business, neither will they</li><li>Be the first one on the phones and the last one to make excuses</li><li>Share your wins and losses with equal transparency — authenticity builds trust faster than success</li></ul>
-              <h4>Seek to understand first</h4>
-              <ul><li>When an agent is struggling, ask questions before offering solutions. <em>"What's getting in your way right now?"</em></li><li>Every agent has a different motivation. Know what drives each person personally</li><li>Active listening is your most powerful leadership tool</li></ul>
-              <h4>Inspiration and incentives</h4>
-              <ul><li>Money motivates short-term. Purpose motivates long-term. Connect your team's work to the bigger mission</li><li>Celebrate publicly, coach privately</li><li>Create a culture of celebration — leaderboards, daily wins in team chat, shout-outs for first sales</li><li>Tie incentives to activity, not just results. Reward the behaviors that produce results</li></ul>
-              <h4>Catering your message to each agent</h4>
-              <ul><li>Apply the BOLT framework to your team — your Bull agents need direct feedback, your Lamb agents need encouragement</li><li>Have individual weekly check-ins — one-on-one time shows agents they matter individually</li><li>Adapt your coaching to where each agent is in their journey. A new agent needs step-by-step guidance; a 6-month agent needs challenge and accountability</li></ul>
+
+              <h4>The Importance of Building a High-Level Producing Team</h4>
+              <p>Your income as a manager is no longer solely determined by your own production — it is determined by the collective output of your team multiplied by your override. A team of 10 agents each writing $10,000 AP/month generates $100,000 in team AP. At a 10% override, that's $10,000/month in passive override income — on top of your personal production.</p>
+              <p>The managers who build empires understand one truth: your ceiling is the average production of your team. Raise the floor of every agent on your team and your ceiling rises with it.</p>
+
+              <h4>Steps to Building a High-Level Producing Team</h4>
+              <p><strong>Step 1 — Recruit with Standards:</strong> Not everyone is a fit. Look for coachability, work ethic, and hunger — not experience. Experience can be taught. Attitude cannot. Recruit from your sphere of influence: former coworkers, social media followers, referrals from current agents.</p>
+              <p><strong>Step 2 — Onboard Systematically:</strong> Every new agent should go through the same structured first 30 days. Week 1: licensing and product knowledge. Week 2: shadowing and roleplay. Week 3: supervised calls. Week 4: first independent presentations. Don't skip steps.</p>
+              <p><strong>Step 3 — Daily Accountability:</strong> Hold a brief daily team huddle (10–15 min). Each agent reports: calls made yesterday, presentations scheduled, policies submitted. Public accountability drives activity. Activity drives results.</p>
+              <p><strong>Step 4 — Coach Individually:</strong> One-on-one weekly check-ins with each agent. Review their metrics. Identify the one skill holding them back most. Focus that week's coaching on that one thing. Progress is made one improvement at a time.</p>
+              <p><strong>Step 5 — Celebrate and Compete:</strong> Create a culture of winning. Post leaderboards. Celebrate first sales publicly. Run weekly mini-competitions (most calls, most presentations, most AP written). Competition and recognition are the most powerful free motivators available.</p>
+              <p><strong>Step 6 — Identify and Develop Leaders:</strong> Find the 1–2 agents who consistently outperform. Invest disproportionately in them. Teach them the manager skillset. Your job is to replace yourself — the best team builders build other team builders.</p>
+              <p><strong>Step 7 — Retain Your Top Producers:</strong> Retention is the hidden key to long-term income. Check in regularly. Know what motivates each agent personally. Solve problems before they become reasons to quit. A top agent who leaves takes their production and their downline with them.</p>
+
+              <h4>How to Form an LLC</h4>
+              <p>As you scale your business, forming an LLC (Limited Liability Company) protects your personal assets and creates tax advantages. Here are the general steps (requirements vary by state):</p>
+              <p><strong>Step 1 — Choose a Business Name:</strong> Your LLC name must be unique in your state. Search your state's Secretary of State database to confirm availability. Most agents use their name or a team brand (e.g., "Parenza Financial Group LLC").</p>
+              <p><strong>Step 2 — File Articles of Organization:</strong> Submit your Articles of Organization (sometimes called Certificate of Formation) to your state's Secretary of State. Filing fees range from $50–$500 depending on state. Can typically be done online in 1–3 business days.</p>
+              <p><strong>Step 3 — Create an Operating Agreement:</strong> An operating agreement outlines how your LLC is managed, profit distributions, and member responsibilities. Not always required by law but essential for protecting your interests — especially if you have partners.</p>
+              <p><strong>Step 4 — Get an EIN:</strong> Apply for a free Employer Identification Number (EIN) from the IRS at irs.gov/businesses/small-businesses. Takes 10 minutes online. Needed to open a business bank account and pay business taxes.</p>
+              <p><strong>Step 5 — Open a Business Bank Account:</strong> Keep business and personal finances completely separate. This is critical for liability protection and tax clarity. Use your EIN and LLC formation documents to open the account.</p>
+              <p><strong>Step 6 — Register for State Taxes:</strong> Depending on your state, you may need to register for state income tax, sales tax, or business privilege tax. Check your state's Department of Revenue website.</p>
+              <p><strong>Step 7 — Annual Maintenance:</strong> Most states require annual reports and fees to keep your LLC in good standing. Set a calendar reminder — missing your annual report can result in your LLC being dissolved.</p>
+
+              <h4>Acquiring Your Insurance Licenses</h4>
+              <p><strong>Life &amp; Health License (Required):</strong> Your foundation license. Required to sell life insurance, annuities, and health products in your resident state. Most states require 20–40 hours of pre-licensing education, a state exam via Pearson VUE or PSI, and a background check.</p>
+              <p><strong>Non-Resident Licenses:</strong> To sell in states other than your home state, you need non-resident licenses. Most states honor reciprocity — once licensed in one state, non-resident applications are streamlined. Apply through NIPR.com for most states.</p>
+              <p><strong>Series 6 / Series 63 (Optional — Securities):</strong> Required if you want to sell variable products (variable life, variable annuities). Regulated by FINRA. Requires passing the SIE exam plus the Series 6 exam. Opens access to higher-commission variable product lines.</p>
+              <p><strong>License Maintenance:</strong> Most states require 24 hours of continuing education (CE) every 2 years. Track your CE deadlines carefully — a lapsed license creates a gap in your ability to write business and can affect your career record.</p>
             </div>
           </div>
         </div>
 
         <!-- EXECUTIVE TRAINING -->
-        <div class="dash-section training-executive-only" style="margin-bottom:1.5rem;display:none;">
-          <div class="dash-section-title" style="margin-bottom:1rem;">Executive Training — Scaling &amp; Operations</div>
+        <div class="dash-section training-executive-only" style="margin-bottom:1.2rem;display:none;">
           <div class="training-doc">
             <div class="training-doc-header" onclick="toggleDoc(this)">
               <div class="training-doc-icon">📊</div>
-              <div class="training-doc-title">Metric Performance &amp; Business Forecasting</div>
-              <div class="training-doc-meta">Executive Tier</div>
+              <div style="flex:1;"><div class="training-doc-title">Executive Training — Metric Performance, Scaling &amp; Operations</div><div class="training-doc-meta">Executive Tier · Business Forecasting · Multi-State Expansion</div></div>
               <div class="training-doc-chevron">▾</div>
             </div>
             <div class="training-doc-body">
-              <h4>Key metrics every executive tracks</h4>
-              <ul>
-                <li><strong>Issued AP:</strong> Total annualized premium of placed policies</li>
-                <li><strong>Placement rate:</strong> Below 70% signals underwriting or application quality issues</li>
-                <li><strong>Persistency rate:</strong> Policies still active after 13 months. 80%+ is industry standard</li>
-                <li><strong>Agent activity ratio:</strong> How many agents wrote business this week vs total contracted. Healthy ratio is 60%+</li>
-                <li><strong>Recruiting pipeline:</strong> New agents submitted, approved, contracted, and actively writing</li>
-              </ul>
-              <h4>Forecasting your business</h4>
-              <ul><li>Set monthly AP targets for each team and track weekly progress</li><li>Build a 90-day rolling forecast — know what's in the pipeline, what's placed, and what's at chargeback risk</li><li>Use persistency data to predict chargeback exposure and protect your commission income</li></ul>
-              <h4>Scaling to other states</h4>
-              <ul><li>Research non-resident license requirements for your target states — most require a non-resident application and fees</li><li>Identify high-opportunity markets: states with aging populations, low insurance penetration</li><li>Build virtual sales systems before expanding — if you can't manage agents remotely, scaling creates chaos</li><li>Contract agents who are already resident-licensed in target states</li></ul>
-              <h4>Recruiting agencies &amp; downline executives</h4>
-              <ul><li>The most scalable move is recruiting agents who want to build teams, not just write business</li><li>Position LLFG as an ownership stake — they build their book, their team, and their legacy</li><li>Target insurance professionals frustrated with their current FMO's support, commission levels, or culture</li><li>Create a systematic onboarding process so every new agent gets the same high-quality experience from day one</li></ul>
+              <h4>Key Metrics Every Executive Tracks</h4>
+              <ul><li><strong>Issued AP:</strong> Total annualized premium of placed policies</li><li><strong>Placement rate:</strong> Below 70% signals underwriting or application quality issues</li><li><strong>Persistency rate:</strong> Policies active after 13 months. 80%+ is industry standard</li><li><strong>Agent activity ratio:</strong> Agents who wrote business this week vs total contracted. 60%+ is healthy</li><li><strong>Recruiting pipeline:</strong> New agents submitted, approved, contracted, and actively writing</li></ul>
+              <h4>Forecasting Your Business</h4>
+              <ul><li>Set monthly AP targets for each team and track weekly progress</li><li>Build a 90-day rolling forecast — know what is in the pipeline, placed, and at chargeback risk</li><li>Use persistency data to predict chargeback exposure and protect commission income</li></ul>
+              <h4>Scaling to Other States</h4>
+              <ul><li>Research non-resident license requirements for target states</li><li>Identify high-opportunity markets: states with aging populations, low insurance penetration</li><li>Build virtual sales systems before expanding — manage agents remotely with documented processes</li><li>Contract agents who are already resident-licensed in target states</li></ul>
+              <h4>Recruiting Executives and Downline Agencies</h4>
+              <ul><li>The most scalable move is recruiting agents who want to build teams</li><li>Position LLFG as an ownership stake — they build their book, their team, their legacy</li><li>Target insurance professionals frustrated with their current FMO's support or commission levels</li><li>Create systematic onboarding so every new agent gets the same high-quality experience from day one</li></ul>
             </div>
           </div>
         </div>
@@ -3788,7 +3631,11 @@
               <!-- Hidden title field auto-set from role -->
               <input type="hidden" id="bcTitle" value="Licensed Insurance Agent"/>
               <button class="modal-btn" onclick="downloadBizCardPDF()" style="width:100%;margin-top:0.4rem;padding:1rem;">⬇ Download PDF</button>
-              <p style="font-size:0.62rem;color:var(--gray);text-align:center;line-height:1.5;">Opens a print-ready page · File → Print → Save as PDF</p>
+              <button class="modal-btn" onclick="downloadAppleWallet()" style="width:100%;margin-top:0.5rem;padding:1rem;background:rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                Add to Apple Wallet
+              </button>
+              <p style="font-size:0.62rem;color:var(--gray);text-align:center;line-height:1.5;margin-top:0.4rem;">PDF: File → Print → Save as PDF<br>Wallet: Opens a .pkpass compatible card</p>
             </div>
           </div>
 
@@ -3818,14 +3665,20 @@
                   <div style="position:absolute;inset:0;padding:1.4rem 1.6rem 1rem 1.8rem;display:flex;flex-direction:column;justify-content:space-between;">
                     <!-- Top: Logo -->
                     <div style="display:flex;align-items:center;justify-content:space-between;">
-                      <div>
-                        <div style="font-family:'Cinzel',serif;font-size:0.55rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase;line-height:1.2;">Legacy Life</div>
-                        <div style="font-size:0.42rem;letter-spacing:0.2em;color:rgba(201,168,76,0.45);text-transform:uppercase;">Financial Group</div>
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        <!-- LLFG Logo Mark -->
+                        <div style="width:26px;height:26px;position:relative;flex-shrink:0;">
+                          <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="20,2 38,11 38,29 20,38 2,29 2,11" fill="none" stroke="#c9a84c" stroke-width="2"/>
+                            <polygon points="20,7 33,14 33,26 20,33 7,26 7,14" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
+                            <text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text>
+                          </svg>
+                        </div>
+                        <div>
+                          <div style="font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;line-height:1.2;">Legacy Life</div>
+                          <div style="font-size:0.38rem;letter-spacing:0.18em;color:rgba(201,168,76,0.45);text-transform:uppercase;">Financial Group</div>
+                        </div>
                       </div>
-                      <svg width="20" height="20" viewBox="0 0 28 28" fill="none" style="opacity:0.5;flex-shrink:0;">
-                        <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-                        <polygon points="14,6 22,10 22,18 14,22 6,18 6,10" stroke="rgba(201,168,76,0.3)" stroke-width="0.8" fill="none"/>
-                      </svg>
                     </div>
                     <!-- Middle: Name + Title -->
                     <div>
@@ -3869,6 +3722,138 @@
       </div>
     </div>
 
+    <!-- TAB: REPORTS -->
+    <div class="admin-tab-content" id="ptab-reports">
+      <div class="dash-body">
+        <div class="dash-welcome">
+          <h2>Organization <em>Reports</em></h2>
+          <p>Download detailed PDF reports for any time period — team AP, performance, onboarding, retention, and more.</p>
+        </div>
+
+        <!-- Period selector -->
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <div style="font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);">Report Period:</div>
+          <div style="display:flex;gap:0.4rem;">
+            <button onclick="setReportPeriod('weekly',this)"   class="report-period-btn active">Weekly</button>
+            <button onclick="setReportPeriod('monthly',this)"  class="report-period-btn">Monthly</button>
+            <button onclick="setReportPeriod('quarterly',this)"class="report-period-btn">Quarterly</button>
+            <button onclick="setReportPeriod('yearly',this)"   class="report-period-btn">Yearly</button>
+          </div>
+          <div style="font-size:0.68rem;color:var(--gray);" id="reportPeriodLabel">Week of Mar 24 – Mar 28, 2026</div>
+        </div>
+
+        <!-- Report Cards Grid -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;" id="reportCardsGrid">
+
+          <!-- Team AP Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(201,168,76,0.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📊</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Team AP Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Annual premium by team &amp; agent</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Total AP written, per-agent breakdown, team rankings, and AP growth vs prior period.</div>
+            <button onclick="downloadReport('ap')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Performance Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(110,207,110,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🏆</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Performance Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Agent rankings &amp; comp levels</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Leaderboard, comp percentages, top producers, activity ratios, and goals vs actuals.</div>
+            <button onclick="downloadReport('performance')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Onboarding Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(110,168,254,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🚀</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Onboarding Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">New agents &amp; pipeline status</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Applications submitted, approved, contracted, licensed — full recruiting pipeline with status tracking.</div>
+            <button onclick="downloadReport('onboarding')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Retention Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(192,132,252,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🔒</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Retention Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Persistency &amp; policy retention</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Persistency rates, chargeback exposure, policy lapse analysis, and at-risk policy flags per agent.</div>
+            <button onclick="downloadReport('retention')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Commission Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(201,168,76,0.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">💰</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Commission Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Earnings &amp; advanced pay</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Per-agent commission breakdown, advanced pay totals, comp levels, override earnings, and debt exposure.</div>
+            <button onclick="downloadReport('commission')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Chargeback Risk Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(224,85,85,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">⚠️</div>
+              <div>
+                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Chargeback Risk Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Debt &amp; chargeback exposure</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Agents at chargeback risk, debt rollup by team, projected exposure, and recommendations for at-risk policies.</div>
+            <button onclick="downloadReport('chargeback')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          </div>
+
+          <!-- Full Organization Report -->
+          <div class="dash-card" style="padding:1.2rem;cursor:default;border-color:rgba(201,168,76,0.4);grid-column:1/-1;">
+            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
+              <div style="width:36px;height:36px;background:rgba(201,168,76,0.18);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📋</div>
+              <div>
+                <div style="font-size:0.82rem;font-weight:600;color:var(--gold);">Full Organization Report</div>
+                <div style="font-size:0.6rem;color:var(--gray);">All metrics combined — AP, performance, onboarding, retention, commissions, chargeback risk</div>
+              </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">The complete picture of your organization in one downloadable document. Includes all teams, all agents, all metrics for the selected period.</div>
+            <button onclick="downloadReport('full')" class="modal-btn" style="width:auto;padding:0.8rem 2rem;font-size:0.72rem;">⬇ Download Full Organization Report</button>
+          </div>
+
+        </div>
+
+        <!-- Quick Summary Table -->
+        <div class="dash-section">
+          <div class="dash-section-title">Period Summary <span id="reportSummaryPeriodLabel" style="font-size:0.62rem;color:var(--gray);font-weight:400;"></span></div>
+          <div style="overflow-x:auto;">
+            <table class="app-table" style="min-width:700px;" id="reportSummaryTable">
+              <thead>
+                <tr><th>Team</th><th>Total AP</th><th>Agents Active</th><th>Persistency</th><th>Chargeback %</th><th>Retention</th><th>Debt Risk</th></tr>
+              </thead>
+              <tbody id="reportSummaryBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- TAB: COMMISSIONS -->
     <div class="admin-tab-content" id="ptab-commissions">
       <div class="dash-body">
@@ -3878,11 +3863,11 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="dash-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;" id="commSummaryCards">
-          <div class="dash-card"><div class="dash-card-label">Total AP Written</div><div class="dash-card-value" id="cTotalAP">$0</div><div class="dash-card-sub">All time</div></div>
-          <div class="dash-card"><div class="dash-card-label">Total Advanced Pay</div><div class="dash-card-value" id="cTotalAdv" style="color:var(--gold-light);">$0</div><div class="dash-card-sub">9-month advance</div></div>
-          <div class="dash-card"><div class="dash-card-label">My Commission %</div><div class="dash-card-value" id="cCommPct" style="color:var(--gold);">—</div><div class="dash-card-sub">Current comp level</div></div>
-          <div class="dash-card"><div class="dash-card-label">Net Earnings</div><div class="dash-card-value" id="cNetEarnings" style="color:#6ecf6e;">$0</div><div class="dash-card-sub">After advance calc</div></div>
+        <div class="dash-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem;gap:0.6rem;" id="commSummaryCards">
+          <div class="dash-card" style="padding:0.7rem 0.9rem;"><div class="dash-card-label" style="font-size:0.52rem;">Total AP Written</div><div class="dash-card-value" id="cTotalAP" style="font-size:1.3rem;">$0</div><div class="dash-card-sub" style="font-size:0.55rem;">All time</div></div>
+          <div class="dash-card" style="padding:0.7rem 0.9rem;"><div class="dash-card-label" style="font-size:0.52rem;">Total Advanced Pay</div><div class="dash-card-value" id="cTotalAdv" style="color:var(--gold-light);font-size:1.3rem;">$0</div><div class="dash-card-sub" style="font-size:0.55rem;">9-month advance</div></div>
+          <div class="dash-card" style="padding:0.7rem 0.9rem;"><div class="dash-card-label" style="font-size:0.52rem;">My Commission %</div><div class="dash-card-value" id="cCommPct" style="color:var(--gold);font-size:1.3rem;">—</div><div class="dash-card-sub" style="font-size:0.55rem;">Current comp level</div></div>
+          <div class="dash-card" style="padding:0.7rem 0.9rem;"><div class="dash-card-label" style="font-size:0.52rem;">Net Earnings</div><div class="dash-card-value" id="cNetEarnings" style="color:#6ecf6e;font-size:1.3rem;">$0</div><div class="dash-card-sub" style="font-size:0.55rem;">After advance calc</div></div>
         </div>
 
         <div class="dash-sections" id="commTabSections">
@@ -4079,99 +4064,53 @@
             </div>
           </div>
 
-          <!-- COL 2: iPHONE MOCKUP PREVIEW -->
+          <!-- COL 2: MODERN EMAIL PREVIEW -->
           <div class="dash-section" style="padding:0;overflow:hidden;">
             <div style="background:rgba(201,168,76,0.06);border-bottom:1px solid rgba(201,168,76,0.12);padding:0.7rem 1.2rem;display:flex;align-items:center;gap:0.5rem;">
-              <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);">Client View — iPhone Preview</span>
+              <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);">Client Email Preview</span>
               <span style="font-size:0.6rem;color:var(--gray);margin-left:auto;" id="dfPreviewTo">To: —</span>
             </div>
-            <div style="display:flex;justify-content:center;align-items:flex-start;padding:1.5rem;background:#0a0a0a;min-height:520px;">
-              <!-- iPhone frame -->
-              <div style="
-                width:260px;height:520px;
-                background:#1a1a1a;
-                border-radius:40px;
-                border:8px solid #2a2a2a;
-                box-shadow:0 0 0 2px #333,0 20px 60px rgba(0,0,0,0.8),inset 0 0 0 1px #444;
-                position:relative;overflow:hidden;
-                display:flex;flex-direction:column;
-                flex-shrink:0;
-              ">
-                <!-- Notch -->
-                <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:24px;background:#1a1a1a;border-radius:0 0 16px 16px;z-index:10;display:flex;align-items:center;justify-content:center;gap:6px;">
-                  <div style="width:8px;height:8px;background:#111;border-radius:50%;"></div>
-                  <div style="width:40px;height:6px;background:#111;border-radius:3px;"></div>
+            <!-- Modern email client mockup -->
+            <div style="background:#f5f5f5;font-family:'Helvetica Neue',Arial,sans-serif;min-height:520px;display:flex;flex-direction:column;">
+              <!-- Email client chrome bar -->
+              <div style="background:#fff;border-bottom:1px solid #e5e5e5;padding:0;">
+                <!-- Top toolbar -->
+                <div style="display:flex;align-items:center;gap:0.5rem;padding:8px 12px;border-bottom:1px solid #f0f0f0;">
+                  <div style="display:flex;gap:4px;">
+                    <div style="width:10px;height:10px;background:#ff5f56;border-radius:50%;"></div>
+                    <div style="width:10px;height:10px;background:#ffbd2e;border-radius:50%;"></div>
+                    <div style="width:10px;height:10px;background:#27c93f;border-radius:50%;"></div>
+                  </div>
+                  <div style="flex:1;background:#f5f5f5;border-radius:4px;padding:4px 10px;font-size:10px;color:#999;text-align:center;">✉ New Message</div>
                 </div>
-                <!-- Status bar -->
-                <div style="padding:28px 16px 6px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
-                  <span style="font-size:9px;color:#fff;font-weight:600;font-family:sans-serif;">9:41</span>
-                  <div style="display:flex;gap:4px;align-items:center;">
-                    <svg width="12" height="8" viewBox="0 0 12 8"><rect x="0" y="2" width="2" height="6" rx="1" fill="#fff"/><rect x="3" y="1" width="2" height="7" rx="1" fill="#fff"/><rect x="6" y="0" width="2" height="8" rx="1" fill="#fff"/><rect x="9" y="3" width="2" height="5" rx="1" fill="rgba(255,255,255,0.3)"/></svg>
-                    <svg width="14" height="10" viewBox="0 0 14 10"><rect x="1" y="2" width="10" height="7" rx="1.5" stroke="#fff" stroke-width="1" fill="none"/><rect x="2" y="3" width="7" height="5" rx="1" fill="#fff"/><rect x="11.5" y="4" width="2" height="3" rx="1" fill="rgba(255,255,255,0.5)"/></svg>
+                <!-- Email header fields -->
+                <div style="padding:0 12px;">
+                  <div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:11px;color:#999;width:44px;flex-shrink:0;">From:</span>
+                    <span style="font-size:11px;color:#1a73e8;font-weight:500;" id="prevFrom"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="701117151e04301c1c16175e0503">[email&#160;protected]</a></span>
                   </div>
-                </div>
-                <!-- Messages app header -->
-                <div style="background:#1c1c1e;padding:8px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="width:28px;height:28px;background:linear-gradient(135deg,#c9a84c,#8b6914);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;font-family:sans-serif;flex-shrink:0;" id="iphoneAgentInit">JD</div>
-                    <div>
-                      <div style="font-size:11px;font-weight:600;color:#fff;font-family:sans-serif;" id="iphoneAgentName">Your Name</div>
-                      <div style="font-size:9px;color:#8e8e93;font-family:sans-serif;">text message</div>
-                    </div>
+                  <div style="display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:11px;color:#999;width:44px;flex-shrink:0;">To:</span>
+                    <span style="font-size:11px;color:#333;" id="prevTo">—</span>
                   </div>
-                </div>
-                <!-- Messages thread -->
-                <div style="flex:1;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:6px;background:#000;">
-                  <!-- Agent's text message bubble -->
-                  <div style="display:flex;justify-content:flex-end;">
-                    <div style="max-width:78%;background:#0a84ff;border-radius:16px 16px 4px 16px;padding:8px 11px;">
-                      <div style="font-size:10px;color:#fff;font-family:sans-serif;line-height:1.45;" id="iphoneMsgText">Hey! I need some info from you to get your policy started. Please fill out this quick secure form when you get a chance 🔒</div>
-                    </div>
+                  <div style="display:flex;align-items:center;padding:7px 0;">
+                    <span style="font-size:11px;color:#999;width:44px;flex-shrink:0;">Subject:</span>
+                    <span style="font-size:11px;color:#333;font-weight:600;" id="prevSubject">Action Required: Policy Information Update</span>
                   </div>
-                  <!-- Secure link preview card -->
-                  <div style="display:flex;justify-content:flex-end;">
-                    <div style="max-width:85%;background:#1c1c1e;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;">
-                      <!-- Link preview header -->
-                      <div style="background:linear-gradient(135deg,#0d0d0d,#1a1109);padding:10px 12px;">
-                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                          <div style="width:16px;height:16px;background:linear-gradient(135deg,#c9a84c,#8b6914);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <svg width="9" height="9" viewBox="0 0 28 28" fill="none"><polygon points="14,2 26,8 26,20 14,26 2,20 2,8" stroke="#fff" stroke-width="2" fill="none"/></svg>
-                          </div>
-                          <span style="font-size:8px;color:#c9a84c;font-family:sans-serif;letter-spacing:1px;text-transform:uppercase;font-weight:600;">llfg.us</span>
-                        </div>
-                        <div style="font-size:10px;color:#fff;font-weight:600;font-family:sans-serif;margin-bottom:2px;">🔒 Secure Policy Verification</div>
-                        <div style="font-size:9px;color:rgba(255,255,255,0.55);font-family:sans-serif;line-height:1.4;">Your personal information is encrypted and secure. This link expires in 7 days.</div>
-                      </div>
-                      <!-- Link URL bar -->
-                      <div style="background:#0a0a0a;padding:6px 10px;display:flex;align-items:center;gap:5px;">
-                        <svg width="8" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="13" rx="2" stroke="#0a84ff" stroke-width="2" fill="none"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#0a84ff" stroke-width="2" fill="none"/></svg>
-                        <span style="font-size:8px;color:#0a84ff;font-family:sans-serif;" id="iphoneLinkPreview">llfg.us/secure-form?ref=••••••</span>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Time stamp -->
-                  <div style="text-align:center;"><span style="font-size:8px;color:#8e8e93;font-family:sans-serif;">Delivered</span></div>
-                </div>
-                <!-- iMessage input bar -->
-                <div style="background:#1c1c1e;padding:8px 10px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                  <div style="flex:1;background:#2c2c2e;border-radius:16px;padding:6px 10px;">
-                    <span style="font-size:9px;color:#8e8e93;font-family:sans-serif;">iMessage</span>
-                  </div>
-                  <div style="width:22px;height:22px;background:#0a84ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><path d="M2 12l20-9-9 20-2-9-9-2z"/></svg>
-                  </div>
-                </div>
-                <!-- Home bar -->
-                <div style="padding:6px;display:flex;justify-content:center;background:#000;">
-                  <div style="width:100px;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;"></div>
                 </div>
               </div>
+              <!-- Email body -->
+              <div style="flex:1;overflow-y:auto;background:#fff;border-top:3px solid #c9a84c;" id="emailPreviewBody">
+                <div style="padding:20px 24px;color:#666;font-style:italic;font-size:12px;">Fill in the form to preview the secure email.</div>
+              </div>
+              <div style="background:#f5f5f5;border-top:1px solid #e5e5e5;padding:6px 12px;">
+                <span style="font-size:9px;color:#bbb;letter-spacing:0.5px;">LEGACY LIFE FINANCIAL GROUP · SECURE · ENCRYPTED</span>
+                <span style="font-size:9px;color:#bbb;float:right;" id="prevDate"></span>
+              </div>
             </div>
-            <!-- Hidden legacy preview elements (still needed by JS) -->
+            <!-- Hidden elements still needed by JS -->
             <div style="display:none;" id="emailPreviewOuter">
-              <div id="prevFrom"></div><div id="prevTo"></div>
-              <div id="prevSubject"></div><div id="prevDate"></div>
-              <div id="emailPreviewBody"></div>
+              <div id="prevFromHidden"></div>
             </div>
           </div>
 
@@ -4962,10 +4901,28 @@
 
   </div><!-- end admin dashboard -->
 
-  <script type="text/javascript">
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+    // ─── Application Type Toggle ───
+    window.switchApplyType = function(type) {
+      const agentForm = document.getElementById('applyForm');
+      const ownerForm = document.getElementById('ownerForm');
+      const agentBtn  = document.getElementById('applyTypeAgent');
+      const ownerBtn  = document.getElementById('applyTypeOwner');
+      if (type === 'agent') {
+        agentForm.style.display = '';
+        ownerForm.style.display = 'none';
+        agentBtn.style.background = 'var(--gold)'; agentBtn.style.color = 'var(--black)';
+        ownerBtn.style.background = 'transparent'; ownerBtn.style.color = 'var(--gold)';
+      } else {
+        agentForm.style.display = 'none';
+        ownerForm.style.display = '';
+        ownerBtn.style.background = 'var(--gold)'; ownerBtn.style.color = 'var(--black)';
+        agentBtn.style.background = 'transparent'; agentBtn.style.color = 'var(--gold)';
+      }
+    };
+
     function handleSubmit(e) {
       e.preventDefault();
-
       const fname    = document.getElementById('fname').value;
       const lname    = document.getElementById('lname').value;
       const email    = document.getElementById('email').value;
@@ -4974,8 +4931,13 @@
       const exp      = document.getElementById('experience').value;
       const licensed = document.getElementById('licensed').value;
       const goal     = document.getElementById('goal').value;
-      const referral = document.getElementById('referral').value;
+      const referral = document.getElementById('referral').value.trim();
       const message  = document.getElementById('message').value;
+
+      // Route to referral agent or to managing partner
+      const routingNote = referral
+        ? `Referred by: ${referral} — Route this application directly to that agent.`
+        : `No referral provided — assign to a Managing Partner for interview and onboarding.`;
 
       const subject = encodeURIComponent(`New Agent Application — ${fname} ${lname}`);
       const body = encodeURIComponent(
@@ -4988,20 +4950,61 @@ State:        ${state}
 Experience:   ${exp}
 Licensed:     ${licensed}
 Income Goal:  ${goal}
-Referral:     ${referral || 'Not provided'}
+Referral:     ${referral || 'None'}
+
+ROUTING: ${routingNote}
 
 Message:
 ${message}`
       );
-
-      window.location.href = `mailto:contact\u0040llfg.us?subject=${subject}&body=${body}`;
-
+      window.location.href = `mailto:lorenzoparenza\u0040llfg.us?subject=${subject}&body=${body}`;
       const btn = e.target.querySelector('button[type="submit"]');
       btn.textContent = 'Application Submitted ✓';
-      btn.style.background = '#2a5c2a';
-      btn.style.color = '#fff';
-      btn.disabled = true;
+      btn.style.background = '#2a5c2a'; btn.style.color = '#fff'; btn.disabled = true;
     }
+
+    window.handleOwnerSubmit = function(e) {
+      e.preventDefault();
+      const first    = document.getElementById('ownerFirst').value;
+      const last     = document.getElementById('ownerLast').value;
+      const email    = document.getElementById('ownerEmail').value;
+      const phone    = document.getElementById('ownerPhone').value;
+      const agency   = document.getElementById('ownerAgency').value;
+      const state    = document.getElementById('ownerState').value;
+      const agents   = document.getElementById('ownerAgents').value;
+      const ap       = document.getElementById('ownerAP').value;
+      const carriers = document.getElementById('ownerCarriers').value;
+      const referral = document.getElementById('ownerReferral').value.trim();
+      const goal     = document.getElementById('ownerGoal').value;
+
+      const routingNote = referral
+        ? `Referred by LLFG agent: ${referral} — Coordinate onboarding with that agent.`
+        : `No referral — assign to Managing Partner for interview and onboarding.`;
+
+      const subject = encodeURIComponent(`Agency Owner Application — ${first} ${last} (${agency})`);
+      const body = encodeURIComponent(
+`Agency Owner Partnership Application
+=====================================
+Name:          ${first} ${last}
+Agency:        ${agency}
+Email:         ${email}
+Phone:         ${phone}
+States:        ${state}
+Agents:        ${agents}
+Monthly AP:    ${ap}
+Carriers:      ${carriers || 'Not listed'}
+Referral:      ${referral || 'None'}
+
+ROUTING: ${routingNote}
+
+Goals:
+${goal}`
+      );
+      window.location.href = `mailto:lorenzoparenza\u0040llfg.us?subject=${subject}&body=${body}`;
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Agency Application Submitted ✓';
+      btn.style.background = '#2a5c2a'; btn.style.color = '#fff'; btn.disabled = true;
+    };
 
     // ─── Admin Tabs ───
     window.__R_showAdminTab = window.showAdminTab = function(tab, el) {
@@ -5853,20 +5856,22 @@ Legacy Life Financial Group`
     let runtimePermissions = {};
 
     const ROLE_TABS = {
-      financial_advisor: ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
-      manager:           ['overview','deals','training','addagents','agentapprovals','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      executive:         ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','commissions'],
-      managing_partner:  ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
-      admin:             ['overview','deals','training','addagents','agentapprovals','contracting','applications','bizcard','calendar','messages','dataforms','commreq','permissions','commissions'],
-      agent:             ['overview','deals','training','addagents','bizcard','calendar','messages','dataforms','commissions'],
+      financial_advisor: ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','commissions'],
+      manager:           ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      executive:         ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      managing_partner:  ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      admin:             ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','management','commissions'],
+      agent:             ['overview','deals','training','recruiting','bizcard','calendar','messages','dataforms','commissions'],
     };
 
     const TAB_LABELS = {
       overview:'Overview', deals:'My Deals', training:'Training',
+      recruiting:'Recruiting ▾', management:'Management ▾',
       addagents:'Add Agents', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
       applications:'Applications', bizcard:'Business Card', calendar:'Calendar',
       messages:'Messages', dataforms:'Data Collection',
       commreq:'Commission Request', permissions:'Permissions', commissions:'Commissions',
+      teammetrics:'Team Metrics', downlineclients:'All Clients',
     };
 
     const ROLE_DISPLAY = {
@@ -6116,27 +6121,271 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
     // ─── Quote of the Day ───
     const QUOTES = [
-      { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-      { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-      { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-      { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
-      { text: "The harder the conflict, the more glorious the triumph.", author: "Thomas Paine" },
-      { text: "Your income is directly related to your philosophy, not the economy.", author: "Jim Rohn" },
-      { text: "Every no gets me closer to a yes.", author: "Sales Proverb" },
-      { text: "It's not about having the right opportunities. It's about handling the opportunities right.", author: "Mark Hunter" },
-      { text: "The difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack of will.", author: "Vince Lombardi" },
-      { text: "Champions aren't made in gyms. Champions are made from something they have deep inside them — a desire, a dream, a vision.", author: "Muhammad Ali" },
-      { text: "Go as far as you can see; when you get there, you'll be able to see further.", author: "J.P. Morgan" },
-      { text: "The best investment you can make is in yourself.", author: "Warren Buffett" },
-      { text: "Work like there is someone working 24 hours a day to take it away from you.", author: "Mark Cuban" },
-      { text: "Excellence is not a destination; it is a continuous journey that never ends.", author: "Brian Tracy" },
-      { text: "Your attitude, not your aptitude, will determine your altitude.", author: "Zig Ziglar" },
+      {text:"Success is not final, failure is not fatal: it is the courage to continue that counts.",author:"Winston Churchill"},
+      {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
+      {text:"Your income is directly related to your philosophy, not the economy.",author:"Jim Rohn"},
+      {text:"You miss 100% of the shots you don't take.",author:"Wayne Gretzky"},
+      {text:"The harder the conflict, the more glorious the triumph.",author:"Thomas Paine"},
+      {text:"Don't watch the clock; do what it does. Keep going.",author:"Sam Levenson"},
+      {text:"Every no gets me closer to a yes.",author:"Sales Proverb"},
+      {text:"It's not about having the right opportunities. It's about handling the opportunities right.",author:"Mark Hunter"},
+      {text:"The difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack of will.",author:"Vince Lombardi"},
+      {text:"Champions aren't made in gyms. Champions are made from something deep inside — a desire, a dream, a vision.",author:"Muhammad Ali"},
+      {text:"Go as far as you can see; when you get there, you'll be able to see further.",author:"J.P. Morgan"},
+      {text:"The best investment you can make is in yourself.",author:"Warren Buffett"},
+      {text:"Work like there is someone working 24 hours a day to take it away from you.",author:"Mark Cuban"},
+      {text:"Excellence is not a destination; it is a continuous journey that never ends.",author:"Brian Tracy"},
+      {text:"Your attitude, not your aptitude, will determine your altitude.",author:"Zig Ziglar"},
+      {text:"The only limit to our realization of tomorrow is our doubts of today.",author:"Franklin D. Roosevelt"},
+      {text:"Believe you can and you're halfway there.",author:"Theodore Roosevelt"},
+      {text:"Act as if what you do makes a difference. It does.",author:"William James"},
+      {text:"Success is walking from failure to failure with no loss of enthusiasm.",author:"Winston Churchill"},
+      {text:"I find that the harder I work, the more luck I seem to have.",author:"Thomas Jefferson"},
+      {text:"The future depends on what you do today.",author:"Mahatma Gandhi"},
+      {text:"An investment in knowledge pays the best interest.",author:"Benjamin Franklin"},
+      {text:"Life is what happens when you're busy making other plans.",author:"John Lennon"},
+      {text:"Opportunities don't happen. You create them.",author:"Chris Grosser"},
+      {text:"Don't be afraid to give up the good to go for the great.",author:"John D. Rockefeller"},
+      {text:"I wake up every morning and think to myself, how far can I push this company in the next 24 hours.",author:"Leah Busque"},
+      {text:"If you are not willing to risk the usual, you will have to settle for the ordinary.",author:"Jim Rohn"},
+      {text:"The most difficult thing is the decision to act. The rest is merely tenacity.",author:"Amelia Earhart"},
+      {text:"Every strike brings me closer to the next home run.",author:"Babe Ruth"},
+      {text:"Definiteness of purpose is the starting point of all achievement.",author:"W. Clement Stone"},
+      {text:"Life isn't about getting and having, it's about giving and being.",author:"Kevin Kruse"},
+      {text:"Strive not to be a success, but rather to be of value.",author:"Albert Einstein"},
+      {text:"Two roads diverged in a wood, and I took the one less traveled by.",author:"Robert Frost"},
+      {text:"The will to win, the desire to succeed, the urge to reach your full potential... these are the keys that will unlock the door to excellence.",author:"Confucius"},
+      {text:"Education is the most powerful weapon which you can use to change the world.",author:"Nelson Mandela"},
+      {text:"I didn't fail the test. I just found 100 ways to do it wrong.",author:"Benjamin Franklin"},
+      {text:"In the middle of every difficulty lies opportunity.",author:"Albert Einstein"},
+      {text:"The secret of success is to do the common thing uncommonly well.",author:"John D. Rockefeller Jr."},
+      {text:"I know the price of success: dedication, hard work and an unremitting devotion to the things you want to see happen.",author:"Frank Lloyd Wright"},
+      {text:"If you genuinely want something, don't wait for it — teach yourself to be impatient.",author:"Gurbaksh Chahal"},
+      {text:"If you don't design your own life plan, chances are you'll fall into someone else's plan.",author:"Jim Rohn"},
+      {text:"If you're going through hell, keep going.",author:"Winston Churchill"},
+      {text:"You don't have to be great to start, but you have to start to be great.",author:"Zig Ziglar"},
+      {text:"The only way to do great work is to love what you do.",author:"Steve Jobs"},
+      {text:"The function of leadership is to produce more leaders, not more followers.",author:"Ralph Nader"},
+      {text:"A real entrepreneur is somebody who has no safety net underneath them.",author:"Henry Kravis"},
+      {text:"The best reason to start an organization is to make meaning — to create a product or service to make the world a better place.",author:"Guy Kawasaki"},
+      {text:"The first step toward success is taken when you refuse to be a captive of the environment in which you first find yourself.",author:"Mark Caine"},
+      {text:"When I dare to be powerful, to use my strength in service of my vision, it becomes less and less important whether I am afraid.",author:"Audre Lorde"},
+      {text:"Failure is the condiment that gives success its flavor.",author:"Truman Capote"},
+      {text:"Vision without execution is just hallucination.",author:"Henry Ford"},
+      {text:"What seems to us as bitter trials are often blessings in disguise.",author:"Oscar Wilde"},
+      {text:"The road to success and the road to failure are almost exactly the same.",author:"Colin R. Davis"},
+      {text:"I believe every human has a finite number of heartbeats. I don't intend to waste any of mine.",author:"Neil Armstrong"},
+      {text:"You only live once, but if you do it right, once is enough.",author:"Mae West"},
+      {text:"Remember that not getting what you want is sometimes a wonderful stroke of luck.",author:"Dalai Lama"},
+      {text:"You become what you believe.",author:"Oprah Winfrey"},
+      {text:"The two most important days in your life are the day you are born and the day you find out why.",author:"Mark Twain"},
+      {text:"Whatever the mind of man can conceive and believe, it can achieve.",author:"Napoleon Hill"},
+      {text:"Twenty years from now you will be more disappointed by the things that you didn't do than by the ones you did do.",author:"Mark Twain"},
+      {text:"Life is not measured by the number of breaths we take, but by the moments that take our breath away.",author:"Maya Angelou"},
+      {text:"Happiness is not something readymade. It comes from your own actions.",author:"Dalai Lama"},
+      {text:"It does not matter how slowly you go as long as you do not stop.",author:"Confucius"},
+      {text:"Everything you've ever wanted is on the other side of fear.",author:"George Addair"},
+      {text:"Dream big and dare to fail.",author:"Norman Vaughan"},
+      {text:"You are never too old to set another goal or to dream a new dream.",author:"C.S. Lewis"},
+      {text:"To see what is right and not do it is a lack of courage.",author:"Confucius"},
+      {text:"The best time to plant a tree was 20 years ago. The second best time is now.",author:"Chinese Proverb"},
+      {text:"An unexamined life is not worth living.",author:"Socrates"},
+      {text:"Spread love everywhere you go. Let no one ever come to you without leaving happier.",author:"Mother Teresa"},
+      {text:"When you reach the end of your rope, tie a knot in it and hang on.",author:"Franklin D. Roosevelt"},
+      {text:"Always remember that you are absolutely unique. Just like everyone else.",author:"Margaret Mead"},
+      {text:"Don't judge each day by the harvest you reap but by the seeds that you plant.",author:"Robert Louis Stevenson"},
+      {text:"The only impossible journey is the one you never begin.",author:"Tony Robbins"},
+      {text:"In the end, it's not the years in your life that count. It's the life in your years.",author:"Abraham Lincoln"},
+      {text:"Never let the fear of striking out keep you from playing the game.",author:"Babe Ruth"},
+      {text:"Money and success don't change people; they merely amplify what is already there.",author:"Will Smith"},
+      {text:"Your time is limited, so don't waste it living someone else's life.",author:"Steve Jobs"},
+      {text:"Not how long, but how well you have lived is the main thing.",author:"Seneca"},
+      {text:"If life were predictable it would cease to be life, and be without flavor.",author:"Eleanor Roosevelt"},
+      {text:"If you look at what you have in life, you'll always have more.",author:"Oprah Winfrey"},
+      {text:"If you want to lift yourself up, lift up someone else.",author:"Booker T. Washington"},
+      {text:"I have been impressed with the urgency of doing. Knowing is not enough; we must apply.",author:"Leonardo da Vinci"},
+      {text:"Knowing is not enough; we must apply. Wishing is not enough; we must do.",author:"Johann Wolfgang von Goethe"},
+      {text:"Imagine your life is perfect in every respect; what would it look like?",author:"Brian Tracy"},
+      {text:"We become what we think about.",author:"Earl Nightingale"},
+      {text:"Twenty years from now you'll be more disappointed by the things you didn't do.",author:"H. Jackson Brown Jr."},
+      {text:"I am not a product of my circumstances. I am a product of my decisions.",author:"Stephen Covey"},
+      {text:"You can never cross the ocean until you have the courage to lose sight of the shore.",author:"Christopher Columbus"},
+      {text:"Either you run the day or the day runs you.",author:"Jim Rohn"},
+      {text:"Whether you think you can or think you can't, you're right.",author:"Henry Ford"},
+      {text:"The person who reads too little and works too much has no advantage over the person who can't read at all.",author:"Mark Twain"},
+      {text:"Too many of us are not living our dreams because we are living our fears.",author:"Les Brown"},
+      {text:"I have learned over the years that when one's mind is made up, this diminishes fear.",author:"Rosa Parks"},
+      {text:"You gain strength, courage and confidence by every experience in which you really stop to look fear in the face.",author:"Eleanor Roosevelt"},
+      {text:"The secret to living well and longer is: eat half, walk double, laugh triple and love without measure.",author:"Tibetan Proverb"},
+      {text:"I don't want to get to the end of my life and find that I have just lived the length of it. I want to have lived the width of it as well.",author:"Diane Ackerman"},
+      {text:"The mind is everything. What you think you become.",author:"Buddha"},
+      {text:"The best and most beautiful things in the world cannot be seen or even touched — they must be felt with the heart.",author:"Helen Keller"},
+      {text:"It is during our darkest moments that we must focus to see the light.",author:"Aristotle"},
+      {text:"Whoever is happy will make others happy too.",author:"Anne Frank"},
+      {text:"Do not go where the path may lead, go instead where there is no path and leave a trail.",author:"Ralph Waldo Emerson"},
+      {text:"You will face many defeats in life, but never let yourself be defeated.",author:"Maya Angelou"},
+      {text:"The greatest glory in living lies not in never falling, but in rising every time we fall.",author:"Nelson Mandela"},
+      {text:"In the long run, the sharpest weapon of all is a kind and gentle spirit.",author:"Anne Frank"},
+      {text:"When you arise in the morning think of what a privilege it is to be alive, to think, to enjoy, to love.",author:"Marcus Aurelius"},
+      {text:"Life is really simple, but we insist on making it complicated.",author:"Confucius"},
+      {text:"May you live all the days of your life.",author:"Jonathan Swift"},
+      {text:"Life is not a problem to be solved, but a reality to be experienced.",author:"Soren Kierkegaard"},
+      {text:"The journey of a thousand miles begins with one step.",author:"Lao Tzu"},
+      {text:"It is not the strongest of the species that survive, nor the most intelligent, but the one most responsive to change.",author:"Charles Darwin"},
+      {text:"You miss 100 percent of the shots you never take.",author:"Wayne Gretzky"},
+      {text:"If opportunity doesn't knock, build a door.",author:"Milton Berle"},
+      {text:"The only disability in life is a bad attitude.",author:"Scott Hamilton"},
+      {text:"In order to succeed, we must first believe that we can.",author:"Nikos Kazantzakis"},
+      {text:"A person who never made a mistake never tried anything new.",author:"Albert Einstein"},
+      {text:"The human capacity for burden is like bamboo — far more flexible than you'd ever believe at first glance.",author:"Jodi Picoult"},
+      {text:"Challenges are what make life interesting and overcoming them is what makes life meaningful.",author:"Joshua J. Marine"},
+      {text:"The question isn't who is going to let me; it's who is going to stop me.",author:"Ayn Rand"},
+      {text:"If your ship doesn't come in, swim out to meet it.",author:"Jonathan Winters"},
+      {text:"Don't say you don't have enough time. You have exactly the same number of hours per day that were given to Helen Keller.",author:"H. Jackson Brown Jr."},
+      {text:"Every moment is a fresh beginning.",author:"T.S. Eliot"},
+      {text:"We must accept finite disappointment, but never lose infinite hope.",author:"Martin Luther King Jr."},
+      {text:"Begin anywhere.",author:"John Cage"},
+      {text:"I am thankful for all of those who said NO to me. It's because of them I'm doing it myself.",author:"Albert Einstein"},
+      {text:"The No. 1 reason people fail in life is because they listen to their friends, family, and neighbors.",author:"Napoleon Hill"},
+      {text:"Remember no one can make you feel inferior without your consent.",author:"Eleanor Roosevelt"},
+      {text:"Life is what we make it, always has been, always will be.",author:"Grandma Moses"},
+      {text:"The question is not who is going to let me; it's who is going to stop me.",author:"Ayn Rand"},
+      {text:"Certain things catch your eye, but pursue only those that capture the heart.",author:"Ancient Indian Proverb"},
+      {text:"Believe and act as if it were impossible to fail.",author:"Charles F. Kettering"},
+      {text:"I have not failed. I've just found 10,000 ways that won't work.",author:"Thomas A. Edison"},
+      {text:"Nothing is impossible, the word itself says 'I'm possible!'",author:"Audrey Hepburn"},
+      {text:"The only way to achieve the impossible is to believe it is possible.",author:"Charles Kingsleigh"},
+      {text:"Diligence is the mother of good luck.",author:"Benjamin Franklin"},
+      {text:"I don't believe in failure. It is not failure if you enjoyed the process.",author:"Oprah Winfrey"},
+      {text:"Go confidently in the direction of your dreams! Live the life you've imagined.",author:"Henry David Thoreau"},
+      {text:"All our dreams can come true, if we have the courage to pursue them.",author:"Walt Disney"},
+      {text:"If you can dream it, you can do it.",author:"Walt Disney"},
+      {text:"Great minds discuss ideas; average minds discuss events; small minds discuss people.",author:"Eleanor Roosevelt"},
+      {text:"Life is short and it is here to be lived.",author:"Kate Winslet"},
+      {text:"Someday is not a day of the week.",author:"Janet Dailey"},
+      {text:"Build your own dreams, or someone else will hire you to build theirs.",author:"Farrah Gray"},
+      {text:"The starting point of all achievement is desire.",author:"Napoleon Hill"},
+      {text:"Success is the sum of small efforts repeated day in and day out.",author:"Robert Collier"},
+      {text:"It's not what you look at that matters, it's what you see.",author:"Henry David Thoreau"},
+      {text:"The most common way people give up their power is by thinking they don't have any.",author:"Alice Walker"},
+      {text:"When one door of happiness closes, another opens.",author:"Helen Keller"},
+      {text:"When I let go of what I am, I become what I might be.",author:"Lao Tzu"},
+      {text:"Life shrinks or expands in proportion to one's courage.",author:"Anais Nin"},
+      {text:"If you hear a voice within you say you cannot paint, then by all means paint and that voice will be silenced.",author:"Vincent Van Gogh"},
+      {text:"There is only one way to avoid criticism: do nothing, say nothing, and be nothing.",author:"Aristotle"},
+      {text:"The mind is not a vessel to be filled, but a fire to be ignited.",author:"Plutarch"},
+      {text:"Do what you can, where you are, with what you have.",author:"Teddy Roosevelt"},
+      {text:"Develop success from failures. Discouragement and failure are two of the surest stepping stones to success.",author:"Dale Carnegie"},
+      {text:"Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.",author:"Thomas A. Edison"},
+      {text:"Nothing will work unless you do.",author:"Maya Angelou"},
+      {text:"If you don't value your time, neither will others. Stop giving away your time and talents.",author:"Kim Garst"},
+      {text:"The only real mistake is the one from which we learn nothing.",author:"Henry Ford"},
+      {text:"I cannot give you the formula for success, but I can give you the formula for failure — which is: Try to please everybody.",author:"Herbert Bayard Swope"},
+      {text:"Success is liking yourself, liking what you do, and liking how you do it.",author:"Maya Angelou"},
+      {text:"Your true success in life begins only when you make the commitment to become excellent at what you do.",author:"Brian Tracy"},
+      {text:"Don't be distracted by criticism. Remember — the only taste of success some people get is to take a bite out of you.",author:"Zig Ziglar"},
+      {text:"People often say that motivation doesn't last. Well, neither does bathing — that's why we recommend it daily.",author:"Zig Ziglar"},
+      {text:"Winning is not a sometime thing; it's an all-time thing. You don't win once in a while; you don't do things right once in a while.",author:"Vince Lombardi"},
+      {text:"Knowing is not enough; we must apply. Willing is not enough; we must do.",author:"Bruce Lee"},
+      {text:"Unless you change how you are, you will always have what you've got.",author:"Jim Rohn"},
+      {text:"Success is the progressive realization of a worthy goal or ideal.",author:"Earl Nightingale"},
+      {text:"If you set goals and go after them with all the determination you can muster, your gifts will take you places that will amaze you.",author:"Les Brown"},
+      {text:"The difference between a successful person and others is not a lack of strength or knowledge but rather a lack of will.",author:"Vince Lombardi"},
+      {text:"The way to get started is to quit talking and begin doing.",author:"Walt Disney"},
+      {text:"I never dreamed about success, I worked for it.",author:"Estee Lauder"},
+      {text:"Don't wish it were easier; wish you were better.",author:"Jim Rohn"},
+      {text:"A goal is a dream with a deadline.",author:"Napoleon Hill"},
+      {text:"Do it now. Sometimes 'later' becomes 'never'.",author:"Unknown"},
+      {text:"The key to success is to focus on goals, not obstacles.",author:"Unknown"},
+      {text:"If you want to achieve greatness stop asking for permission.",author:"Unknown"},
+      {text:"Things work out best for those who make the best of how things work out.",author:"John Wooden"},
+      {text:"To live a creative life, we must lose our fear of being wrong.",author:"Anonymous"},
+      {text:"If you are not willing to risk the usual, you will have to settle for the ordinary.",author:"Jim Rohn"},
+      {text:"Trust because you are willing to accept the risk, not because it's safe or certain.",author:"Anonymous"},
+      {text:"Take up one idea. Make that one idea your life.",author:"Swami Vivekananda"},
+      {text:"All progress takes place outside the comfort zone.",author:"Michael John Bobak"},
+      {text:"What would you attempt to do if you knew you would not fail?",author:"Robert Schuller"},
+      {text:"Friendship is the hardest thing in the world to explain. It's not something you learn in school. But if you haven't learned the meaning of friendship, you really haven't learned anything.",author:"Muhammad Ali"},
+      {text:"The secret of getting ahead is getting started. The secret of getting started is breaking your complex overwhelming tasks into small manageable tasks.",author:"Mark Twain"},
+      {text:"Stop being afraid of what could go wrong, and start being excited about what could go right.",author:"Tony Robbins"},
+      {text:"If you have everything under control, you're not moving fast enough.",author:"Mario Andretti"},
+      {text:"What separates the people who achieve from those who do not is in direct proportion to one's ability to ask for help.",author:"Donald Keough"},
+      {text:"The fastest way to change yourself is to hang out with people who are already the way you want to be.",author:"Reid Hoffman"},
+      {text:"The real test is not whether you avoid failure, because you won't. It's whether you let it harden or shame you into inaction, or whether you learn from it.",author:"Barack Obama"},
+      {text:"No masterpiece was ever created by a lazy artist.",author:"Unknown"},
+      {text:"Happiness is a butterfly, which when pursued, is always just beyond your grasp, but which, if you will sit down quietly, may alight upon you.",author:"Nathaniel Hawthorne"},
+      {text:"Motivation is what gets you started. Habit is what keeps you going.",author:"Jim Rohn"},
+      {text:"People who are crazy enough to think they can change the world are the ones who do.",author:"Rob Siltanen"},
+      {text:"Failure will never overtake me if my determination to succeed is strong enough.",author:"Og Mandino"},
+      {text:"Entrepreneurs are great at dealing with uncertainty and also very good at minimizing risk.",author:"Mohnish Pabrai"},
+      {text:"We may encounter many defeats but we must not be defeated.",author:"Maya Angelou"},
+      {text:"Knowing what must be done does away with fear.",author:"Rosa Parks"},
+      {text:"Try not to become a person of success, but rather try to become a person of value.",author:"Albert Einstein"},
+      {text:"A truly rich man is one whose children run into his arms when his hands are empty.",author:"Unknown"},
+      {text:"It is not the man who has too little, but the man who craves more, that is poor.",author:"Seneca"},
+      {text:"There are two types of people who will tell you that you cannot make a difference in this world: those who are afraid to try and those who are afraid you will succeed.",author:"Ray Goforth"},
+      {text:"Successful people do what unsuccessful people are not willing to do. Don't wish it were easier; wish you were better.",author:"Jim Rohn"},
+      {text:"Never give in except to convictions of honor and good sense.",author:"Winston Churchill"},
+      {text:"We become what we think about most of the time, and that's the strangest secret.",author:"Earl Nightingale"},
+      {text:"The number one reason most people don't get what they want is that they don't know what they want.",author:"T. Harv Eker"},
+      {text:"The successful warrior is the average man, with laser-like focus.",author:"Bruce Lee"},
+      {text:"Life is 10% what happens to you and 90% how you react to it.",author:"Charles R. Swindoll"},
+      {text:"Be so good they can't ignore you.",author:"Steve Martin"},
+      {text:"I find that when you have a real interest in life and a curious life, that sleep is not the most important thing.",author:"Martha Stewart"},
+      {text:"It's not about ideas. It's about making ideas happen.",author:"Scott Belsky"},
+      {text:"What seems to us as bitter trials are often blessings in disguise.",author:"Oscar Wilde"},
+      {text:"Nobody ever wrote down a plan to be broke, fat, lazy, or stupid. Those things are what happen when you don't have a plan.",author:"Larry Winget"},
+      {text:"Good business leaders create a vision, articulate the vision, passionately own the vision, and relentlessly drive it to completion.",author:"Jack Welch"},
+      {text:"Stay self-funded as long as possible.",author:"Garrett Camp"},
+      {text:"Stop doubting yourself. Work hard and make it happen.",author:"Unknown"},
+      {text:"Don't count the days, make the days count.",author:"Muhammad Ali"},
+      {text:"He who is not courageous enough to take risks will accomplish nothing in life.",author:"Muhammad Ali"},
+      {text:"It's hard to beat a person who never gives up.",author:"Babe Ruth"},
+      {text:"I wake up every morning and I feel like I'm the luckiest man in the world.",author:"Justin Timberlake"},
+      {text:"Give me six hours to chop down a tree and I will spend the first four sharpening the axe.",author:"Abraham Lincoln"},
+      {text:"The purpose of our lives is to be happy.",author:"Dalai Lama"},
+      {text:"You only live once, but if you do it right, once is enough.",author:"Mae West"},
+      {text:"Live as if you were to die tomorrow. Learn as if you were to live forever.",author:"Mahatma Gandhi"},
+      {text:"Never let the fear of striking out keep you from playing the game.",author:"Babe Ruth"},
+      {text:"Hard days are the best because that's when champions are made.",author:"Gabby Douglas"},
+      {text:"The power of one more is the difference between where you are and where you want to be.",author:"Ed Mylett"},
+      {text:"Your breakthrough is on the other side of your consistency.",author:"Unknown"},
+      {text:"Don't wait for the perfect moment — take the moment and make it perfect.",author:"Zoey Sayward"},
+      {text:"Be fearless in the pursuit of what sets your soul on fire.",author:"Jennifer Lee"},
+      {text:"One sale a day keeps the doubt away.",author:"LLFG Sales Culture"},
+      {text:"Resilience is not about bouncing back — it's about bouncing forward.",author:"Unknown"},
+      {text:"The grind is a part of the glory.",author:"Unknown"},
+      {text:"Top producers are not born — they are built, one call at a time.",author:"LLFG Sales Culture"},
+      {text:"You are one conversation away from changing your life.",author:"Unknown"},
+      {text:"Act boldly and unseen forces will come to your aid.",author:"Dorothea Brande"},
+      {text:"Every day you don't improve is a day your competition does.",author:"Unknown"},
+      {text:"Your future is created by what you do today, not tomorrow.",author:"Robert Kiyosaki"},
     ];
 
     function getQuoteOfTheDay() {
-      const dayIndex = Math.floor(Date.now() / 86400000) % QUOTES.length;
-      return QUOTES[dayIndex];
+      // Changes every 12 hours
+      const halfDayIndex = Math.floor(Date.now() / (12 * 60 * 60 * 1000)) % QUOTES.length;
+      return QUOTES[halfDayIndex];
     }
+
+    // Update quote every 12 hours while portal is open
+    setInterval(function() {
+      const qEl = document.querySelector('.qotd-text');
+      const aEl = document.querySelector('.qotd-author');
+      if (qEl && aEl) {
+        const q = getQuoteOfTheDay();
+        qEl.style.opacity = '0';
+        aEl.style.opacity = '0';
+        setTimeout(function() {
+          qEl.textContent = q.text;
+          aEl.textContent = '— ' + q.author;
+          qEl.style.transition = 'opacity 0.8s';
+          aEl.style.transition = 'opacity 0.8s';
+          qEl.style.opacity = '1';
+          aEl.style.opacity = '1';
+        }, 500);
+      }
+    }, 12 * 60 * 60 * 1000);
 
     // ─── Leaderboard data ───
     const LEADERBOARD_AGENTS = [
@@ -6238,22 +6487,22 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           <div class="dash-section">
             <div class="qotd-wrap"><div class="qotd-mark">"</div><div class="qotd-text">${q.text}</div><div class="qotd-author">— ${q.author}</div></div>
           </div>
-          ${customerBookHTML}
           <div class="dash-section">
             <div class="dash-section-title">Quick Actions</div>
-            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab(\'deals\',document.querySelector(\'[onclick*=deals]\'))">
+            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab('deals',document.querySelector('[onclick*=deals]'))">
               <div class="training-icon">💼</div><div><div class="training-name">Log a New Deal</div><div class="training-meta">Calculate AP and advanced pay</div></div>
             </div>
-            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab(\'training\',document.querySelector(\'[onclick*=training]\'))">
+            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab('training',document.querySelector('[onclick*=training]'))">
               <div class="training-icon">📚</div><div><div class="training-name">Open Training</div><div class="training-meta">Products, sales process & scripts</div></div>
             </div>
-            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab(\'dataforms\',document.querySelector(\'[onclick*=dataforms]\'))">
+            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab('dataforms',document.querySelector('[onclick*=dataforms]'))">
               <div class="training-icon">🔒</div><div><div class="training-name">Send Secure Data Form</div><div class="training-meta">Collect encrypted client info</div></div>
             </div>
-            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab(\'addagents\',document.querySelector(\'[onclick*=addagents]\'))">
+            <div class="training-item" style="cursor:pointer;" onclick="showPortalTab('addagents',document.querySelector('[onclick*=addagents]'))">
               <div class="training-icon">👥</div><div><div class="training-name">Add an Agent</div><div class="training-meta">Recruit to your downline</div></div>
             </div>
           </div>
+          ${customerBookHTML}
         </div>
         <div class="dash-section">${lbHTML}</div>`;
     }
@@ -6266,12 +6515,96 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     }
 
-    window.__R_showPortalTab = window.showPortalTab = function(tab, el) {
-      document.querySelectorAll('#portalTabs .admin-tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('[id^="ptab-"]').forEach(t=>t.classList.remove('active'));
-      if(el) el.classList.add('active');
+    // Sub-tab definitions per role
+    const RECRUITING_TABS = {
+      financial_advisor: ['addagents'],
+      agent:             ['addagents'],
+      manager:           ['addagents','agentapprovals'],
+      executive:         ['addagents','agentapprovals','contracting','applications'],
+      managing_partner:  ['addagents','agentapprovals','contracting','applications'],
+      admin:             ['addagents','agentapprovals','contracting','applications'],
+    };
+    const MANAGEMENT_TABS = {
+      manager:           ['commreq','reports'],
+      executive:         ['commreq','teammetrics','reports'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports'],
+    };
+    const SUBTAB_LABELS = {
+      addagents:'Add Agents', agentapprovals:'Agent Approvals',
+      contracting:'Send Contracts', applications:'Applications',
+      commreq:'Commission Request', permissions:'Permissions',
+      teammetrics:'Team Metrics', downlineclients:'All Clients', reports:'Reports',
+    };
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('.portal-dropdown').forEach(d => d.remove());
+    }
+
+    function openSubDropdown(parentEl, subTabs, onSelect) {
+      closeAllDropdowns();
+      const rect = parentEl.getBoundingClientRect();
+      const menu = document.createElement('div');
+      menu.className = 'portal-dropdown';
+      menu.style.cssText = `position:fixed;top:${rect.bottom}px;left:${rect.left}px;background:#111;border:1px solid rgba(201,168,76,0.2);z-index:9999;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
+      menu.innerHTML = subTabs.map(t => `
+        <div onclick="selectSubTab('${t}',this.parentElement)" style="padding:0.65rem 1rem;font-size:0.72rem;color:var(--gray);cursor:pointer;letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.04);" onmouseover="this.style.background='rgba(201,168,76,0.08)';this.style.color='var(--cream)'" onmouseout="this.style.background='';this.style.color='var(--gray)'">${SUBTAB_LABELS[t]||t}</div>
+      `).join('');
+      document.body.appendChild(menu);
+      // Close on outside click
+      setTimeout(() => {
+        document.addEventListener('click', function closeDD(e) {
+          if (!menu.contains(e.target) && e.target !== parentEl) { menu.remove(); document.removeEventListener('click', closeDD); }
+        });
+      }, 10);
+    }
+
+    window.__R_selectSubTab = window.selectSubTab = function(tab, menu) {
+      if (menu) menu.remove();
+      showPortalTab(tab, null, true);
+    };
+
+    window.__R_showPortalTab = window.showPortalTab = function(tab, el, isSubTab) {
+      // Handle dropdown tabs
+      const role = (currentUser?.role) || 'financial_advisor';
+      if (tab === 'recruiting' && !isSubTab) {
+        const subs = RECRUITING_TABS[role] || ['addagents'];
+        if (subs.length === 1) { showPortalTab(subs[0], null, true); return; }
+        document.querySelectorAll('#portalTabs .admin-tab').forEach(t => t.classList.remove('active'));
+        if (el) { el.classList.add('active'); openSubDropdown(el, subs); }
+        return;
+      }
+      if (tab === 'management' && !isSubTab) {
+        const subs = MANAGEMENT_TABS[role] || ['commreq'];
+        if (subs.length === 1) { showPortalTab(subs[0], null, true); return; }
+        document.querySelectorAll('#portalTabs .admin-tab').forEach(t => t.classList.remove('active'));
+        if (el) { el.classList.add('active'); openSubDropdown(el, subs); }
+        return;
+      }
+
+      closeAllDropdowns();
+
+      document.querySelectorAll('#portalTabs .admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('[id^="ptab-"]').forEach(t => t.classList.remove('active'));
+
+      // Highlight parent tab if this is a sub-tab
+      if (isSubTab) {
+        const recruitingSubs = Object.values(RECRUITING_TABS).flat();
+        const managementSubs = Object.values(MANAGEMENT_TABS).flat();
+        if (recruitingSubs.includes(tab)) {
+          const rBtn = Array.from(document.querySelectorAll('#portalTabs .admin-tab')).find(b => b.textContent.includes('Recruiting'));
+          if (rBtn) rBtn.classList.add('active');
+        } else if (managementSubs.includes(tab)) {
+          const mBtn = Array.from(document.querySelectorAll('#portalTabs .admin-tab')).find(b => b.textContent.includes('Management'));
+          if (mBtn) mBtn.classList.add('active');
+        }
+      } else if (el) {
+        el.classList.add('active');
+      }
+
       const el2 = document.getElementById('ptab-'+tab);
-      if(el2) el2.classList.add('active');
+      if (el2) el2.classList.add('active');
+
       if(tab === 'agentapprovals') { renderAgentApprovals(); renderPromotionRequests(); }
       if(tab === 'contracting')    renderContractingQueue();
       if(tab === 'addagents')      renderMyAgentList();
@@ -6280,8 +6613,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if(tab === 'emailtemplates') { renderEmailTemplates(); }
       if(tab === 'commissions')    { renderCommissionsTab(); }
       if(tab === 'permissions')    { renderPermissionsOptions(); }
+      if(tab === 'reports')        { initReportsTab(); renderReportSummary(); }
       if(tab === 'bizcard') {
-        // Pre-fill with current user's info
         const u = currentUser || window._llfgCurrentUser;
         if (u) {
           const nameEl = document.getElementById('bcName'); if(nameEl && !nameEl.value) nameEl.value = u.name || '';
@@ -6295,9 +6628,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         else if(typeof window.__R_updateBizCard === 'function') window.__R_updateBizCard();
       }
       if(tab === 'applications') {
-        // Managers see only their referrals; execs/admins see all
-        const role = currentUser?.role;
-        const isManagerOnly = (role === 'manager');
+        const r = currentUser?.role;
+        const isManagerOnly = (r === 'manager');
         const subtitle = document.getElementById('ptabAppsSubtitle');
         if (isManagerOnly) {
           if(subtitle) subtitle.textContent = `Showing applications where you were listed as the referral.`;
@@ -6307,6 +6639,302 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           renderApplications();
         }
       }
+    };
+
+    // ─── Reports Tab ───
+    let currentReportPeriod = 'weekly';
+
+    const PERIOD_LABELS = {
+      weekly:    'Week of Mar 24 – Mar 28, 2026',
+      monthly:   'March 2026',
+      quarterly: 'Q1 2026 (Jan – Mar)',
+      yearly:    'Full Year 2026',
+    };
+
+    // Multipliers to simulate different period totals
+    const PERIOD_MULTIPLIERS = { weekly:0.25, monthly:1, quarterly:3, yearly:12 };
+
+    window.__R_setReportPeriod = window.setReportPeriod = function(period, el) {
+      currentReportPeriod = period;
+      document.querySelectorAll('.report-period-btn').forEach(b => b.classList.remove('active'));
+      if (el) el.classList.add('active');
+      const labelEl = document.getElementById('reportPeriodLabel');
+      if (labelEl) labelEl.textContent = PERIOD_LABELS[period] || period;
+      const summaryLabel = document.getElementById('reportSummaryPeriodLabel');
+      if (summaryLabel) summaryLabel.textContent = '— ' + (PERIOD_LABELS[period] || period);
+      renderReportSummary();
+    };
+
+    function renderReportSummary() {
+      const tbody = document.getElementById('reportSummaryBody');
+      if (!tbody || typeof TEAM_DATA === 'undefined') return;
+      const m = PERIOD_MULTIPLIERS[currentReportPeriod] || 1;
+      tbody.innerHTML = TEAM_DATA.map(team => {
+        const ap = Math.round(team.totalAP * m);
+        const debtCol = team.debtRisk === 'Low' ? '#6ecf6e' : team.debtRisk === 'Medium' ? '#ffa500' : '#e05555';
+        const pCol    = team.persistency >= 85 ? '#6ecf6e' : team.persistency >= 78 ? '#ffa500' : '#e05555';
+        const cbCol   = team.chargeback < 4 ? '#6ecf6e' : team.chargeback < 7 ? '#ffa500' : '#e05555';
+        return `<tr>
+          <td><strong style="color:var(--cream);">${team.name}</strong><br><span style="font-size:0.6rem;color:var(--gray);">Lead: ${team.leader}</span></td>
+          <td style="color:var(--gold);font-weight:600;">$${ap.toLocaleString()}</td>
+          <td>${team.agents.length}</td>
+          <td style="color:${pCol};">${team.persistency}%</td>
+          <td style="color:${cbCol};">${team.chargeback}%</td>
+          <td style="color:${pCol};">${team.retention}%</td>
+          <td><span style="color:${debtCol};font-size:0.7rem;font-weight:600;">${team.debtRisk}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    window.__R_downloadReport = window.downloadReport = function(type) {
+      const period = currentReportPeriod;
+      const periodLabel = PERIOD_LABELS[period] || period;
+      const m = PERIOD_MULTIPLIERS[period] || 1;
+      const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+      const u = currentUser || window._llfgCurrentUser;
+      const generatedBy = u?.name || 'Admin';
+
+      const reportTitles = {
+        ap:          'Team AP Report',
+        performance: 'Performance Report',
+        onboarding:  'Onboarding Report',
+        retention:   'Retention Report',
+        commission:  'Commission Report',
+        chargeback:  'Chargeback Risk Report',
+        full:        'Full Organization Report',
+      };
+
+      const title = reportTitles[type] || 'Organization Report';
+
+      // Build report content based on type
+      let reportSections = '';
+
+      if (type === 'ap' || type === 'full') {
+        const apRows = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.map(t => {
+          const ap = Math.round(t.totalAP * m);
+          const agentRows = t.agents.map(a => `
+            <tr style="background:#fafafa;">
+              <td style="padding:6px 12px 6px 28px;font-size:11px;color:#555;">${a.name}</td>
+              <td style="padding:6px 12px;font-size:11px;color:#555;">${a.role}</td>
+              <td style="padding:6px 12px;font-size:11px;color:#555;text-align:right;">$${Math.round(a.ap*m).toLocaleString()}</td>
+              <td style="padding:6px 12px;font-size:11px;color:#555;text-align:right;">${a.comm}%</td>
+              <td style="padding:6px 12px;font-size:11px;color:#555;text-align:right;">$${Math.round(a.ap*m*0.75*(a.comm/100)).toLocaleString()}</td>
+            </tr>`).join('');
+          return `
+            <tr style="background:#f0f0f0;border-top:2px solid #c9a84c;">
+              <td colspan="5" style="padding:8px 12px;font-size:13px;font-weight:700;color:#111;">${t.name} — Lead: ${t.leader}</td>
+            </tr>
+            ${agentRows}
+            <tr style="background:#fff7e6;border-top:1px solid #e8d9a0;">
+              <td style="padding:6px 12px;font-size:12px;font-weight:700;color:#8b6914;" colspan="2">Team Total</td>
+              <td style="padding:6px 12px;font-size:12px;font-weight:700;color:#8b6914;text-align:right;">$${ap.toLocaleString()}</td>
+              <td></td>
+              <td style="padding:6px 12px;font-size:12px;font-weight:700;color:#8b6914;text-align:right;">$${Math.round(ap*0.75*(t.leaderComm/100)).toLocaleString()}</td>
+            </tr>`;
+        }).join('') : '';
+
+        reportSections += `
+          <div class="section-header">Team Annual Premium Breakdown</div>
+          <table class="report-table">
+            <thead><tr><th>Agent</th><th>Role</th><th>AP (${periodLabel})</th><th>Comp %</th><th>Advanced Pay</th></tr></thead>
+            <tbody>${apRows}</tbody>
+          </table>`;
+      }
+
+      if (type === 'performance' || type === 'full') {
+        const allAgents = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team: t.name}))) : [];
+        const sorted = [...allAgents].sort((a,b) => b.ap - a.ap);
+        const perfRows = sorted.map((a, i) => `
+          <tr>
+            <td style="padding:7px 12px;font-size:11px;">${i+1}</td>
+            <td style="padding:7px 12px;font-size:11px;font-weight:600;">${a.name}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.team}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.role}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:right;font-weight:700;color:#8b6914;">$${Math.round(a.ap*m).toLocaleString()}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:right;">${a.comm}%</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;color:${a.persist>=85?'#27a851':a.persist>=78?'#d97706':'#dc2626'};font-weight:600;">${a.persist}%</td>
+          </tr>`).join('');
+        reportSections += `
+          <div class="section-header">Agent Performance Rankings</div>
+          <table class="report-table">
+            <thead><tr><th>#</th><th>Agent</th><th>Team</th><th>Role</th><th>AP</th><th>Comp</th><th>Persistency</th></tr></thead>
+            <tbody>${perfRows}</tbody>
+          </table>`;
+      }
+
+      if (type === 'onboarding' || type === 'full') {
+        const onboardingRows = [
+          {name:'Jordan Mitchell', state:'Illinois',  status:'Pending Approval', exp:'No experience',  date:'Mar 25, 2026', ref:'Instagram'},
+          {name:'Camille Brooks',  state:'Georgia',   status:'Approved',         exp:'1–3 years',      date:'Mar 24, 2026', ref:'Lorenzo Parenza'},
+          {name:'Devon Castillo',  state:'California',status:'Licensed',         exp:'Less than 1 yr', date:'Mar 24, 2026', ref:'Google'},
+          {name:'Amara Singh',     state:'Texas',     status:'Contracted',       exp:'3–5 years',      date:'Mar 23, 2026', ref:'Jaalyn Bowman'},
+          {name:'Marcus Webb',     state:'Ohio',      status:'Pending Approval', exp:'No experience',  date:'Mar 22, 2026', ref:'None'},
+        ].map(a => {
+          const sc = a.status==='Licensed'||a.status==='Contracted' ? '#27a851' : a.status==='Approved' ? '#2563eb' : '#d97706';
+          return `<tr>
+            <td style="padding:7px 12px;font-size:11px;font-weight:600;">${a.name}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.state}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.exp}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.ref}</td>
+            <td style="padding:7px 12px;font-size:11px;font-weight:700;color:${sc};">${a.status}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.date}</td>
+          </tr>`;
+        }).join('');
+        reportSections += `
+          <div class="section-header">Agent Onboarding Pipeline</div>
+          <table class="report-table">
+            <thead><tr><th>Name</th><th>State</th><th>Experience</th><th>Referred By</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>${onboardingRows}</tbody>
+          </table>`;
+      }
+
+      if (type === 'retention' || type === 'full') {
+        const retRows = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team:t.name}))).map(a => {
+          const pc = a.persist>=85?'#27a851':a.persist>=78?'#d97706':'#dc2626';
+          const cc = a.cb<4?'#27a851':a.cb<7?'#d97706':'#dc2626';
+          const rc = a.ret>=88?'#27a851':a.ret>=82?'#d97706':'#dc2626';
+          return `<tr>
+            <td style="padding:7px 12px;font-size:11px;font-weight:600;">${a.name}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.team}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;color:${pc};font-weight:600;">${a.persist}%</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;color:${cc};font-weight:600;">${a.cb}%</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;color:${rc};font-weight:600;">${a.ret}%</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;color:${a.debt==='Low'?'#27a851':a.debt==='Medium'?'#d97706':'#dc2626'};font-weight:600;">${a.debt}</td>
+          </tr>`;
+        }).join('') : '';
+        reportSections += `
+          <div class="section-header">Retention &amp; Persistency Analysis</div>
+          <table class="report-table">
+            <thead><tr><th>Agent</th><th>Team</th><th>Persistency</th><th>Chargeback %</th><th>Retention</th><th>Debt Risk</th></tr></thead>
+            <tbody>${retRows}</tbody>
+          </table>`;
+      }
+
+      if (type === 'commission' || type === 'full') {
+        const commRows = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team:t.name}))).map(a => {
+          const ap = Math.round(a.ap * m);
+          const adv = Math.round(ap * 0.75);
+          const earn = Math.round(adv * a.comm / 100);
+          return `<tr>
+            <td style="padding:7px 12px;font-size:11px;font-weight:600;">${a.name}</td>
+            <td style="padding:7px 12px;font-size:11px;">${a.team}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:center;">${a.comm}%</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:right;font-weight:600;">$${ap.toLocaleString()}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:right;">$${adv.toLocaleString()}</td>
+            <td style="padding:7px 12px;font-size:11px;text-align:right;font-weight:700;color:#166534;">$${earn.toLocaleString()}</td>
+          </tr>`;
+        }).join('') : '';
+        reportSections += `
+          <div class="section-header">Commission &amp; Earnings Breakdown</div>
+          <table class="report-table">
+            <thead><tr><th>Agent</th><th>Team</th><th>Comp %</th><th>AP</th><th>Advanced Pay</th><th>Net Earnings</th></tr></thead>
+            <tbody>${commRows}</tbody>
+          </table>`;
+      }
+
+      if (type === 'chargeback' || type === 'full') {
+        const cbRows = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team:t.name})))
+          .sort((a,b) => b.cb - a.cb)
+          .map(a => {
+            const risk = a.cb >= 7 ? 'HIGH' : a.cb >= 4 ? 'MEDIUM' : 'LOW';
+            const rc = a.cb >= 7 ? '#dc2626' : a.cb >= 4 ? '#d97706' : '#27a851';
+            const exposure = Math.round(a.ap * m * 0.75 * (a.cb / 100));
+            return `<tr>
+              <td style="padding:7px 12px;font-size:11px;font-weight:600;">${a.name}</td>
+              <td style="padding:7px 12px;font-size:11px;">${a.team}</td>
+              <td style="padding:7px 12px;font-size:11px;text-align:center;color:${rc};font-weight:700;">${a.cb}%</td>
+              <td style="padding:7px 12px;font-size:11px;text-align:right;color:#dc2626;font-weight:600;">$${exposure.toLocaleString()}</td>
+              <td style="padding:7px 12px;font-size:11px;text-align:center;color:${rc};font-weight:700;">${risk}</td>
+              <td style="padding:7px 12px;font-size:11px;">${risk==='HIGH'?'Immediate review needed — contact agent':risk==='MEDIUM'?'Monitor closely':'No action needed'}</td>
+            </tr>`;
+          }).join('') : '';
+        reportSections += `
+          <div class="section-header">Chargeback Risk Analysis</div>
+          <table class="report-table">
+            <thead><tr><th>Agent</th><th>Team</th><th>CB Rate</th><th>Exposure ($)</th><th>Risk Level</th><th>Recommendation</th></tr></thead>
+            <tbody>${cbRows}</tbody>
+          </table>`;
+      }
+
+      // Generate totals
+      const totalAP = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + Math.round(t.totalAP * m), 0) : 0;
+      const avgPersist = (typeof TEAM_DATA !== 'undefined') ? Math.round(TEAM_DATA.reduce((s,t) => s + t.persistency, 0) / TEAM_DATA.length) : 0;
+      const avgCB = (typeof TEAM_DATA !== 'undefined') ? (TEAM_DATA.reduce((s,t) => s + t.chargeback, 0) / TEAM_DATA.length).toFixed(1) : 0;
+      const totalAgents = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + t.agents.length, 0) : 0;
+
+      const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Raleway',Arial,sans-serif; background:#fff; color:#222; padding:40px; font-size:12px; }
+  .report-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; padding-bottom:20px; border-bottom:3px solid #c9a84c; }
+  .report-logo { font-family:'Cormorant Garamond',serif; }
+  .report-logo .brand { font-size:22px; font-weight:600; color:#111; letter-spacing:2px; }
+  .report-logo .sub { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#c9a84c; }
+  .report-meta { text-align:right; }
+  .report-meta .report-title { font-size:16px; font-weight:700; color:#111; margin-bottom:4px; }
+  .report-meta .report-period { font-size:11px; color:#c9a84c; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
+  .report-meta .report-info { font-size:10px; color:#888; margin-top:4px; }
+  .kpi-row { display:flex; gap:16px; margin-bottom:28px; }
+  .kpi { flex:1; background:#f9f9f9; border-left:4px solid #c9a84c; padding:12px 16px; }
+  .kpi-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:#999; margin-bottom:4px; }
+  .kpi-value { font-size:22px; font-weight:700; color:#111; font-family:'Cormorant Garamond',serif; }
+  .section-header { background:#111; color:#c9a84c; padding:10px 16px; font-size:11px; letter-spacing:2px; text-transform:uppercase; font-weight:600; margin-top:24px; margin-bottom:0; }
+  .report-table { width:100%; border-collapse:collapse; margin-bottom:16px; }
+  .report-table thead { background:#c9a84c; }
+  .report-table thead th { padding:8px 12px; font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#fff; text-align:left; }
+  .report-table tbody tr:nth-child(even) { background:#fafafa; }
+  .report-table tbody tr:hover { background:#fff7e6; }
+  .footer { margin-top:40px; padding-top:16px; border-top:1px solid #eee; display:flex; justify-content:space-between; font-size:10px; color:#aaa; }
+  @media print { body { padding:20px; } @page { margin:0.5in; } }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="report-logo">
+    <div class="brand">Legacy Life</div>
+    <div class="sub">Financial Group</div>
+  </div>
+  <div class="report-meta">
+    <div class="report-title">${title}</div>
+    <div class="report-period">${periodLabel}</div>
+    <div class="report-info">Generated: ${now} · By: ${generatedBy}</div>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-label">Total Org AP</div><div class="kpi-value">$${totalAP.toLocaleString()}</div></div>
+  <div class="kpi"><div class="kpi-label">Active Agents</div><div class="kpi-value">${totalAgents}</div></div>
+  <div class="kpi"><div class="kpi-label">Avg Persistency</div><div class="kpi-value">${avgPersist}%</div></div>
+  <div class="kpi"><div class="kpi-label">Avg Chargeback</div><div class="kpi-value">${avgCB}%</div></div>
+</div>
+
+${reportSections}
+
+<div class="footer">
+  <span>Legacy Life Financial Group · Confidential · Internal Use Only</span>
+  <span>llfg.us · ${now}</span>
+</div>
+
+<script>window.onload = function() { window.print(); }<\/script>
+</body></html>`;
+
+      const blob = new Blob([html], {type:'text/html'});
+      const url  = URL.createObjectURL(blob);
+      const win  = window.open(url, '_blank');
+      if (win) { setTimeout(() => URL.revokeObjectURL(url), 10000); }
+      else {
+        const a = document.createElement('a');
+        a.href = url; a.download = `LLFG_${type}_${period}_report.html`; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      }
+    };
+
+    // Initialize report summary when tab opens
+    function initReportsTab() {
+      setReportPeriod('weekly', document.querySelector('.report-period-btn.active'));
     }
 
     // ─── Commissions Tab ───
@@ -6602,14 +7230,18 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       ['dClient','dPolicy','dPremium','dDraft','dPolicyNum'].forEach(id=>document.getElementById(id).value='');
       document.getElementById('dCarrier').value='';
 
-      // Post to team chat
+      // Post to team chat via Sales Bot
       const ap = premium * 12;
-      const salesMsg = `🎉 ${currentUser?.name || 'An agent'} just logged a new deal! Client: ${client} | Carrier: ${carrier||'—'} | AP: $${ap.toLocaleString()} | Policy #: ${policyNum||'TBD'}`;
-      if (!msgThreads['team']) msgThreads['team'] = [];
-      msgThreads['team'].push({ me:false, from:'Daily Sales', text:salesMsg, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), system:true });
+      const agentTeam = 'Team Alpha'; // TODO: pull from real team data
+      window._postSaleBotToTeamChat(
+        currentUser?.name || 'An Agent',
+        agentTeam,
+        `${carrier||'Life Policy'} — ${client}`,
+        ap
+      );
 
       const succ = document.getElementById('dealSuccess');
-      succ.textContent = `✓ Deal logged and saved to Book of Business${policyNum ? ' (Policy #: ' + policyNum + ')' : ''}.`;
+      succ.textContent = `✓ Deal logged and posted to team chat${policyNum ? ' (Policy #: ' + policyNum + ')' : ''}.`;
       succ.style.display = 'block';
       setTimeout(()=>succ.style.display='none', 5000);
 
@@ -6855,17 +7487,29 @@ Please log into the Legacy Life portal to approve or deny this submission.`
         el.innerHTML = '<p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No agents submitted yet.</p>';
         return;
       }
-      const statusLabel = { pending_manager:'Awaiting Manager', approved_manager:'Awaiting Contracting', contracted:'Contracted ✓', denied:'Denied' };
-      const statusColor = { pending_manager:'#c9a84c', approved_manager:'#6ea8fe', contracted:'#6ecf6e', denied:'#e05555' };
-      el.innerHTML = mySubmittedAgents.map(a => `
-        <div class="team-row">
-          <div class="team-avatar">${a.name.split(' ').map(n=>n[0]).join('')}</div>
-          <div>
-            <div class="team-name">${a.name}</div>
-            <div class="team-role">NPN: ${a.npn} · ${a.email} · ${a.date}</div>
+      const statusConfig = {
+        pending_manager:  { label:'Pending Approval',  color:'#c9a84c', bg:'rgba(201,168,76,0.1)',  icon:'⏳' },
+        approved_manager: { label:'Approved',           color:'#6ea8fe', bg:'rgba(110,168,254,0.1)', icon:'✅' },
+        contracted:       { label:'Licensed',           color:'#6ecf6e', bg:'rgba(110,207,110,0.1)', icon:'🏆' },
+        denied:           { label:'Declined',           color:'#e05555', bg:'rgba(224,85,85,0.1)',   icon:'❌' },
+      };
+      el.innerHTML = mySubmittedAgents.map(a => {
+        const sc = statusConfig[a.status] || { label: a.status, color:'#888', bg:'rgba(136,136,136,0.1)', icon:'•' };
+        return `
+        <div style="display:flex;align-items:center;gap:0.9rem;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+          <div class="team-avatar" style="width:36px;height:36px;font-size:0.7rem;flex-shrink:0;">${a.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.82rem;color:var(--cream);font-weight:500;">${a.name}</div>
+            <div style="font-size:0.62rem;color:var(--gray);">NPN: ${a.npn} · ${a.email} · Submitted ${a.date}</div>
           </div>
-          <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:${statusColor[a.status]||'#888'};margin-left:auto;white-space:nowrap;">${statusLabel[a.status]||a.status}</span>
-        </div>`).join('');
+          <div style="flex-shrink:0;text-align:right;">
+            <div style="display:inline-flex;align-items:center;gap:0.35rem;background:${sc.bg};border:1px solid ${sc.color}33;padding:0.25rem 0.65rem;">
+              <span>${sc.icon}</span>
+              <span style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:${sc.color};font-weight:600;">${sc.label}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     // Manager approval functions
@@ -7261,29 +7905,81 @@ contact\u0040llfg.us`
       const msgs = msgThreads[activeContact] || [];
       thread.innerHTML = msgs.length === 0
         ? `<p style="color:var(--gray);font-size:0.78rem;text-align:center;margin-top:2rem;">No messages yet. Say hello! 👋</p>`
-        : msgs.map(m => {
-          const side = m.me ? 'msg-me' : 'msg-them';
-          const bubClass = m.system ? 'msg-bubble' : `msg-bubble ${m.me?'me':'them'}`;
+        : msgs.map((m, idx) => {
           let content = '';
           if (m.type === 'image') {
-            content = `<img src="${m.src}" style="max-width:200px;max-height:160px;border:1px solid rgba(201,168,76,0.2);display:block;" alt="image"/>`;
+            content = `<img src="${m.src}" style="max-width:220px;max-height:180px;border-radius:8px;display:block;" alt="image"/>`;
           } else if (m.type === 'gif') {
-            content = `<img src="${m.src}" style="max-width:200px;border:1px solid rgba(201,168,76,0.15);display:block;" alt="gif"/>`;
+            content = `<img src="${m.src}" style="max-width:220px;border-radius:8px;display:block;" alt="gif"/>`;
+          } else if (m.type === 'sale_bot') {
+            // Discord-style sales bot announcement
+            return `<div style="display:flex;align-items:flex-start;gap:0.7rem;padding:0.6rem 0.8rem;background:rgba(110,207,110,0.06);border-left:3px solid #6ecf6e;margin:0.4rem 0;">
+              <div style="width:32px;height:32px;background:linear-gradient(135deg,#6ecf6e,#2a8a2a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🤖</div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+                  <span style="font-size:0.75rem;font-weight:700;color:#6ecf6e;">SalesBot</span>
+                  <span style="font-size:0.56rem;background:#6ecf6e22;color:#6ecf6e;padding:0.1rem 0.35rem;border-radius:2px;letter-spacing:0.08em;text-transform:uppercase;">BOT</span>
+                  <span style="font-size:0.6rem;color:var(--gray);">${m.time}</span>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(110,207,110,0.2);padding:0.8rem 1rem;border-radius:4px;">
+                  <div style="font-size:0.72rem;color:var(--cream);font-weight:600;margin-bottom:0.5rem;">🎉 New Sale Alert!</div>
+                  <div style="display:grid;grid-template-columns:auto 1fr;gap:0.25rem 0.8rem;font-size:0.68rem;">
+                    <span style="color:var(--gray);">Agent</span><span style="color:var(--cream);">${m.agentName}</span>
+                    <span style="color:var(--gray);">Team</span><span style="color:var(--gold);">${m.teamName}</span>
+                    <span style="color:var(--gray);">Policy</span><span style="color:var(--cream);">${m.deal}</span>
+                    <span style="color:var(--gray);">AP</span><span style="color:#6ecf6e;font-weight:700;font-size:0.82rem;">$${m.ap.toLocaleString()}</span>
+                  </div>
+                </div>
+                <div style="display:flex;gap:0.3rem;margin-top:0.4rem;flex-wrap:wrap;" id="reactions-${idx}">
+                  ${(m.reactions||[]).map(r=>`<span style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);padding:0.15rem 0.5rem;border-radius:12px;font-size:0.78rem;cursor:pointer;" onclick="addReactionToMsg(${idx},'${r.emoji}')">${r.emoji} ${r.count}</span>`).join('')}
+                  <span onclick="showReactionPicker(${idx})" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:0.15rem 0.5rem;border-radius:12px;font-size:0.78rem;cursor:pointer;color:var(--gray);">+ React</span>
+                </div>
+              </div>
+            </div>`;
           } else {
-            content = m.text || '';
+            content = `<span style="font-size:0.82rem;line-height:1.5;">${m.text||''}</span>`;
           }
-          const reactions = m.reactions?.length ? `<div style="display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;">${m.reactions.map(r=>`<span style="background:rgba(201,168,76,0.1);padding:1px 4px;font-size:0.8rem;border-radius:3px;">${r}</span>`).join('')}</div>` : '';
-          const fromName = m.me ? 'You' : (m.from || 'Them');
-          return `<div class="${m.system?'':''+side}" style="${m.system?'align-self:center;':''}">
-            <div class="${m.system?'msg-bubble':bubClass}" style="${m.system?'background:rgba(42,92,42,0.15);border:1px solid rgba(110,207,110,0.2);color:#6ecf6e;font-style:italic;font-size:0.72rem;text-align:center;':''}">
-              ${content}
+          const isMe = m.me;
+          const reactions = (m.reactions||[]).length ? `<div style="display:flex;gap:0.3rem;margin-top:0.3rem;flex-wrap:wrap;">${(m.reactions||[]).map(r=>`<span style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);padding:0.12rem 0.45rem;border-radius:12px;font-size:0.78rem;cursor:pointer;">${r.emoji} ${r.count}</span>`).join('')}</div>` : '';
+          return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};margin:0.2rem 0;">
+            <div style="display:flex;align-items:flex-start;gap:0.5rem;flex-direction:${isMe?'row-reverse':'row'};">
+              ${!isMe?`<div style="width:28px;height:28px;background:rgba(201,168,76,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:600;color:var(--gold);flex-shrink:0;">${(m.from||'T').charAt(0)}</div>`:''}
+              <div style="max-width:70%;">
+                ${!isMe?`<div style="font-size:0.62rem;color:var(--gray);margin-bottom:0.2rem;">${m.from||''}</div>`:''}
+                <div style="background:${isMe?'var(--gold)':'rgba(255,255,255,0.07)'};color:${isMe?'#000':'var(--cream)'};padding:0.55rem 0.85rem;border-radius:${isMe?'12px 12px 2px 12px':'12px 12px 12px 2px'};word-break:break-word;">
+                  ${content}
+                </div>
+                <div style="font-size:0.56rem;color:var(--gray);margin-top:0.2rem;text-align:${isMe?'right':'left'};">${m.time}</div>
+              </div>
             </div>
             ${reactions}
-            <div class="msg-meta">${fromName} · ${m.time}</div>
+            <span onclick="showReactionPicker(${idx})" style="font-size:0.65rem;color:var(--gray);cursor:pointer;margin-top:0.1rem;opacity:0.5;" title="React">😊</span>
           </div>`;
         }).join('');
       thread.scrollTop = thread.scrollHeight;
     }
+
+    const REACTION_EMOJIS = ['🔥','💪','🎉','💰','👏','⭐','🚀','💯','🙌','❤️','😂','👍'];
+
+    window.__R_showReactionPicker = window.showReactionPicker = function(idx) {
+      const existing = document.getElementById('reactionPicker');
+      if (existing) { existing.remove(); return; }
+      const picker = document.createElement('div');
+      picker.id = 'reactionPicker';
+      picker.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid rgba(201,168,76,0.2);padding:0.5rem;display:flex;flex-wrap:wrap;gap:0.3rem;max-width:240px;z-index:999;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6);';
+      picker.innerHTML = REACTION_EMOJIS.map(e => `<span onclick="addReactionToMsg(${idx},'${e}');document.getElementById('reactionPicker').remove();" style="font-size:1.3rem;cursor:pointer;padding:0.2rem 0.3rem;border-radius:4px;" onmouseover="this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.background=''">${e}</span>`).join('');
+      document.body.appendChild(picker);
+      setTimeout(() => { if(document.getElementById('reactionPicker')) document.getElementById('reactionPicker').remove(); }, 5000);
+    };
+
+    window.__R_addReactionToMsg = window.addReactionToMsg = function(idx, emoji) {
+      const msgs = msgThreads[activeContact] || [];
+      if (!msgs[idx]) return;
+      if (!msgs[idx].reactions) msgs[idx].reactions = [];
+      const existing = msgs[idx].reactions.find(r => r.emoji === emoji);
+      if (existing) { existing.count++; } else { msgs[idx].reactions.push({emoji, count:1}); }
+      renderMsgThread();
+    };
 
     window.__R_sendMsg = window.sendMsg = function() {
       const input = document.getElementById('msgInput');
@@ -7296,15 +7992,11 @@ contact\u0040llfg.us`
       });
       input.value = '';
       renderMsgThread();
-      // Simulate reply
       const allContacts = [...MSG_CONTACTS.team, ...MSG_CONTACTS.upline, ...MSG_CONTACTS.downline];
       const contact = allContacts.find(c => c.id === activeContact);
       setTimeout(() => {
         if (!msgThreads[activeContact]) return;
-        const replies = [
-          'Got it, thanks!', 'Sounds good!', 'On it — will follow up shortly.',
-          'Perfect, appreciate you reaching out.', 'Copy that!', 'Noted — talk soon.'
-        ];
+        const replies = ['Got it, thanks!','Sounds good!','On it — will follow up shortly.','Perfect, appreciate you reaching out.','Copy that!','Noted — talk soon.'];
         msgThreads[activeContact].push({
           me: false,
           from: contact?.name || 'Them',
@@ -7313,7 +8005,20 @@ contact\u0040llfg.us`
         });
         renderMsgThread();
       }, 1200);
-    }
+    };
+
+    // ── Sales Bot — auto-posts new deals to team chat ──
+    window._postSaleBotToTeamChat = function(agentName, teamName, deal, ap) {
+      if (!msgThreads['team']) msgThreads['team'] = [];
+      msgThreads['team'].push({
+        type: 'sale_bot',
+        agentName, teamName, deal, ap,
+        reactions: [{emoji:'🔥',count:1},{emoji:'💰',count:1}],
+        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+      });
+      // If team chat is active, re-render
+      if (activeContact === 'team' || activeMsgTab === 'team') renderMsgThread();
+    };
 
     // ─── Business Card ───
     window.__R_updateBizCard = window.updateBizCard = function() {
@@ -7340,6 +8045,35 @@ contact\u0040llfg.us`
       set('bcPreviewWebsite', website);
       set('bcPreviewNPN',     npn ? 'NPN: '+npn : 'NPN: —');
       set('bcPreviewStates',  states || '—');
+    };
+
+    window.__R_downloadAppleWallet = window.downloadAppleWallet = function() {
+      const u       = currentUser || window._llfgCurrentUser;
+      const name    = document.getElementById('bcName')?.value    || u?.name || 'Agent';
+      const title   = document.getElementById('bcTitle')?.value   || 'Financial Advisor';
+      const phone   = document.getElementById('bcPhone')?.value   || '';
+      const email   = document.getElementById('bcEmail')?.value   || '';
+      const website = document.getElementById('bcWebsite')?.value || 'llfg.us';
+      const npn     = document.getElementById('bcNPN')?.value     || '';
+
+      // Generate a vCard-compatible HTML page that Apple can save as a contact
+      const vcardContent = `BEGIN:VCARD\r\nVERSION:3.0\r\nN:${name.split(' ').reverse().join(';')}\r\nFN:${name}\r\nORG:Legacy Life Financial Group\r\nTITLE:${title}\r\nTEL;TYPE=CELL:${phone}\r\nEMAIL:${email}\r\nURL:https://${website}\r\nNOTE:NPN: ${npn} | Legacy Life Financial Group\r\nEND:VCARD`;
+
+      // Create downloadable .vcf file (iOS/Mac auto-adds to contacts/wallet)
+      const blob = new Blob([vcardContent], {type:'text/vcard'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = name.replace(/\s/g,'_') + '_LLFG.vcf';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Show instruction toast
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.8rem 1.5rem;font-size:0.72rem;z-index:9999;font-family:"Raleway",sans-serif;text-align:center;line-height:1.6;max-width:300px;';
+      toast.innerHTML = '📱 <strong style="color:var(--gold);">Downloaded!</strong><br>Open on iPhone → tap the .vcf file → Add to Contacts. Then save to Wallet from your Contacts app.';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
     };
 
     window.__R_downloadBizCardPDF = window.downloadBizCardPDF = function() {
@@ -7575,22 +8309,11 @@ contact\u0040llfg.us`
       if (prevDate)  prevDate.textContent  = today;
       if (previewTo) previewTo.textContent = email ? `To: ${email}` : 'To: —';
 
-      // ── Update iPhone mockup ──
-      const agentInitials = agentName.split(' ').map(n=>n[0]).join('').substr(0,2).toUpperCase();
-      const iInit  = document.getElementById('iphoneAgentInit');
-      const iName  = document.getElementById('iphoneAgentName');
-      const iMsg   = document.getElementById('iphoneMsgText');
-      const iLink  = document.getElementById('iphoneLinkPreview');
-      if (iInit) iInit.textContent = agentInitials || 'AG';
-      if (iName) iName.textContent = agentName;
-      if (iMsg && first) iMsg.textContent = `Hey ${first}! I need some info to get your ${carrier||'policy'} started. Please fill out this quick secure form when you get a chance 🔒`;
-      if (iLink) iLink.textContent = `llfg.us/secure-form?ref=${token.substr(0,6)}••••••`;
-
       const body = document.getElementById('emailPreviewBody');
       if (!body) return;
 
       if (!first && !last && !carrier) {
-        body.innerHTML = '<p style="color:#aaa;font-style:italic;font-size:12px;text-align:center;padding:2rem 0;">Fill in the form on the left to preview your email.</p>';
+        body.innerHTML = '<div style="padding:20px 24px;color:#aaa;font-style:italic;font-size:12px;text-align:center;">Fill in the form to preview the secure email.</div>';
         return;
       }
 
@@ -8734,12 +9457,4 @@ This request requires Managing Partner approval.`
 
         document.querySelectorAll('.pillar, .about-left, .apply-inner, .why-card').forEach(el => {
       el.style.opacity = '0';
-      el.style.transform = 'translateY(24px)';
-      el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-      observer.observe(el);
-    });
-
-    // Functions self-register as __R_X at definition time above.
-  </script>
-</body>
-</html>
+      el.style.transfor
