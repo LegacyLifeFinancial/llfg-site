@@ -947,6 +947,32 @@
     .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
     .admin-tab:hover { color: var(--cream); }
 
+    /* ── Training Unit Content Styles ── */
+    .training-unit-body h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      color: var(--cream);
+      margin: 1.5rem 0 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      padding-bottom: 0.3rem;
+    }
+    .training-unit-body h4:first-child { margin-top: 0; }
+    .training-unit-body p { margin-bottom: 0.9rem; line-height: 1.85; }
+    .training-unit-body ul, .training-unit-body ol { padding-left: 1.5rem; margin-bottom: 0.9rem; }
+    .training-unit-body li { margin-bottom: 0.45rem; line-height: 1.75; }
+    .training-unit-body strong { color: var(--cream); font-weight: 600; }
+
+    /* Desktop — larger training text */
+    @media (min-width: 1024px) {
+      .training-unit-body > div { font-size: 0.97rem !important; }
+      .training-unit-body h4 { font-size: 1.22rem; }
+    }
+
+    /* ── Overview Quick Actions ── */
+    #portalOverviewSections > div:first-child > div:first-child > div > div { transition: all 0.15s; }
+
     .portal-dropdown {
       animation: fadeUp 0.15s ease both;
     }
@@ -3682,8 +3708,41 @@
               <div class="cal-field"><label>Business Email</label><input type="email" id="bcEmail" placeholder="jane&#64;llfg.us" oninput="updateBizCard()"/></div>
               <div class="cal-field"><label>Website</label><input type="text" id="bcWebsite" placeholder="llfg.us" oninput="updateBizCard()"/></div>
               <div class="cal-field"><label>License States</label><input type="text" id="bcStates" placeholder="IL, TX, GA, FL" oninput="updateBizCard()"/></div>
+
+              <!-- LLC Name Option -->
               <div class="cal-field">
-                <label>Card Style</label>
+                <label>Display Name <span style="color:var(--gray);font-size:0.6rem;">— Use your LLC name or personal brand</span></label>
+                <input type="text" id="bcBrandName" placeholder="Legacy Life Financial Group" oninput="updateBizCard()" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.75rem;font-family:'Raleway',sans-serif;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box;"/>
+                <div style="font-size:0.6rem;color:var(--gray);margin-top:0.3rem;line-height:1.5;">Leave blank to use Legacy Life Financial Group. Enter your registered LLC name if applicable.</div>
+              </div>
+
+              <!-- Logo Selection -->
+              <div class="cal-field">
+                <label>Logo Style</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.3rem;" id="bcLogoSelector">
+                  <div onclick="selectBcLogo('hexagon',this)" class="bc-logo-opt active" style="border:1px solid rgba(201,168,76,0.35);padding:0.6rem;cursor:pointer;text-align:center;background:rgba(201,168,76,0.06);">
+                    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 0.3rem;"><polygon points="20,2 38,11 38,29 20,38 2,29 2,11" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>
+                    <div style="font-size:0.58rem;color:var(--cream);">Hexagon L</div>
+                  </div>
+                  <div onclick="selectBcLogo('shield',this)" class="bc-logo-opt" style="border:1px solid rgba(255,255,255,0.08);padding:0.6rem;cursor:pointer;text-align:center;">
+                    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 0.3rem;"><path d="M20 3 L36 9 L36 22 C36 30 20 38 20 38 C20 38 4 30 4 22 L4 9 Z" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>
+                    <div style="font-size:0.58rem;color:var(--cream);">Shield</div>
+                  </div>
+                  <div onclick="selectBcLogo('diamond',this)" class="bc-logo-opt" style="border:1px solid rgba(255,255,255,0.08);padding:0.6rem;cursor:pointer;text-align:center;">
+                    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 0.3rem;"><polygon points="20,2 38,20 20,38 2,20" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>
+                    <div style="font-size:0.58rem;color:var(--cream);">Diamond</div>
+                  </div>
+                  <div onclick="selectBcLogo('circle',this)" class="bc-logo-opt" style="border:1px solid rgba(255,255,255,0.08);padding:0.6rem;cursor:pointer;text-align:center;">
+                    <svg width="28" height="28" viewBox="0 0 40 40" fill="none" style="display:block;margin:0 auto 0.3rem;"><circle cx="20" cy="20" r="17" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>
+                    <div style="font-size:0.58rem;color:var(--cream);">Circle</div>
+                  </div>
+                  <div onclick="selectBcLogo('wordmark',this)" class="bc-logo-opt" style="border:1px solid rgba(255,255,255,0.08);padding:0.6rem;cursor:pointer;text-align:center;grid-column:1/-1;">
+                    <div style="font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.28em;color:var(--gold);margin-bottom:0.2rem;">LEGACY LIFE</div>
+                    <div style="font-size:0.58rem;color:var(--cream);">Wordmark Only</div>
+                  </div>
+                </div>
+                <style>.bc-logo-opt:hover{border-color:rgba(201,168,76,0.3)!important;background:rgba(201,168,76,0.04)!important;}.bc-logo-opt.active{border-color:rgba(201,168,76,0.5)!important;background:rgba(201,168,76,0.1)!important;}</style>
+              </div>
                 <select id="bcStyle" onchange="updateBizCard()" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.75rem;font-family:'Raleway',sans-serif;font-size:0.85rem;outline:none;width:100%;-webkit-appearance:none;">
                   <option value="dark">Dark Gold (Default)</option>
                   <option value="light">White Minimal</option>
@@ -3728,16 +3787,16 @@
                     <!-- Top: Logo + Photo -->
                     <div style="display:flex;align-items:center;justify-content:space-between;">
                       <div style="display:flex;align-items:center;gap:6px;">
-                        <div style="width:26px;height:26px;position:relative;flex-shrink:0;">
+                        <div id="bcCardLogoMark" style="width:26px;height:26px;position:relative;flex-shrink:0;">
                           <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
                             <polygon points="20,2 38,11 38,29 20,38 2,29 2,11" fill="none" stroke="#c9a84c" stroke-width="2"/>
                             <polygon points="20,7 33,14 33,26 20,33 7,26 7,14" fill="rgba(201,168,76,0.08)" stroke="rgba(201,168,76,0.4)" stroke-width="1"/>
                             <text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text>
                           </svg>
                         </div>
-                        <div>
-                          <div style="font-family:'Cinzel',serif;font-size:0.52rem;letter-spacing:0.28em;color:var(--gold);text-transform:uppercase;line-height:1.2;">Legacy Life</div>
-                          <div style="font-size:0.38rem;letter-spacing:0.18em;color:rgba(201,168,76,0.45);text-transform:uppercase;">Financial Group</div>
+                        <div id="bcPreviewBrand">
+                          <div style="font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.24em;color:var(--gold);text-transform:uppercase;line-height:1.25;">Legacy Life</div>
+                          <div style="font-size:0.36rem;letter-spacing:0.16em;color:rgba(201,168,76,0.45);text-transform:uppercase;">Financial Group</div>
                         </div>
                       </div>
                       <!-- Agent photo -->
@@ -4520,25 +4579,46 @@
     <div class="admin-tab-content" id="ptab-agentapprovals">
       <div class="dash-body">
         <div class="dash-welcome">
-          <h2>Agent <em>Approvals</em></h2>
-          <p>Review agent submissions from your downline and promotion requests. Executive approval required for manager promotions.</p>
+          <h2>Team <em>Management</em></h2>
+          <p id="approvalTabSubtitle">Review agent submissions, manage compensation levels, and approve promotions within your hierarchy.</p>
         </div>
 
-        <!-- PROMOTION REQUESTS (Executive only) -->
+        <!-- HIERARCHY CHART -->
+        <div class="dash-section" style="margin-bottom:1.5rem;">
+          <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+            <span>Your Hierarchy</span>
+            <span style="font-size:0.6rem;color:var(--gray);font-weight:400;">Commission levels shown — click any agent to manage</span>
+          </div>
+          <div id="hierarchyChartWrap" style="overflow-x:auto;padding-bottom:0.5rem;"></div>
+        </div>
+
+        <!-- PROMOTION REQUESTS (Executive+ only) -->
         <div class="dash-section" id="promotionSection" style="margin-bottom:1.5rem;display:none;">
-          <div class="dash-section-title">Manager Promotion Requests <span id="promotionCount">0</span></div>
-          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Agents requesting promotion to Manager role. Executive approval required.</p>
+          <div class="dash-section-title">Promotion Requests <span id="promotionCount" style="font-size:0.7rem;color:var(--gray);font-weight:400;margin-left:0.3rem;">0</span></div>
+          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">Agents requesting promotion to Manager. Executives approve promotions within their hierarchy. Managing Partners approve Executive promotions.</p>
           <div id="promotionList"><p style="color:var(--gray);font-size:0.78rem;padding:0.5rem 0;">No promotion requests pending.</p></div>
         </div>
 
+        <!-- PENDING AGENT SUBMISSIONS -->
         <div class="dash-section" style="margin-bottom:1.5rem;">
-          <div class="dash-section-title">Pending Agent Submissions <span id="pendingAgentCount">0</span></div>
+          <div class="dash-section-title">Pending Submissions <span id="pendingAgentCount" style="font-size:0.7rem;color:var(--gray);font-weight:400;margin-left:0.3rem;">0</span></div>
+          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;">New agents submitted by your downline awaiting your review. Approved agents advance to contracting.</p>
           <div id="pendingAgentList"><p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No submissions awaiting approval.</p></div>
         </div>
-        <div class="dash-section">
-          <div class="dash-section-title">Approved — Awaiting Contracting <span id="approvedAgentCount">0</span></div>
-          <div id="approvedAgentList"><p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No agents approved yet.</p></div>
+
+        <!-- APPROVED / AWAITING CONTRACTING -->
+        <div class="dash-section" style="margin-bottom:1.5rem;">
+          <div class="dash-section-title">Approved — Awaiting Contracting <span id="approvedAgentCount" style="font-size:0.7rem;color:var(--gray);font-weight:400;margin-left:0.3rem;">0</span></div>
+          <div id="approvedAgentList"><p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No agents awaiting contracting.</p></div>
         </div>
+
+        <!-- COMPENSATION MANAGEMENT -->
+        <div class="dash-section" id="compManagementSection">
+          <div class="dash-section-title">Compensation Management</div>
+          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.6;" id="compMgmtDesc">Adjust agent commission levels within your authority. Managers may set comp up to 5% below their own level. Executives may override any comp within their hierarchy.</p>
+          <div id="compManagementList"></div>
+        </div>
+
       </div>
     </div>
 
@@ -6325,8 +6405,8 @@ Legacy Life Financial Group`
     // manager sees: overview, deals, addagents, messages, dataforms, commreq
     // Hierarchy: admin > managing_partner > executive > manager > financial_advisor
     const USERS = {
-      'agent\u0040llfg.us':           { password:'agent123',   role:'financial_advisor', name:'Demo Agent',       comm:75  },
-      'jaalyn\u0040llfg.us':          { password:'agent123',   role:'financial_advisor', name:'Jaalyn Bowman',    comm:80  },
+      'agent\u0040llfg.us':           { password:'agent123',   role:'financial_advisor', name:'Demo Agent',       comm:65  },
+      'jaalyn\u0040llfg.us':          { password:'agent123',   role:'financial_advisor', name:'Jaalyn Bowman',    comm:65  },
       'manager\u0040llfg.us':         { password:'mgr123',     role:'manager',           name:'Marcus Reid',      comm:100 },
       'executive\u0040llfg.us':       { password:'exec123',    role:'executive',         name:'Sofia Lane',       comm:120 },
       'partner\u0040llfg.us':         { password:'partner123', role:'managing_partner',  name:'Diana Walsh',      comm:140 },
@@ -6337,10 +6417,27 @@ Legacy Life Financial Group`
     // Runtime permission overrides
     let runtimePermissions = {};
 
+    // ── Promotion Requirements ──
+    const PROMOTION_REQUIREMENTS = {
+      manager:          { ap: 150000, label: 'Manager (100%)',         color: '#6ea8fe', req: 'Three teams of 4+ producing agents · $150K monthly team AP' },
+      executive:        { ap: 500000, label: 'Executive (120%)',        color: '#c084fc', req: '3 Managers with 3–4 generations of downlines · $500K monthly team AP' },
+      director:         { ap: 1500000,label: 'Director (135%)',         color: '#ff9f43', req: '3 Executives producing · $1.5M monthly team AP' },
+      managing_partner: { ap: 6000000,label: 'Managing Partner (150%)', color: '#c9a84c', req: '3+ Directors operating · $6M monthly team AP' },
+    };
+
+    // ── Commission tier caps per role (can only see 2 levels above) ──
+    const COMM_VISIBILITY_CAP = {
+      financial_advisor: 120, agent: 120,   // sees FA + Manager level
+      manager: 135,                          // sees FA + Manager + Executive
+      executive: 150,                        // sees up to Director
+      director: 150, managing_partner: 150, admin: 999,
+    };
+
     const ROLE_TABS = {
       financial_advisor: ['overview','mydeals','tools','calendar','messages','dataforms','management'],
       manager:           ['overview','mydeals','tools','calendar','messages','dataforms','management'],
       executive:         ['overview','mydeals','tools','calendar','messages','dataforms','management'],
+      director:          ['overview','mydeals','tools','calendar','messages','dataforms','management'],
       managing_partner:  ['overview','mydeals','tools','calendar','messages','dataforms','management'],
       admin:             ['overview','mydeals','tools','calendar','messages','dataforms','management'],
       agent:             ['overview','mydeals','tools','calendar','messages','dataforms','management'],
@@ -6910,89 +7007,137 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
       const q = getQuoteOfTheDay();
 
-      // Leaderboard
+      // ── Hierarchy Leaderboard — role-gated to own hierarchy only ──
+      const isDirectorPlus = ['director','managing_partner','admin'].includes(role) || isOwner;
+      const isExecPlus     = ['executive','director','managing_partner','admin'].includes(role) || isOwner;
+
       let lbHTML = '';
       if (isAgent || isManager) {
+        // Agents & Managers see individual agent leaderboard within their hierarchy
         const sorted = [...LEADERBOARD_AGENTS].sort((a,b) => b.ap - a.ap);
-        const maxAP  = sorted[0].ap;
-        const showC  = !isAgent;
-        lbHTML = `<div class="dash-section-title" style="margin-bottom:1rem;">Top Producers <span>This Month</span></div>`
+        const maxAP  = sorted[0]?.ap || 1;
+        lbHTML = `
+          <div class="dash-section-title" style="margin-bottom:0.8rem;display:flex;align-items:center;justify-content:space-between;">
+            <span>Agent Production <span style="color:var(--gray);font-weight:400;font-size:0.68rem;">— This Month</span></span>
+          </div>
+          <div style="font-size:0.62rem;color:var(--gray);margin-bottom:0.8rem;">Your hierarchy — click any row to expand individual detail</div>`
           + sorted.map((a,i) => {
-            const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+            const rc = i===0?'var(--gold)':i===1?'#aaa':i===2?'#cd7f32':'var(--gray)';
             const pct = Math.round((a.ap/maxAP)*100);
-            return `<div class="lb-row">
-              <div class="lb-rank ${rankClass}">${i+1}</div>
-              <div class="team-avatar" style="width:32px;height:32px;font-size:0.7rem;flex-shrink:0;">${a.init}</div>
-              <div class="lb-info"><div class="lb-name">${a.name}</div><div class="lb-sub">${a.role}${showC?' · '+a.comm+'%':''}</div></div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
-              <div class="lb-val">$${a.ap.toLocaleString()}</div>
+            return `<div style="display:flex;align-items:center;gap:0.7rem;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:${rc};min-width:20px;text-align:center;font-weight:700;">${i+1}</div>
+              <div style="width:30px;height:30px;background:rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:center;font-size:0.62rem;color:var(--gold);font-weight:600;flex-shrink:0;">${a.init}</div>
+              <div style="flex:1;">
+                <div style="font-size:0.78rem;color:var(--cream);font-weight:500;">${a.name}</div>
+                <div style="font-size:0.58rem;color:var(--gray);">${a.role} · ${a.comm}%</div>
+              </div>
+              <div style="flex:1;max-width:100px;background:rgba(255,255,255,0.04);height:4px;overflow:hidden;">
+                <div style="height:100%;background:var(--gold);width:${pct}%;opacity:0.7;"></div>
+              </div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);min-width:64px;text-align:right;">$${a.ap.toLocaleString()}</div>
             </div>`;
           }).join('');
       } else {
+        // Manager+ sees team leaderboard — expandable to agents
         const sorted = [...LEADERBOARD_TEAMS].sort((a,b) => b.totalAP - a.totalAP);
-        const maxAP  = sorted[0].totalAP;
-        lbHTML = `<div class="dash-section-title" style="margin-bottom:0.5rem;">Team Leaderboard <span>This Month</span></div>
-          <p style="font-size:0.68rem;color:var(--gray);margin-bottom:1rem;">Click a team to see agent breakdown</p>`
+        const maxAP  = sorted[0]?.totalAP || 1;
+        lbHTML = `
+          <div class="dash-section-title" style="margin-bottom:0.4rem;display:flex;align-items:center;justify-content:space-between;">
+            <span>Team Performance <span style="color:var(--gray);font-weight:400;font-size:0.68rem;">— This Month</span></span>
+          </div>
+          <div style="font-size:0.62rem;color:var(--gray);margin-bottom:0.9rem;">Your hierarchy — click any team to expand agent breakdown</div>`
           + sorted.map((t,i) => {
-            const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+            const rc = i===0?'var(--gold)':i===1?'#aaa':i===2?'#cd7f32':'var(--gray)';
             const pct = Math.round((t.totalAP/maxAP)*100);
-            const agentsHTML = LEADERBOARD_AGENTS.filter(a=>a.team===t.name).sort((a,b)=>b.ap-a.ap)
-              .map(a=>`<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0.8rem;background:rgba(201,168,76,0.03);">
-                <div class="team-avatar" style="width:26px;height:26px;font-size:0.6rem;">${a.init}</div>
-                <div style="flex:1;font-size:0.75rem;color:var(--cream);">${a.name}</div>
-                <div style="font-size:0.65rem;color:var(--gray);">${a.comm}%</div>
-                <div style="font-family:\'Cormorant Garamond\',serif;font-size:1rem;color:var(--gold);">$${a.ap.toLocaleString()}</div>
+            const agents = LEADERBOARD_AGENTS.filter(a=>a.team===t.name).sort((a,b)=>b.ap-a.ap);
+            const agentBreakdown = agents.map(a=>`
+              <div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 1rem 0.45rem 3rem;border-bottom:1px solid rgba(255,255,255,0.02);">
+                <div style="width:24px;height:24px;background:rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--gold);flex-shrink:0;">${a.init}</div>
+                <div style="flex:1;font-size:0.74rem;color:var(--cream);">${a.name}</div>
+                <div style="font-size:0.6rem;color:var(--gray);">${a.comm}%</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--gold);">$${a.ap.toLocaleString()}</div>
               </div>`).join('');
-            return `<div class="lb-row clickable" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">
-              <div class="lb-rank ${rankClass}">${i+1}</div>
-              <div class="lb-info"><div class="lb-name">${t.name}</div><div class="lb-sub">Lead: ${t.leader} · ${t.agents} agents</div></div>
-              <div class="lb-bar-wrap"><div class="lb-bar" style="width:${pct}%"></div></div>
-              <div class="lb-val">$${t.totalAP.toLocaleString()}</div>
-            </div>
-            <div style="display:none;border-bottom:1px solid rgba(201,168,76,0.08);">${agentsHTML}</div>`;
+            return `<div style="border-bottom:1px solid rgba(255,255,255,0.04);">
+              <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;cursor:pointer;" onmouseover="this.style.background='rgba(201,168,76,0.03)'" onmouseout="this.style.background=''">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:${rc};min-width:22px;text-align:center;font-weight:700;">${i+1}</div>
+                <div style="flex:1;">
+                  <div style="font-size:0.8rem;color:var(--cream);font-weight:500;">${t.name}</div>
+                  <div style="font-size:0.58rem;color:var(--gray);">Lead: ${t.leader} · ${t.agents} agents</div>
+                </div>
+                <div style="width:80px;background:rgba(255,255,255,0.04);height:4px;overflow:hidden;">
+                  <div style="height:100%;background:var(--gold);width:${pct}%;opacity:0.7;"></div>
+                </div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);min-width:72px;text-align:right;">$${t.totalAP.toLocaleString()}</div>
+              </div>
+              <div style="display:none;">${agentBreakdown}</div>
+            </div>`;
           }).join('');
       }
 
-      // Customer Book of Business (agents only — live, updates with deals)
+      // ── Promotion Progress ──
+      const promoData = {
+        financial_advisor: { next:'Manager (100%)', req:'Achieve $150K monthly team AP with 3 teams of 4+ producing agents', color:'#6ea8fe', progress: 12 },
+        manager:           { next:'Executive (120%)', req:'$500K monthly team AP · 3 Managers with 3–4 generations of downlines', color:'#c084fc', progress: 34 },
+        executive:         { next:'Director (135%)', req:'$1.5M monthly team AP · 3 Executives producing', color:'#ff9f43', progress: 22 },
+        director:          { next:'Managing Partner (150%)', req:'$6M monthly team AP · 3+ Directors operating', color:'var(--gold)', progress: 45 },
+        managing_partner:  { next:'Elite Tier', req:'You have achieved the highest published tier.', color:'var(--gold)', progress: 100 },
+      };
+      const pd = promoData[role] || promoData.financial_advisor;
+      const promoHTML = role !== 'admin' && !isOwner ? `
+        <div class="dash-section" style="border-color:rgba(${pd.color.includes('--gold')?'201,168,76':pd.color.includes('6ea8fe')?'110,168,254':pd.color.includes('c084fc')?'192,132,252':'255,159,67'},0.2);">
+          <div class="dash-section-title" style="margin-bottom:0.6rem;">Promotion Path</div>
+          <div style="font-size:0.68rem;color:var(--gray);margin-bottom:0.3rem;">Next tier: <strong style="color:var(--cream);">${pd.next}</strong></div>
+          <div style="font-size:0.62rem;color:var(--gray);line-height:1.6;margin-bottom:0.8rem;">${pd.req}</div>
+          <div style="background:rgba(255,255,255,0.05);height:6px;overflow:hidden;margin-bottom:0.4rem;">
+            <div style="height:100%;background:${pd.color};width:${pd.progress}%;transition:width 0.6s ease;"></div>
+          </div>
+          <div style="font-size:0.6rem;color:var(--gray);">Progress toward next promotion threshold</div>
+        </div>` : '';
+
+      // Customer Book of Business
       const customerBookHTML = isAgent ? `
         <div class="dash-section">
-          <div class="dash-section-title">My Book of Business <span id="ovBobCount" style="color:var(--gray);font-size:0.7rem;font-weight:400;">0 clients</span></div>
-          <div id="ovBobList"><p style="font-size:0.75rem;color:var(--gray);padding:0.5rem 0;">No policies logged yet. Add deals in My Deals tab.</p></div>
-        </div>
-        <div class="dash-section">
-          <div class="dash-section-title">Earnings Statements <span style="font-size:0.62rem;color:var(--gray);font-weight:400;">Per Deal</span></div>
-          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:0.8rem;line-height:1.6;">Individual commission breakdown per policy — updated when you log deals.</p>
-          <div id="ovEarningsList"><p style="font-size:0.75rem;color:var(--gray);padding:0.5rem 0;">No earnings recorded yet. Log your first deal to generate a statement.</p></div>
+          <div class="dash-section-title">Book of Business <span id="ovBobCount" style="color:var(--gray);font-size:0.7rem;font-weight:400;">0 clients</span></div>
+          <div id="ovBobList"><p style="font-size:0.75rem;color:var(--gray);padding:0.5rem 0;">No policies logged yet.</p></div>
         </div>` : '';
 
       document.getElementById('portalOverviewSections').innerHTML = `
         <div style="display:flex;flex-direction:column;gap:1rem;">
+          <!-- Quick Actions -->
           <div class="dash-section">
-            <div class="dash-section-title">Quick Actions</div>
+            <div class="dash-section-title" style="margin-bottom:0.8rem;">Quick Actions</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="showPortalTab('deals',document.querySelector('[onclick*=deals]'))">
-                <div class="training-icon" style="font-size:1.1rem;">💼</div><div><div class="training-name" style="font-size:0.72rem;">Log a Deal</div><div class="training-meta">AP &amp; commission calc</div></div>
+              <div onclick="selectSubTab('deals')" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Log a Deal</div>
+                <div style="font-size:0.6rem;color:var(--gray);">AP and commission</div>
               </div>
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="showPortalTab('commissions',document.querySelector('[onclick*=commissions]'))">
-                <div class="training-icon" style="font-size:1.1rem;">💰</div><div><div class="training-name" style="font-size:0.72rem;">Commissions</div><div class="training-meta">Earnings &amp; statements</div></div>
+              <div onclick="selectSubTab('commissions')" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Commissions</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Earnings and statements</div>
               </div>
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="showPortalTab('training',document.querySelector('[onclick*=training]'))">
-                <div class="training-icon" style="font-size:1.1rem;">📚</div><div><div class="training-name" style="font-size:0.72rem;">Training</div><div class="training-meta">Products &amp; sales process</div></div>
+              <div onclick="selectSubTab('training')" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Training</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Curriculum and resources</div>
               </div>
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="showPortalTab('dataforms',document.querySelector('[onclick*=dataforms]'))">
-                <div class="training-icon" style="font-size:1.1rem;">🔒</div><div><div class="training-name" style="font-size:0.72rem;">Secure Form</div><div class="training-meta">Collect client info</div></div>
+              <div onclick="showPortalTab('calendar',null)" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Schedule Event</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Calendar and invites</div>
               </div>
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="selectSubTab('addagents')">
-                <div class="training-icon" style="font-size:1.1rem;">👥</div><div><div class="training-name" style="font-size:0.72rem;">Add an Agent</div><div class="training-meta">Recruit to downline</div></div>
+              <div onclick="selectSubTab('addagents')" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Add an Agent</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Recruit to downline</div>
               </div>
-              <div class="training-item" style="cursor:pointer;padding:0.6rem 0.8rem;" onclick="showPortalTab('messages',document.querySelector('[onclick*=messages]'))">
-                <div class="training-icon" style="font-size:1.1rem;">💬</div><div><div class="training-name" style="font-size:0.72rem;">Team Chat</div><div class="training-meta">Messages &amp; updates</div></div>
+              <div onclick="showPortalTab('messages',null)" style="padding:0.8rem;border:1px solid rgba(201,168,76,0.1);cursor:pointer;background:rgba(201,168,76,0.03);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.3)';this.style.background='rgba(201,168,76,0.07)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.1)';this.style.background='rgba(201,168,76,0.03)'">
+                <div style="font-size:0.72rem;font-weight:600;color:var(--cream);margin-bottom:0.2rem;">Messages</div>
+                <div style="font-size:0.6rem;color:var(--gray);">Team chat and groups</div>
               </div>
             </div>
           </div>
+          <!-- Quote of the Day -->
           <div class="dash-section">
             <div class="qotd-wrap"><div class="qotd-mark">"</div><div class="qotd-text">${q.text}</div><div class="qotd-author">— ${q.author}</div></div>
           </div>
+          ${promoHTML}
           ${customerBookHTML}
         </div>
         <div class="dash-section">${lbHTML}</div>`;
@@ -7669,23 +7814,22 @@ ${reportSections}
       if (scaleEl) {
         // Define all tiers
         const allTiers = [
-          { pct:65,  apLabel:'Starting Level',      roleLabel:'Financial Advisor', promotion:'' },
-          { pct:70,  apLabel:'$5K AP / month',      roleLabel:'Financial Advisor', promotion:'' },
-          { pct:80,  apLabel:'$20K AP / month',     roleLabel:'Financial Advisor', promotion:'' },
-          { pct:90,  apLabel:'$50K AP / month',     roleLabel:'Financial Advisor', promotion:'' },
-          { pct:100, apLabel:'$150K AP / month',    roleLabel:'Manager',           promotion:'Manager Promotion' },
-          { pct:110, apLabel:'$250K AP / month',    roleLabel:'Manager',           promotion:'' },
-          { pct:120, apLabel:'$500K AP / month',    roleLabel:'Executive',         promotion:'Executive Promotion' },
-          { pct:130, apLabel:'$1M AP / month',      roleLabel:'Executive',         promotion:'' },
-          { pct:140, apLabel:'$3M AP / month',      roleLabel:'Managing Partner',  promotion:'Managing Partner' },
+          { pct:65,  apLabel:'Starting Level',        roleLabel:'Financial Advisor', promotion:'' },
+          { pct:70,  apLabel:'$5K AP / month',        roleLabel:'Financial Advisor', promotion:'' },
+          { pct:80,  apLabel:'$20K AP / month',       roleLabel:'Financial Advisor', promotion:'' },
+          { pct:90,  apLabel:'$50K AP / month',       roleLabel:'Financial Advisor', promotion:'' },
+          { pct:100, apLabel:'$150K monthly team AP · 3 teams of 4+ agents', roleLabel:'Manager', promotion:'Manager Promotion' },
+          { pct:110, apLabel:'$250K AP / month',      roleLabel:'Manager',           promotion:'' },
+          { pct:120, apLabel:'$500K monthly team AP · 3 Managers + 3–4 gen downlines', roleLabel:'Executive', promotion:'Executive Promotion' },
+          { pct:130, apLabel:'$1M AP / month',        roleLabel:'Executive',         promotion:'' },
+          { pct:135, apLabel:'$1.5M monthly team AP · 3 Executives producing', roleLabel:'Director', promotion:'Director Promotion' },
+          { pct:150, apLabel:'$6M monthly team AP · 3+ Directors operating',   roleLabel:'Managing Partner', promotion:'Managing Partner' },
         ];
 
-        // Role-based visibility cap
-        const visibilityCap = {
-          financial_advisor: 100, agent: 100,
-          manager: 120,
-          executive: 140, managing_partner: 140, admin: 999,
-        };
+        // Role-based visibility cap — can only see 2 levels above current
+        const visibilityCap = (typeof COMM_VISIBILITY_CAP !== 'undefined')
+          ? COMM_VISIBILITY_CAP
+          : { financial_advisor:120, agent:120, manager:135, executive:150, director:150, managing_partner:150, admin:999 };
         const cap = visibilityCap[role] || 100;
         const visibleTiers = allTiers.filter(t => t.pct <= cap);
 
@@ -7741,207 +7885,432 @@ ${reportSections}
     // ─── Training Curriculum ───
     const TRAINING_CURRICULUM = [
       {
-        id: 'fa',
-        role: 'financial_advisor',
-        roleLabel: 'Financial Advisor',
-        icon: '📋',
-        color: 'var(--gold)',
+        id: 'fa', role: 'financial_advisor', roleLabel: 'Financial Advisor',
+        icon: '', color: 'var(--gold)',
         chapters: [
           {
-            title: 'Chapter 1 — Foundations of Insurance Sales',
+            title: 'Chapter 1 — Product Mastery',
             units: [
-              { id:'fa_1_1', title:'Unit 1 — Term Life Insurance', icon:'📄', duration:'15 min', content: `<h4>What It Is</h4><p>Term life provides a death benefit for a set period — typically 10, 20, or 30 years. The most affordable and straightforward product. If the insured passes during the term, the beneficiary receives the face amount tax-free.</p><h4>Who It's For</h4><ul><li>Young families needing income replacement</li><li>Homeowners with a mortgage</li><li>Business owners with key-person exposure</li><li>Anyone needing maximum coverage at the lowest cost</li></ul><h4>Sales Psychology</h4><p>Lead with protection. "If something happened to you tomorrow, would your family be okay financially?" Anchor against monthly expenses — $250,000 coverage for less than a Netflix subscription per day.</p><h4>Key Objections</h4><p><strong>"I'll think about it"</strong> — "What specifically would you want to think about?"<br><strong>"Too expensive"</strong> — Reframe to daily cost. A $500K policy might be $28/month.<br><strong>"I have work coverage"</strong> — "Group coverage ends when you leave. Is that a risk you're comfortable with?"</p>` },
-              { id:'fa_1_2', title:'Unit 2 — Whole Life Insurance', icon:'📄', duration:'15 min', content: `<h4>What It Is</h4><p>Permanent coverage that lasts a lifetime, builds guaranteed cash value, and has fixed premiums. The death benefit is guaranteed as long as premiums are paid.</p><h4>Who It's For</h4><ul><li>Final expense and burial planning ($5K–$25K)</li><li>Parents buying for children to lock in low rates early</li><li>High-income earners using it as a tax-advantaged savings vehicle</li></ul><h4>Sales Psychology</h4><p>"Term is renting, whole life is owning." For final expense: "This covers your funeral so your family only has to grieve — not worry about money."</p>` },
-              { id:'fa_1_3', title:'Unit 3 — Indexed Universal Life (IUL)', icon:'📄', duration:'20 min', content: `<h4>What It Is</h4><p>Flexible permanent insurance where cash value growth ties to a stock market index (S&P 500) with a 0% floor — you never lose money in a down market. Offers tax-free growth and distributions in retirement.</p><h4>Who It's For</h4><ul><li>Business owners who have maxed 401k/IRA</li><li>Clients wanting market-like growth without market risk</li><li>People planning for tax-free retirement income</li></ul><h4>Key Points</h4><p>Zero floor. Tax-free growth via policy loans. Flexible premiums. Not subject to 401k contribution limits.</p>` },
-              { id:'fa_1_4', title:'Unit 4 — Final Expense & Annuities', icon:'📄', duration:'15 min', content: `<h4>Final Expense</h4><p>Simplified issue whole life for seniors (50–85). No medical exam. Face amounts $5,000–$35,000. Fast to issue, fast commission.</p><h4>Annuities</h4><p>Contracts that guarantee income. Fixed annuities provide guaranteed interest. FIAs offer index-linked growth with no downside. Ideal for clients worried about outliving their money.</p>` },
-              { id:'fa_1_5', title:'Unit 5 — The 5-Step Sales Process', icon:'🎯', duration:'25 min', content: `<h4>Step 1 — Build Rapport</h4><p>Spend the first 2 minutes asking about them — their family, their goals, their concerns. Listen more than you talk.</p><h4>Step 2 — Fact Find</h4><p>"Do you have any life insurance currently?" "Who depends on your income?" "If something happened to you, what's your biggest concern for your family?"</p><h4>Step 3 — Present the Solution</h4><p>Show one product that solves their specific problem. Don't overwhelm with options. Tie the solution back to what they told you in the fact find.</p><h4>Step 4 — Handle Objections</h4><p>Every objection is a request for more information. Ask: "What specifically would you want to think about?" Then address that one thing.</p><h4>Step 5 — Close</h4><p>Assume the sale. "Based on everything we've discussed, the best fit for your family is the 20-year term at $X/month. Let's get your application started." Then be quiet.</p>` },
-              { id:'fa_1_6', title:'Unit 6 — B.O.L.T. Client Types', icon:'🎭', duration:'20 min', content: `<h4>Bull</h4><p>Confident, assertive, results-driven. Get to the point fast. Present numbers and facts. They respect directness.</p><h4>Owl</h4><p>Analytical, detail-oriented, skeptical. Give them data, comparisons, and proof. Answer every question thoroughly.</p><h4>Lamb</h4><p>Warm, relationship-driven, avoidant of conflict. Build trust first. Speak slowly and reassuringly.</p><h4>Tiger</h4><p>Enthusiastic, big picture, fast mover. Match their energy. Show them the vision. Get the application in fast.</p>` },
-              { id:'fa_1_7', title:'Unit 7 — Carrier Benefits Guide', icon:'🏢', duration:'30 min', content: `<p>Know your carriers. Understanding each carrier's strengths, GI qualifications, and ideal client profile separates a good agent from a great one. Study each carrier's product guides, underwriting guidelines, and living benefit riders.</p><div id="carrierTrainingList"></div>` },
-              { id:'fa_1_8', title:'Unit 8 — Writing Good Business & Avoiding Chargebacks', icon:'⚠️', duration:'20 min', content: `<h4>What Is a Chargeback?</h4><p>A chargeback occurs when a policy lapses within the advance period (typically 9 months). The carrier claws back the commission advance, creating debt.</p><h4>Prevention</h4><ul><li>Only write policies clients can genuinely afford</li><li>Set draft dates that align with their payday</li><li>Send a welcome call 30 days after issue</li><li>Always confirm the client has received and understood their policy</li></ul><h4>Persistency</h4><p>Your persistency rate (policies still active after 13 months) is the most important metric after AP. Below 70% triggers review. Above 85% earns better contract levels.</p>` },
+              { id:'fa_1_1', title:'Unit 1 — Term Life Insurance', duration:'20 min', content: `
+<h4>What It Is</h4>
+<p>Term life insurance provides a guaranteed death benefit for a defined period — most commonly 10, 15, 20, or 30 years. If the insured passes away while the policy is in force, the named beneficiary receives the face amount income-tax-free under IRC Section 101(a). Premiums are level for the duration of the selected term and are determined at issue based on age, health classification, and coverage amount.</p>
+<p>Term is the purest form of life insurance — maximum death benefit for minimum premium. It is not designed to accumulate cash value, which is precisely why it is the most affordable option available.</p>
+
+<h4>Prime Candidates</h4>
+<p>The ideal term life client is someone with significant financial obligations and a time-sensitive need for protection:</p>
+<ul>
+<li><strong>Young families with children</strong> — A 32-year-old parent with two children under six needs income replacement protection that covers at minimum the years until the youngest reaches financial independence. A 20-year, $750,000 term policy accomplishes this for a fraction of what permanent insurance would cost at that age.</li>
+<li><strong>Homeowners carrying a mortgage</strong> — The death benefit can retire the outstanding mortgage balance, keeping the family in their home regardless of the breadwinner's absence.</li>
+<li><strong>Business owners with key-person exposure</strong> — If a business would suffer materially from the loss of a specific individual, term insurance on that key person funds operational continuity during the transition.</li>
+<li><strong>Income replacement for dual-income households</strong> — Either spouse's income loss could destabilize the household. Both should carry coverage equal to 10–12x their annual income.</li>
+<li><strong>Parents with student loan co-signers</strong> — Private student loan debt does not discharge at death in most cases. A term policy protects the co-signer from inherited liability.</li>
+</ul>
+
+<h4>How to Sell Term Life</h4>
+<p>Term life is sold on the reality of financial exposure, not on the fear of death. Your conversation should quantify the client's existing obligations and translate them into a specific dollar amount of protection needed.</p>
+<p>Begin by establishing what is at stake: "If something were to happen to you tomorrow, what would your family need financially to maintain their current lifestyle?" Guide them through a simple calculation — outstanding debt, future income needs, childcare costs, and education funding. Once the exposure is defined, the solution sells itself.</p>
+<p>Never apologize for the conversation. Discussing mortality is uncomfortable. Discussing the financial devastation left behind for a spouse and children is far worse. Your role is to have the conversation others will not have.</p>
+
+<h4>Key Objections and Responses</h4>
+<p><strong>"I'll think about it."</strong> — "I understand — what specifically would you want to think through? Let's make sure I've given you everything you need to make a confident decision." This response converts a stall into a conversation.</p>
+<p><strong>"It's too expensive."</strong> — Reframe to a daily cost. A $500,000, 20-year term policy for a healthy 35-year-old may cost $28/month — less than $1 per day. Ask: "Is protecting your family's financial future worth a dollar a day to you?"</p>
+<p><strong>"I have coverage through work."</strong> — "Most employer plans provide 1–2x your salary, which rarely covers a family's actual needs. And if you change jobs or are laid off, that coverage ends the day your employment does. Does that feel like a complete plan to you?"</p>
+<p><strong>"I'm young and healthy — I don't need it yet."</strong> — "That's actually exactly the reason to lock in coverage now. Your health rating determines your premium for the life of the policy. The cheapest premium you'll ever qualify for is today."</p>`},
+
+              { id:'fa_1_2', title:'Unit 2 — Whole Life Insurance', duration:'20 min', content: `
+<h4>What It Is</h4>
+<p>Whole life insurance is permanent protection that remains in force for the insured's entire lifetime, provided premiums are paid. It is a contract between the policyholder and the insurance company with three guaranteed components: a fixed death benefit, a fixed premium that never increases, and guaranteed cash value accumulation.</p>
+<p>Cash value grows at a guaranteed rate set by the insurance company and is sheltered from market volatility. In participating whole life policies, policyholders may also receive non-guaranteed dividends — a return of excess premium — which can be taken as cash, used to reduce premiums, or reinvested to purchase additional paid-up insurance.</p>
+
+<h4>Prime Candidates</h4>
+<ul>
+<li><strong>Final expense planning (ages 50–85)</strong> — The most common and accessible application. Simplified-issue whole life policies with face amounts of $5,000–$25,000 cover burial costs, outstanding medical bills, and end-of-life expenses without requiring a medical exam. Many clients in this market have been carrying the emotional weight of not wanting to be a financial burden to their children. You are solving a deeply personal problem.</li>
+<li><strong>Parents insuring children</strong> — A $25,000 whole life policy on a 2-year-old locks in insurability for life regardless of future health conditions, and the premium will never be lower than it is today. The child inherits the policy at adulthood with significant cash value already accumulated.</li>
+<li><strong>High-income earners seeking tax-advantaged savings</strong> — Once qualified retirement accounts are maximized, whole life offers additional tax-deferred cash value growth with tax-free access via policy loans.</li>
+<li><strong>Business succession planning</strong> — Buy-sell agreements often use whole life insurance to fund the buyout of a deceased partner's ownership interest at a pre-agreed valuation.</li>
+</ul>
+
+<h4>How to Sell Whole Life</h4>
+<p>For final expense: The conversation centers on relief, not death. "You've worked hard your whole life to provide for your family. The last thing you want is to leave them with a bill during the hardest week of their lives." Make it about legacy and dignity, not about illness or death.</p>
+<p>For high-income clients: Position it as a fourth financial vehicle — after 401(k), IRA, and taxable brokerage accounts. The combination of guaranteed growth, tax-free access, and a permanent death benefit creates a uniquely efficient asset that no other financial product replicates.</p>
+<p>Key framing: "Term is renting protection. Whole life is owning it. Rent money disappears. Ownership builds equity." This analogy resonates immediately and requires no financial education to understand.`},
+
+              { id:'fa_1_3', title:'Unit 3 — Indexed Universal Life (IUL) — Deep Dive', duration:'35 min', content: `
+<h4>What It Is</h4>
+<p>An Indexed Universal Life policy is a permanent life insurance contract that provides a death benefit alongside a cash value component whose growth is linked to the performance of a market index — most commonly the S&amp;P 500, Nasdaq, or a blended index — without the policyholder being directly invested in the market.</p>
+<p>The policy operates on a crediting mechanism. Each policy year, the insurance carrier measures the performance of the selected index over a defined period (typically one year). If the index rises, the policy is credited interest up to a cap rate (commonly 10–14%). If the index falls, the policy receives a floor credit — most commonly 0%. The policyholder never loses cash value due to market performance. This is the defining feature of the IUL.</p>
+
+<h4>The Four Core Mechanics</h4>
+<p><strong>The Floor (0% or higher):</strong> The policy guarantees a minimum credit rate — typically 0%, but some policies offer a 1% or 2% floor. If the S&amp;P 500 drops 35% in a given year, the policyholder's cash value is unaffected by that decline. The floor is an absolute protection mechanism written into the contract.</p>
+<p><strong>The Cap Rate:</strong> The maximum interest that will be credited in a given period, regardless of index performance. If the cap is 12% and the index returns 28%, the policy is credited 12%. Caps vary by carrier and product and can change over time, though carriers must follow actuarial guidelines in adjusting them.</p>
+<p><strong>The Participation Rate:</strong> Some policies use a participation rate rather than or in addition to a cap. A 100% participation rate means the policy mirrors index performance up to the cap. An 80% participation rate means the policy captures 80% of the index's gain up to the cap.</p>
+<p><strong>Flexible Premiums:</strong> Unlike whole life, IUL premiums can be adjusted within defined limits. The policyholder can increase, decrease, or skip premiums (provided sufficient cash value exists to cover internal costs). This flexibility makes IUL adaptable to income fluctuations — an essential feature for business owners and commission-based earners.</p>
+
+<h4>The Tax Advantages — Why This Changes Everything</h4>
+<p>The IUL's most powerful feature is not its growth potential — it is the tax treatment of that growth and the tax-free access to it.</p>
+<p>Cash value inside a life insurance policy accumulates tax-deferred under IRC Section 7702. Unlike a 401(k) or traditional IRA, there is no contribution limit on a properly structured IUL. More significantly, the policyholder can access cash value through policy loans — which are not considered income and therefore not subject to income tax. A client in the 35% federal tax bracket accessing $100,000 from a properly structured IUL pays $0 in taxes. The same $100,000 from a 401(k) distribution would generate $35,000 in federal taxes, plus potential state taxes and required minimum distribution complications.</p>
+<p>Policy loans accrue interest, but that interest is typically charged at a rate similar to the crediting rate — in many indexed loan designs, the net cost of borrowing is near zero or even positive.</p>
+
+<h4>Prime Candidates for an IUL</h4>
+<p>The IUL is not appropriate for every client. It performs best for individuals with the following profile:</p>
+<ul>
+<li><strong>High-income earners who have maximized qualified retirement accounts</strong> — The client who has maximized their 401(k) ($23,000 in 2024) and IRA ($7,000) still has surplus income to shelter. The IUL becomes the next logical vehicle with no contribution limit and tax-free distributions.</li>
+<li><strong>Business owners seeking income replacement in retirement</strong> — A business owner who plans to sell their business eventually may receive a large, taxable lump sum at sale. The IUL funded in the years prior to the sale provides a tax-free income stream to supplement retirement regardless of the tax consequences of the sale.</li>
+<li><strong>Professionals in peak earning years (ages 35–55)</strong> — This group has the longest runway for cash value accumulation and the highest marginal tax rates — making the tax-free access at retirement disproportionately valuable.</li>
+<li><strong>Clients concerned about sequence of returns risk in retirement</strong> — Traditional equity investors are vulnerable to a significant market decline in the early years of retirement, which can permanently impair a portfolio's longevity. The IUL's 0% floor eliminates this risk entirely for the portion of assets held within the policy.</li>
+<li><strong>Parents planning for a child's education</strong> — Unlike 529 plans, IUL cash value is not counted as an asset in federal financial aid calculations under current rules. Distributions for any purpose are tax-free, providing far greater flexibility than education-specific accounts.</li>
+</ul>
+
+<h4>How to Sell an IUL</h4>
+<p>IUL is not sold on insurance — it is sold on outcome. Your prospect is not buying a life insurance policy. They are buying a tax-free retirement income strategy that happens to include a death benefit. Lead with the outcome they want and build backward to the product.</p>
+<p>Start with the retirement income conversation: "When you retire, what does your income look like? Where is it coming from? How much of it goes to taxes?" Most clients have never mapped this out. Walk them through the math of taxable versus tax-free income in retirement. The numbers are viscerally compelling.</p>
+<p>Then introduce the zero-floor concept: "What if I could show you a strategy where your money participates in market growth in the good years, and in years when the market declines — like 2008, 2020, or 2022 — your account simply earns zero rather than losing 30%?" This statement requires no financial sophistication to appreciate. Every prospect understands the pain of market losses.</p>
+<p>The best IUL presentations use real numbers from the client's situation. Run an illustration showing projected cash value, internal rate of return, and tax-free distribution amounts. Make the numbers specific to their age, contribution amount, and retirement timeline. Generic examples don't close. Personalized illustrations do.`},
+
+              { id:'fa_1_4', title:'Unit 4 — Annuities: Types, Benefits & Licensing', duration:'30 min', content: `
+<h4>What Is an Annuity?</h4>
+<p>An annuity is a contract issued by an insurance company in which the client makes either a lump-sum payment or a series of payments, and the insurer commits to deliver a stream of payments to the client beginning either immediately or at some future date. Annuities are fundamentally income vehicles — designed to address the risk of outliving one's assets, known in the financial planning industry as longevity risk.</p>
+<p>Unlike life insurance, which pays at death, annuities are designed to pay during life. They are the only financial instrument that can guarantee an income stream for as long as the annuitant lives — regardless of how long that is.</p>
+
+<h4>The Four Primary Types</h4>
+<p><strong>Fixed Annuities:</strong> The insurance company guarantees a specific interest rate for a defined period — similar to a CD but issued by an insurer and often offering higher rates. Ideal for clients who want certainty above all else: no market exposure, no variability, no risk of principal loss. Multi-Year Guaranteed Annuities (MYGAs) are the most common form, locking in a rate for 2–10 years.</p>
+<p><strong>Fixed Indexed Annuities (FIAs):</strong> The cousin of the IUL on the annuity side. Cash value is linked to an index with a floor and cap, providing participation in market upside with protection from downside. No direct market investment. FIAs are the fastest-growing segment of the annuity market precisely because they solve the accumulation versus protection dilemma without requiring a compromise.</p>
+<p><strong>Variable Annuities:</strong> The client's premiums are allocated among sub-accounts that invest directly in the market — similar to mutual funds. Returns are not guaranteed, and the principal is subject to market loss. Variable annuities typically include optional living benefit riders that guarantee a minimum income regardless of account performance. These require a securities license (Series 6 or 63) to sell.</p>
+<p><strong>Immediate Annuities (SPIAs):</strong> A Single Premium Immediate Annuity converts a lump sum into an immediate, guaranteed income stream. The client pays once and begins receiving income within 30 days. Commonly used by retirees who have accumulated assets and want to convert them to predictable, lifetime income without managing investments.</p>
+
+<h4>Prime Candidates for Annuities</h4>
+<ul>
+<li><strong>Pre-retirees (ages 55–70) concerned about income security</strong> — The core annuity market. These clients have worked 30+ years to accumulate retirement assets and are now terrified of a market downturn or of simply running out of money. An FIA with an income rider solves both problems simultaneously.</li>
+<li><strong>Clients with pension income shortfalls</strong> — Those relying on a pension that covers only a portion of their expenses can use an annuity to fill the gap with guaranteed lifetime income.</li>
+<li><strong>Clients receiving an inheritance or insurance settlement</strong> — A large, sudden influx of capital with no investment strategy. An annuity provides a structured, tax-deferred home for the funds with guaranteed growth.</li>
+</ul>
+
+<h4>Licensing Requirements to Sell Annuities</h4>
+<p><strong>Fixed and Fixed Indexed Annuities:</strong> Require only your Life &amp; Health insurance license plus a state-specific annuity training course (typically 4–8 hours online). Most states now require this training before you can sell annuities — check your state's Department of Insurance for specifics. NIPR.com is the standard portal for license management.</p>
+<p><strong>Variable Annuities:</strong> Require a Life &amp; Health license plus a FINRA securities registration. Specifically, the Securities Industry Essentials (SIE) exam followed by the Series 6 exam (Investment Company and Variable Products Representative). The Series 63 (Uniform Securities Agent) exam may also be required depending on your state. This licensing pathway opens access to the full range of variable products, including variable life insurance — and dramatically expands your earning capacity.`},
+
+              { id:'fa_1_5', title:'Unit 5 — Final Expense Insurance', duration:'15 min', content: `
+<h4>What It Is</h4>
+<p>Final expense insurance — also called burial insurance or simplified issue whole life — is a small face amount permanent policy designed to cover end-of-life costs. Coverage amounts typically range from $2,000 to $35,000 and are issued without a medical exam. Underwriting is done through a series of health questions, with three typical outcomes: standard (immediate full coverage), graded (limited benefit in years one and two), or guaranteed issue (anyone qualifies regardless of health).</p>
+
+<h4>Prime Candidates</h4>
+<p>Adults between 50 and 85 who either lack life insurance entirely, have coverage that will lapse when they retire, or whose current assets are insufficient to cover burial costs without burdening their families. The median cost of a funeral in the United States exceeds $9,000 — a sum most retirees do not have in liquid savings specifically set aside for this purpose.</p>
+<p>This market is enormous, underserved, and emotionally motivated. The client is not buying for themselves — they are buying to protect their children and grandchildren from an uncomfortable conversation at the worst possible time.</p>
+
+<h4>How to Sell Final Expense</h4>
+<p>Lead with empathy, not product. "Have you given much thought to what happens financially when you pass? I work with a lot of people who tell me they don't want their family to have to worry about those costs while they're grieving." This framing is not manipulative — it is accurate. Funeral directors universally report that financial stress among surviving family members is among the most common and painful experiences in their profession.</p>
+<p>The close is straightforward: most final expense premiums fall between $40 and $120 per month depending on age and coverage. For most prospects, this is a budgetable expense. Once the need is established, the conversation shifts to which payment date works best for them — not whether they want the coverage.`},
+
+              { id:'fa_1_6', title:'Unit 6 — The B.O.L.T. Client Framework', duration:'25 min', content: `
+<h4>Why Client Psychology Determines Your Close Rate</h4>
+<p>Every sales technique you learn is a tool. Tools only work when applied to the right material. The B.O.L.T. framework is a client behavioral classification system that allows you to match your communication style, pacing, and emphasis to the psychological profile of each individual prospect. Agents who master B.O.L.T. consistently outperform those who use a single, uniform sales approach — because they are no longer selling insurance. They are speaking each client's native language.</p>
+
+<h4>Bull — The Results-Driven Decision Maker</h4>
+<p>The Bull is confident, decisive, and impatient with anything that wastes their time. They are typically high-achieving professionals or entrepreneurs who make decisions quickly and respect directness. They have an instinctive skepticism toward salespeople and will shut down at the first sign of manipulation or unnecessary complexity.</p>
+<p><strong>How to identify them:</strong> They interrupt. They answer questions with questions. They give short, clipped responses. They check their phone. They mention their accomplishments early in the conversation.</p>
+<p><strong>How to sell to them:</strong> Get to the point within the first 90 seconds. Lead with outcome, not process. "Based on your income and business structure, I have one recommendation that will save you $40,000 in taxes over the next decade and guarantee your family's financial security. Can I show you how it works?" Give them the number. Show them the logic. Ask for the decision. Respect their time by not wasting it.</p>
+<p><strong>What to avoid:</strong> Lengthy rapport-building, emotional appeals, excessive explanation. The Bull interprets over-explanation as a lack of confidence.</p>
+
+<h4>Owl — The Analytical Processor</h4>
+<p>The Owl is methodical, risk-averse, and deeply skeptical of anything they cannot independently verify. They are often engineers, accountants, doctors, or researchers — people who process the world through data and systems. They will not make a decision until they feel they have all the relevant information. Pressure tactics cause them to shut down entirely.</p>
+<p><strong>How to identify them:</strong> They take notes. They ask highly specific questions — about how the cap rate is calculated, what the guaranteed internal rate of return is, what happens in a lapse scenario. They request documents to review independently.</p>
+<p><strong>How to sell to them:</strong> Arrive prepared. Bring illustrations, product comparison sheets, carrier ratings, and actuarial summaries. Welcome their questions — every question is a sign of interest. Validate their process: "You're asking exactly the right questions — let me walk you through the carrier's methodology." Never rush them. Schedule a follow-up specifically to address the questions they've taken home.</p>
+<p><strong>What to avoid:</strong> Vague language, emotional pressure, or implying that they are overthinking. An Owl who feels dismissed will never buy from you.</p>
+
+<h4>Lamb — The Relationship-Centered Connector</h4>
+<p>The Lamb is warm, agreeable, and deeply motivated by trust and personal connection. They will not say no directly — instead, they will agree with everything and disappear. They make decisions based on how safe they feel with you as a person, not on the features of the product. Their greatest fear is making a mistake and being judged for it.</p>
+<p><strong>How to identify them:</strong> They ask about you before you ask about them. They talk about their family at length. They smile frequently and nod agreement. They never raise objections directly — they defer and say "let me think about it."</p>
+<p><strong>How to sell to them:</strong> Build genuine trust before presenting anything. Ask about their family. Be vulnerable about your own experience with insurance. Speak slowly and warmly. When it's time to present the solution, frame it in terms of protecting the people they love: "This would mean that no matter what happens, your daughter never has to worry about losing this house." Make them feel safe making the decision with you, not just in spite of you.</p>
+<p><strong>What to avoid:</strong> Rushing, being transactional, or applying any form of pressure. The Lamb needs to feel that the decision is completely theirs. They respond to gentle guidance, not sales tactics.</p>
+
+<h4>Tiger — The Enthusiastic Visionary</h4>
+<p>The Tiger is energetic, optimistic, and motivated by possibility and excitement. They make decisions quickly — sometimes impulsively — and are attracted to big ideas and transformative outcomes. They are excellent candidates for large policies and premium products because they respond to vision, not details.</p>
+<p><strong>How to identify them:</strong> They are animated and high-energy. They talk fast. They share big goals and ambitious plans. They ask "what's the best case scenario?" rather than "what's the worst case?"</p>
+<p><strong>How to sell to them:</strong> Match their energy. Lead with the big picture. "What I'm going to show you is a strategy that top executives and business owners use to protect their families and create tax-free wealth simultaneously — it's genuinely remarkable." Let them see the vision. Then move quickly to the application. The Tiger's enthusiasm can fade if you slow down too much. Get the paperwork in front of them while the energy is high.</p>
+<p><strong>What to avoid:</strong> Drowning them in details, moving too slowly, or being low-energy. The Tiger needs to feel like they're doing something significant. Don't reduce their purchase decision to a transaction.`},
+
+              { id:'fa_1_7', title:'Unit 7 — The 5-Step Sales Process', duration:'25 min', content: `
+<h4>Why Process Beats Talent</h4>
+<p>The most consistent producers in insurance are not necessarily the most charming or the most knowledgeable. They are the ones who follow a disciplined, repeatable process every single time. A structured sales process eliminates guesswork, reduces anxiety, and creates a client experience that feels organized and trustworthy — which is the foundation of every closed sale.</p>
+
+<h4>Step 1 — Establish Rapport</h4>
+<p>The first two to three minutes of any client interaction are entirely about the person in front of you — not about insurance. Ask one genuine question about their life and listen completely. Most salespeople are too eager to demonstrate their knowledge. The most effective sales professionals spend the first minutes making the client feel seen and heard.</p>
+<p>Rapport is not small talk. It is the process of establishing emotional safety. A client who feels safe with you will tell you the truth — about their finances, their fears, and their family situation. A client who does not feel safe will give you surface-level answers that make it impossible to identify their real needs.</p>
+
+<h4>Step 2 — Conduct a Thorough Fact Find</h4>
+<p>The fact find is the diagnostic phase. You are discovering — not assuming — what the client actually needs. Cover four dimensions: financial exposure (income, debts, dependents), existing coverage (what they have and through what vehicles), goals (what they want their family's financial future to look like), and concerns (what keeps them up at night).</p>
+<p>Key questions: "Who depends on your income financially?" "If you were gone tomorrow, what's your biggest concern for your family?" "Do you have any coverage currently? What does it cover?" "Have you thought about what retirement looks like for you?" Every answer gives you material to customize your recommendation.</p>
+
+<h4>Step 3 — Present the Tailored Solution</h4>
+<p>Present one solution — the right one — not a menu of options. When you present multiple products, you force the client to make comparisons they are not equipped to make. This creates confusion and delay. Your job during the fact find was to identify the specific need. Your job in the presentation is to solve that specific need precisely.</p>
+<p>Connect every feature of your solution back to something the client told you in the fact find. "You mentioned you're concerned about your mortgage — this policy would pay off the full balance, so your family keeps the house." This linkage demonstrates that you were listening and that your recommendation is personal, not generic.</p>
+
+<h4>Step 4 — Handle Objections with Curiosity</h4>
+<p>Every objection is a request for more information or an expression of unresolved concern. It is not a rejection. Agents who treat objections as rejection lose sales they should win. Agents who treat objections as diagnostic information close consistently.</p>
+<p>The three-step objection response: acknowledge the concern genuinely, clarify the specific issue, and provide the precise information that resolves it. "I completely understand — can you tell me more about what's giving you pause? Is it the timing, the cost, or something about the coverage itself?" Once you know exactly what the objection is, you can address it surgically.</p>
+
+<h4>Step 5 — Ask for the Decision</h4>
+<p>The failure to ask for the decision directly is the single most common reason agents lose sales they deserved to win. After addressing the final concern, move to the decision naturally: "Based on everything we've covered, I'm confident this is the right protection for your family. Let's get your application started — I'll need your date of birth and we can begin right now."</p>
+<p>Then be quiet. The silence after the close is the most important silence in sales. The next person who speaks loses. If the client says yes, you move forward. If they raise another concern, you have more information. If they need time, ask specifically what they need before they can decide — and agree on a specific follow-up date.`},
+
+              { id:'fa_1_8', title:'Unit 8 — Follow-Up & Client Relationship Management', duration:'25 min', content: `
+<h4>Why Most Agents Fail at Follow-Up</h4>
+<p>The insurance industry loses billions of dollars annually in lapsed policies, declined applications, and missed referrals — nearly all of which trace back to inadequate follow-up and poor client relationship management. New agents focus on acquiring clients. Elite agents focus on keeping them.</p>
+<p>A client who feels forgotten is a client who lapses. A client who feels valued refers their family and friends. The difference in income between these two outcomes is not marginal — it is the difference between an average career and an exceptional one.</p>
+
+<h4>The Follow-Up Sequence</h4>
+<p><strong>Immediately after application submission:</strong> Send a brief message confirming you've received everything and letting them know you'll keep them updated throughout underwriting. This sets an expectation and establishes your reliability.</p>
+<p><strong>During underwriting:</strong> Update the client at every meaningful stage — when the application is received by the carrier, when any additional requirements are requested, when the policy is approved. Most agents go silent during underwriting. This silence creates anxiety. Fill it with communication.</p>
+<p><strong>At policy delivery:</strong> Do not simply email the policy documents. Conduct a formal policy delivery — either in person or by video call. Review the coverage with the client, confirm beneficiaries, explain how to access the carrier's online portal, and set expectations for the first premium draft date. This conversation reinforces the value of what they purchased and dramatically reduces early lapse.</p>
+<p><strong>30 days after issue:</strong> Check in. "Your first premium drafted — everything go smoothly?" This call prevents confusion, addresses any billing issues, and keeps the relationship warm.</p>
+<p><strong>Annual review:</strong> Every client deserves an annual policy review. Their circumstances change — income increases, new children, new businesses, new debts. The annual review is your opportunity to ensure their coverage remains appropriate and to identify additional needs. It is also your most natural referral conversation: "Is there anyone in your life — a sibling, a close friend — whose family might be in a similar situation to where you were when we first spoke?"</p>
+
+<h4>The Referral Conversation</h4>
+<p>Referrals are the highest-quality lead source available to any agent. A referred prospect enters the conversation with pre-existing trust — they know someone who trusts you. This reduces resistance dramatically and shortens the sales cycle.</p>
+<p>The best time to ask for a referral is immediately after a positive client experience — following policy delivery, following a claim paid, or following any moment of genuine gratitude. The question is direct: "I'm glad this worked out so well for your family. Is there anyone you care about — a sibling, a colleague, a close friend — who might benefit from having this conversation? I'd be honored to help them the way I helped you."</p>
+<p>Do not make referral requests feel transactional. They should feel like a natural extension of your commitment to the people your clients love.</p>
+
+<h4>Building a Client Relationship That Lasts</h4>
+<p>The agents who build 20-year careers in this industry do so on the foundation of relationships, not transactions. Call clients on birthdays. Remember the names of their children. Send a handwritten note when a policy is delivered. These gestures require minutes and cost nothing. Their compound effect on loyalty, retention, and referrals is immeasurable.</p>
+<p>Every client you write is a long-term relationship, not a transaction. Approach every interaction with that lens and your career will reflect it.`},
+
+              { id:'fa_1_9', title:'Unit 9 — Writing Quality Business & Avoiding Chargebacks', duration:'20 min', content: `
+<h4>What Is a Chargeback?</h4>
+<p>A chargeback occurs when a policy lapses — or the client requests a refund — within the advance payment period, which is typically 9 months from the date of issue. When this happens, the insurance carrier claws back the commission advance that was paid at the time of issue, creating a debt on your account.</p>
+<p>Chargebacks are the single greatest threat to a new agent's financial stability. An agent writing $30,000 in AP per month with a 90% advance and a 20% chargeback rate is effectively losing $5,400 per month in clawbacks — often with no warning until the monthly commission statement reflects a negative balance.</p>
+
+<h4>Why Policies Lapse</h4>
+<ul>
+<li>The client could not genuinely afford the premium at the time of application</li>
+<li>The premium draft date did not align with the client's pay schedule</li>
+<li>The client did not understand what they purchased and did not see the value</li>
+<li>No one followed up with them to reinforce the decision and address post-sale doubt</li>
+<li>A change in the client's financial situation was not addressed before it became a lapse</li>
+</ul>
+
+<h4>Prevention Strategies</h4>
+<p><strong>Only write policies the client can genuinely afford.</strong> An $180/month premium on a $35,000 annual income creates financial strain that will manifest as a lapse within six months. Fit the coverage to the budget — a smaller policy that stays in force serves the client better than a larger policy that lapses.</p>
+<p><strong>Set the draft date strategically.</strong> Always ask: "When does your paycheck deposit?" Schedule the premium draft two to three days after payroll — never in the middle of a billing cycle when funds may be tight.</p>
+<p><strong>Conduct a policy delivery conversation.</strong> Every client who understands and values what they own is dramatically less likely to lapse. Walk them through the coverage, reinforce the decision, and make sure they know how to reach you with questions.</p>
+<p><strong>Execute your 30-day follow-up.</strong> The most vulnerable period for any policy is the first 60 days. Contact the client after the first premium drafts to confirm everything processed correctly. This one call prevents the majority of early lapses.</p>
+<p><strong>Track your persistency rate.</strong> Your goal is 85% or higher — meaning 85 of every 100 policies you write are still in force after 13 months. Carriers reward high persistency with better contract levels. A persistency rate below 70% will trigger carrier review and may result in contract downgrade or termination.`}
             ]
           },
           {
-            title: 'Chapter 2 — Mastery: Product Knowledge, Confidence & Financial Fitness',
+            title: 'Chapter 2 — Sales Mastery & Financial Fitness',
             units: [
-              { id:'fa_2_1', title:'Unit 1 — Deep Product Knowledge', icon:'📚', duration:'20 min', content: `<p>Confidence comes from competence. Study each carrier's underwriting guidelines, living benefit riders, conversion options, and ideal client profile daily. Dedicate 15–20 minutes each morning to reviewing one product or one carrier.</p>` },
-              { id:'fa_2_2', title:'Unit 2 — Confidence Building', icon:'💪', duration:'20 min', content: `<p><strong>Confidence is a skill, not a trait.</strong> Built through repetition, preparation, and action.</p><p><strong>The identity shift:</strong> "I am a licensed insurance professional helping families protect what matters most."</p><p><strong>Post-call review:</strong> What went well? What would I do differently? What's one thing I can apply next time?</p>` },
-              { id:'fa_2_3', title:'Unit 3 — Roleplay with Your Upline', icon:'🎤', duration:'30 min', content: `<p>Schedule dedicated roleplay sessions with your direct upline or manager on a regular basis until you feel fully comfortable presenting, handling objections, and closing. Your upline has the experience to provide immediate, specific feedback no training material can replicate.</p><p>Practice your opening, your fact-find questions, your product presentation, your objection responses, and your close. Allow your upline to challenge you with difficult scenarios — the more pressure you experience in practice, the more composed you will be in real conversations.</p><p>Continue these sessions until you are presenting with natural confidence and consistency, and your upline agrees you are ready to operate independently.</p>` },
-              { id:'fa_2_4', title:'Unit 4 — Income Strategy & Financial Planning', icon:'💰', duration:'25 min', content: `<p><strong>Separate your accounts from day one.</strong> Open a dedicated business checking account. Every commission enters your business account first, then you pay yourself a consistent "salary" regardless of what came in that week.</p><p><strong>Build a three-month reserve</strong> equal to three months of personal living expenses before increasing your lifestyle.</p><p><strong>Set aside 25–30% of every commission</strong> immediately to a tax savings account. Transfer it the moment a commission is received.</p>` },
-              { id:'fa_2_5', title:'Unit 5 — Tax Preparation', icon:'📊', duration:'25 min', content: `<p><strong>Pay estimated quarterly taxes.</strong> The IRS requires self-employed individuals to pay four times per year. Use IRS Form 1040-ES.</p><p><strong>Deductible expenses:</strong> Home office, phone/internet (business portion), mileage, licensing fees, CE courses, marketing, health insurance premiums.</p><p><strong>Work with a CPA</strong> who specializes in self-employed individuals. They will save you far more than their fee costs.</p>` },
-              { id:'fa_2_6', title:'Unit 6 — The 30-30-30 Financial Method', icon:'📐', duration:'20 min', content: `<p><strong>30% — Living Expenses.</strong> Essential personal costs: housing, food, transportation, utilities.</p><p><strong>30% — Taxes & Business.</strong> 20% to taxes, 10% to business investment — licensing, marketing, tools, professional development.</p><p><strong>30% — Savings & Wealth Building.</strong> Three-month reserve, Roth IRA or SEP-IRA, general investment accounts.</p><p><strong>10% — Discretionary.</strong> Experiences, personal enjoyment, motivation.</p>` },
-            ]
-          },
-          {
-            title: 'Chapter 3 — Becoming Elite: Shadowing, Resilience & The Power of One More',
-            units: [
-              { id:'fa_3_1', title:'Unit 1 — Shadowing & Becoming a Sponge', icon:'🔍', duration:'20 min', content: `<p>The fastest path to mastery is proximity to excellence. Find the top producers in your organization and study them obsessively. How do they open calls? How do they handle silence? How do they close without pressure?</p><p>Industry podcasts: Ed Mylett, Andy Elliott, Grant Cardone. Books: The One Thing, Go-Giver, Way of the Wolf. Carrier webinars. National producer conferences.</p>` },
-              { id:'fa_3_2', title:'Unit 2 — Staying Resilient', icon:'🔥', duration:'20 min', content: `<p>For every 10 people you speak to, 3 will be interested, 1.5 will apply, and 1 will issue. Elite agents have made peace with this ratio.</p><ol><li><strong>Normalize the no.</strong> Track your no's with pride.</li><li><strong>Control what you control.</strong> Focus on inputs — calls, presentations, applications.</li><li><strong>Reframe failure as data.</strong> Every lost sale contains information.</li><li><strong>Protect your mindset.</strong> Surround yourself with producers, not complainers.</li><li><strong>Have a reset ritual.</strong> A 10-minute walk, a workout, a review of your wins.</li></ol>` },
-              { id:'fa_3_3', title:'Unit 3 — The Power of One More', icon:'⚡', duration:'15 min', content: `<p>Whatever you think your limit is, do one more. One more call. One more presentation. One more follow-up.</p><p><strong>The compound effect:</strong> One more call per day = 250 extra calls per year. At 10% conversion = 25 extra appointments. At 50% close rate = 12 extra policies. At $3,000 average AP = <strong>$36,000 in additional annual premium from one more call per day.</strong></p>` },
+              { id:'fa_2_1', title:'Unit 1 — Confidence, Identity & the Professional Mindset', duration:'20 min', content: `
+<h4>The Identity Shift</h4>
+<p>Most new agents struggle not with product knowledge or sales technique — they struggle with identity. They have not yet fully inhabited the professional role they've assumed. Until that identity shift happens, every sales conversation carries a subtle undercurrent of apology — a hesitation that prospects sense immediately.</p>
+<p>The shift is deliberate: from "I'm new to this and still learning" to "I am a licensed insurance professional whose only purpose in this conversation is to determine whether I can help this family protect what matters most to them." These are not just different words — they produce fundamentally different energy, posture, and presence.</p>
+<p>Confidence is not an emotion. It is a posture you choose before you feel it. Act from the role you intend to inhabit, and the feelings follow.</p>
+
+<h4>Daily Excellence Habits</h4>
+<p>The most consistent producers structure their days the same way, regardless of circumstance. Morning preparation — reviewing client files, rehearsing product talking points, setting specific activity targets for the day. Post-call review — a 60-second debrief after every conversation asking: what worked, what would I change, what's one thing I'll implement immediately. End-of-day accountability — confirming that the day's activity targets were met and noting what carried over.</p>
+<p>Agents who review their own performance daily improve three to five times faster than those who do not. The difference is not aptitude — it is attention.`},
+
+              { id:'fa_2_2', title:'Unit 2 — Upline Roleplay & Practice Methodology', duration:'30 min', content: `
+<h4>Practice Is the Investment That Pays at Scale</h4>
+<p>Elite athletes do not practice skills they have already mastered — they practice the specific elements of their performance that are weakest, under conditions that simulate the pressure of competition. Insurance sales is no different.</p>
+<p>Schedule structured roleplay sessions with your direct upline or manager at least twice per week until you can conduct a complete client conversation — from opening through close — without hesitation or reference materials. Your upline has navigated objections you have not yet encountered. Their feedback is worth more than any course or training material.</p>
+<p>The objective of each roleplay is not to be perfect. It is to identify the specific point in the conversation where you lose momentum, introduce uncertainty, or fail to connect with the prospect — and to practice past that point repeatedly until it becomes fluid.</p>
+<p>Practice scenarios to rotate through: a Bull client who challenges every statement, an Owl who asks questions you cannot immediately answer, a Lamb who agrees with everything but will not commit, a Tiger who is enthusiastic but disorganized. Each requires a fundamentally different approach. Deliberate practice across all four profiles makes you truly versatile.`},
+
+              { id:'fa_2_3', title:'Unit 3 — Income Strategy & the 30-30-30 Method', duration:'25 min', content: `
+<h4>Why Commission Income Requires a Different Financial Architecture</h4>
+<p>The financial infrastructure that works for a salaried employee — one bank account, one monthly budget — fails completely for commission-based earners. Income arrives in large, irregular deposits. Expenses are constant. Without a deliberate system, even high-producing agents find themselves financially stressed in slow months and fiscally undisciplined in strong ones.</p>
+<p>The solution is structural separation and systematic allocation from the moment income is received.</p>
+
+<h4>The 30-30-30 Method</h4>
+<p><strong>The First 30 — Living Expenses.</strong> Thirty percent of every commission covers your essential personal obligations: housing, food, transportation, utilities, insurance. This is your baseline. If your current lifestyle exceeds 30% of your income, you have two options: reduce the lifestyle, or increase the income. In this business, increasing the income is always the correct answer.</p>
+<p><strong>The Second 30 — Taxes and Business Investment.</strong> Allocate 20% to your tax reserve — transferred immediately to a dedicated savings account the day commission arrives, never touched for any other purpose until estimated quarterly taxes are due. The remaining 10% funds your business: licensing in new states, marketing, professional development, software tools. This is your business operating budget.</p>
+<p><strong>The Third 30 — Savings and Wealth Building.</strong> This is the portion that converts your income into lasting financial independence. Fund your emergency reserve first — three months of personal living expenses held in a high-yield savings account, untouched except for genuine emergencies. Once that reserve is established, direct this allocation toward retirement vehicles (Roth IRA, SEP-IRA), investment accounts, and — appropriately — your own IUL policy. The most credible financial professionals use the products they recommend.</p>
+<p><strong>The Final 10 — Discretionary.</strong> Your life. The experiences, the joy, the things that remind you why you're building this. Financial discipline is not deprivation — it is the clarity of knowing that the important categories are covered before you spend freely on the optional ones.`},
+
+              { id:'fa_2_4', title:'Unit 4 — Tax Preparation for Independent Contractors', duration:'20 min', content: `
+<h4>Your Tax Reality as a 1099 Producer</h4>
+<p>As an independent contractor, you are responsible for both the employee and employer portions of Social Security and Medicare taxes — collectively known as self-employment tax — plus federal and state income taxes on your net earnings. The combined rate for a producer in a moderate-income state can exceed 40%. Failing to plan for this produces one of the most common and avoidable financial crises in the industry: a producer who earns $200,000 and owes $70,000 in taxes they did not set aside.</p>
+<p>The solution is systematic: 20% of every gross commission is transferred to a dedicated tax account the moment it is received. This is non-negotiable. It is not your money — it is the government's money that you are temporarily holding.</p>
+
+<h4>Quarterly Estimated Taxes</h4>
+<p>Self-employed individuals are required by the IRS to pay estimated taxes four times per year. The 2024 due dates are April 15, June 17, September 16, and January 15, 2025. Failure to pay quarterly estimated taxes results in underpayment penalties, compounded monthly. Use IRS Form 1040-ES to calculate and submit your quarterly payments.</p>
+
+<h4>Deductible Business Expenses</h4>
+<p>Every legitimate business expense reduces your taxable income dollar-for-dollar. Categories available to licensed producers: home office square footage (dedicated exclusively to business), business-use percentage of phone and internet, mileage for client meetings and carrier appointments, licensing and CE fees, professional subscriptions and software, marketing and advertising, professional development, and the self-employed health insurance deduction (100% of premiums paid for yourself and dependents).</p>
+<p>Engage a CPA who specializes in self-employed clients. Their fee is itself deductible, and their knowledge of industry-specific deductions will consistently exceed their cost.`},
+
+              { id:'fa_2_5', title:'Unit 5 — Resilience, Rejection & the Long Game', duration:'15 min', content: `
+<h4>The Mathematics of Rejection</h4>
+<p>In a well-run insurance practice, approximately one in ten conversations results in a placed policy. This is not a failure rate of 90%. It is a success rate that compounds predictably over time. An agent who speaks with twenty prospects per week, closes two policies, and maintains that activity for twelve months writes 104 policies annually. At an average AP of $3,000, that is $312,000 in annual premium — and a career in the top tier of the industry.</p>
+<p>The agents who fail do not fail because they lack skill. They fail because they cannot emotionally sustain the mathematics of rejection long enough for the system to work. Resilience — the ability to absorb a no and contact the next prospect without carrying the previous conversation — is the defining characteristic of every long-term producer.</p>
+
+<h4>Building Emotional Durability</h4>
+<p>Depersonalize the rejection. A prospect who declines is not rejecting you — they are declining an offer whose value they did not yet fully understand. That is information about the presentation, not a verdict about you as a person.</p>
+<p>Establish a reset ritual. When a conversation ends poorly, perform a specific physical action that signals the reset: a five-minute walk, three minutes of silence, a review of a past client success. The ritual interrupts the emotional momentum of the previous conversation and prepares the state for the next one.</p>
+<p>Track inputs, not outcomes. The only metric you can fully control is activity — calls made, presentations scheduled, applications submitted. Focus your attention there. Outcomes are the lagging result of consistent inputs applied over time.`}
             ]
           }
         ]
       },
       {
-        id: 'manager',
-        role: 'manager',
-        roleLabel: 'Insurance Manager',
-        icon: '👑',
-        color: '#6ea8fe',
+        id: 'manager', role: 'manager', roleLabel: 'Insurance Manager',
+        icon: '', color: '#6ea8fe',
         chapters: [
           {
-            title: 'Manager Chapter 1 — Building a High-Level Producing Team',
+            title: 'Manager Chapter 1 — Team Building & Leadership',
             units: [
-              { id:'mgr_1_1', title:'Unit 1 — The Manager Mindset', icon:'🧠', duration:'20 min', content: `<p>Your income is no longer solely determined by your own production — it is determined by the collective output of your team multiplied by your override. Your ceiling is the average production of your team. Raise the floor of every agent and your ceiling rises with it.</p>` },
-              { id:'mgr_1_2', title:'Unit 2 — 7 Steps to Building Your Team', icon:'📋', duration:'30 min', content: `<p><strong>Step 1 — Recruit with Standards:</strong> Look for coachability, work ethic, and hunger. Consider Ferrari Financial Group — they did not recruit experienced car salespeople. They recruited people with character, drive, and desire to learn.</p><p><strong>Step 2 — Onboard Systematically:</strong> Week 1: licensing and product knowledge. Week 2: shadowing and roleplay. Week 3: supervised calls. Week 4: first independent presentations.</p><p><strong>Step 3 — Daily Accountability:</strong> 10–15 min daily huddle. Each agent reports: calls made, presentations scheduled, policies submitted.</p><p><strong>Step 4 — Coach Individually:</strong> Weekly one-on-ones. Identify the one skill most limiting each agent. Focus coaching on that one thing.</p><p><strong>Step 5 — Celebrate and Compete:</strong> Leaderboards, first sale celebrations, weekly competitions.</p><p><strong>Step 6 — Develop Leaders:</strong> Find the 1–2 agents who consistently outperform. Teach them the manager skill set.</p><p><strong>Step 7 — Retain Top Producers:</strong> Check in proactively. Know what motivates each agent personally.</p>` },
-              { id:'mgr_1_3', title:'Unit 3 — Recruiting Strategies', icon:'🎯', duration:'25 min', content: `<p><strong>Warm Market Recruiting:</strong> Every person in your contact list is a potential candidate. "I'm building a team and I immediately thought of you."</p><p><strong>Referral-Based Recruiting:</strong> Your current agents are your best recruiters. Incentivize referrals.</p><p><strong>Targeted Outreach:</strong> Real estate agents, mortgage brokers, financial coaches, and customer service professionals are frequently strong candidates.</p>` },
-              { id:'mgr_1_4', title:'Unit 4 — Social Media Recruiting', icon:'📱', duration:'25 min', content: `<p><strong>LinkedIn:</strong> Maintain a complete, polished profile. Post content about team results, agent success stories, and income potential. Connect with professionals in adjacent industries.</p><p><strong>Instagram & Facebook:</strong> Showcase culture, income milestones, team recognition, and behind-the-scenes content. Authenticity performs significantly better than polished promotion.</p><p><strong>Educational Videos:</strong> Short-form video on TikTok, Instagram Reels, or YouTube. Create value-driven content that builds trust and attracts candidates already researching the industry.</p><p><strong>Consistency:</strong> Post at least three times per week. Over 90–180 days, consistent content creates a compounding effect of visibility and inbound interest.</p>` },
-              { id:'mgr_1_5', title:'Unit 5 — Networking & Lead Generation', icon:'🤝', duration:'20 min', content: `<p><strong>Professional Networking:</strong> Attend industry events, Chamber of Commerce gatherings, and community functions. Follow up within 24 hours of every meaningful conversation.</p><p><strong>Lead Generation Systems:</strong> Social media content calendar, referral program, partnerships with CPAs and real estate agents, targeted LinkedIn outreach sequences.</p><p><strong>Community Involvement:</strong> Sponsor local events, volunteer, participate in professional associations. Community trust translates directly into recruiting credibility.</p>` },
-              { id:'mgr_1_6', title:'Unit 6 — Tracking Business Expenses', icon:'📊', duration:'20 min', content: `<p><strong>What to track:</strong> Home office, phone/internet, mileage, licensing fees, marketing spend, software subscriptions, client meals (50% deductible).</p><p><strong>How to track:</strong> Use a dedicated business card for all business purchases. Use an expense tracking app (QuickBooks, Expensify, or Wave). Photograph receipts immediately.</p><p><strong>Work with a CPA</strong> who specializes in self-employed professionals and small business owners.</p>` },
+              { id:'mgr_1_1', title:'Unit 1 — The Manager Mindset', duration:'20 min', content: `<p>At the Manager level, your income is no longer a function of your personal production alone — it is a function of the collective output of the team you build and develop multiplied by your override percentage. This is a fundamental structural change in how you create wealth, and it requires a fundamental change in how you allocate your time and attention.</p><p>The highest-leverage activity for a Manager is not writing more personal business. It is developing agents who write consistently. A team of five agents each producing $15,000 per month in AP generates $75,000 in monthly team AP — and your override on that production is passive income that scales with the team rather than with your personal hours.</p>` },
+              { id:'mgr_1_2', title:'Unit 2 — Recruiting with Standards', duration:'25 min', content: `<p>The quality of your team is determined entirely by your recruiting standards. The temptation for new managers is to recruit broadly — to bring in anyone who expresses interest. This produces high turnover, low production, and a culture that eventually repels the high-quality producers you actually want.</p><p>The Ferrari Financial model is instructive: they did not recruit experienced salespeople — they recruited people with character, coachability, and hunger. Experience transfers. Attitude does not. The candidate who has never sold insurance but exhibits genuine ambition, professional discipline, and a willingness to be coached will outperform the experienced agent who is resistant to feedback in virtually every case.</p><p>Recruit from your existing network first: former colleagues, acquaintances who are underemployed relative to their capabilities, and referrals from your best agents. The best agents know other potential agents. Ask every producer: "Is there anyone in your life who has the drive for something like this?"</p>` },
+              { id:'mgr_1_3', title:'Unit 3 — Onboarding & First 30 Days', duration:'20 min', content: `<p>The onboarding experience determines retention. An agent who feels disorganized, unsupported, or unclear about their path in the first 30 days is very likely to quit within 90. A structured, progressive onboarding experience communicates that this organization is professional, that their success is taken seriously, and that help is available at every stage.</p><p>Week 1: Licensing education, product orientation, and portal access. Week 2: Supervised product presentations and upline roleplay. Week 3: First independent prospect conversations with debrief. Week 4: First independent presentations and close attempts. Each week builds on the previous. Do not compress or skip stages. The sequence is designed around the rate at which confidence and competence develop simultaneously.` },
+              { id:'mgr_1_4', title:'Unit 4 — Daily Accountability & Performance Coaching', duration:'20 min', content: `<p>A 15-minute daily team huddle is the most cost-effective management tool available. Each agent reports three metrics: conversations initiated, presentations scheduled, and applications submitted. Public reporting — even in a small group — dramatically increases activity because human beings are wired to avoid the discomfort of public underperformance.</p><p>Weekly individual coaching sessions of 30 minutes per agent are equally essential. Review their metrics, identify the specific point in their process where they lose momentum, and focus that week's coaching on that single improvement. Progress in sales is made one specific skill improvement at a time — not through broad encouragement.`},
+              { id:'mgr_1_5', title:'Unit 5 — LLC Formation & Business Structure', duration:'20 min', content: `<p>Operating as a Manager without a formal business structure leaves significant tax advantages on the table and exposes your personal assets unnecessarily. Forming an LLC costs between $50 and $500 in most states and can be completed online in one to three business days.</p><p>Steps: (1) Choose a unique business name and verify availability through your state's Secretary of State database. (2) File Articles of Organization with the appropriate state agency and pay the filing fee. (3) Draft an Operating Agreement — essential if you have a partner. (4) Obtain a free EIN from irs.gov (10 minutes online). (5) Open a dedicated business bank account using your EIN and LLC documents. (6) Register for any applicable state business taxes. (7) Calendar your annual report filing date — a missed annual report can result in administrative dissolution of the LLC.</p>`}
             ]
           },
           {
-            title: 'Manager Chapter 2 — LLC Formation & Licensing',
+            title: 'Manager Chapter 2 — Recruiting, Social Media & Business Systems',
             units: [
-              { id:'mgr_2_1', title:'Unit 1 — How to Form an LLC', icon:'🏛', duration:'25 min', content: `<ol><li><strong>Choose a Business Name</strong> — Search your state's Secretary of State database. (e.g., "Parenza Financial Group LLC")</li><li><strong>File Articles of Organization</strong> — $50–$500 fee, typically done online in 1–3 business days.</li><li><strong>Create an Operating Agreement</strong> — Outlines management, profit distributions, and member responsibilities.</li><li><strong>Get an EIN</strong> — Free at irs.gov. Takes 10 minutes. Required for a business bank account.</li><li><strong>Open a Business Bank Account</strong> — Keep business and personal finances completely separate.</li><li><strong>Register for State Taxes</strong> — Check your state's Department of Revenue.</li><li><strong>Annual Maintenance</strong> — File annual reports. Set calendar reminders — missing this dissolves your LLC.</li></ol>` },
-              { id:'mgr_2_2', title:'Unit 2 — Acquiring Licenses', icon:'📜', duration:'20 min', content: `<p><strong>Life & Health License:</strong> 20–40 hours pre-licensing, state exam via Pearson VUE or PSI, background check.</p><p><strong>Non-Resident Licenses:</strong> Apply through NIPR.com. Most states honor reciprocity.</p><p><strong>Series 6 / Series 63 (Optional):</strong> Required for variable products. Regulated by FINRA.</p><p><strong>License Maintenance:</strong> 24 hours CE every 2 years. Track your CE deadlines carefully.</p>` },
+              { id:'mgr_2_1', title:'Unit 1 — Social Media Recruiting Strategy', duration:'25 min', content: `<p>LinkedIn is the premier platform for professional recruiting in financial services. Maintain a complete profile that clearly articulates the opportunity — not the product, the opportunity. Prospect-facing content should address income potential, autonomy, training support, and career trajectory. Connect strategically with professionals in adjacent industries: real estate, banking, retail management, education, and healthcare. These fields produce candidates with the relationship skills and income motivation that predict success in insurance.</p><p>Instagram and Facebook serve a different function — they humanize your brand and create social proof. Document team achievements, income milestones, and personal transformations. Authenticity consistently outperforms polish on these platforms. Short-form video on Reels or TikTok builds the broadest audience with the least investment, provided the content delivers genuine value.</p>` },
+              { id:'mgr_2_2', title:'Unit 2 — Lead Generation & Networking', duration:'20 min', content: `<p>The most scalable recruiting pipeline combines three inputs: consistent social media content, a structured referral program for current agents, and systematic professional networking in your local market. Chamber of Commerce events, industry association meetings, and community organization involvement all create visibility among the professionally ambitious individuals who are your best candidates.</p><p>Follow up within 24 hours of every meaningful networking conversation. The majority of sales — and recruiting — contacts require five or more follow-up touchpoints before a decision is made. Agents who follow up once and move on are leaving the majority of their pipeline on the table.</p>` },
+              { id:'mgr_2_3', title:'Unit 3 — Licensing & CE Management', duration:'15 min', content: `<p>Life and Health licensing requirements differ by state but follow a common structure: pre-licensing education (20–40 hours), a state exam administered through Pearson VUE or PSI, a background check, and an application through the state's Department of Insurance. Non-resident licenses for additional states are obtained through NIPR.com and typically leverage reciprocity with your home state.</p><p>Continuing Education requirements in most states are 24 hours every two years. Track CE deadlines with a calendar reminder set 90 days before expiration. A lapsed license creates a gap in your ability to write business and must be disclosed to carriers — in some cases triggering a temporary contract suspension.`}
             ]
           }
         ]
       },
       {
-        id: 'executive',
-        role: 'executive',
-        roleLabel: 'Executive Producer',
-        icon: '📊',
-        color: '#c084fc',
+        id: 'executive', role: 'executive', roleLabel: 'Executive Producer',
+        icon: '', color: '#c084fc',
         chapters: [
           {
-            title: 'Executive Chapter 1 — Metrics, Forecasting & Scaling',
+            title: 'Executive Chapter 1 — Organizational Performance & Scaling',
             units: [
-              { id:'exec_1_1', title:'Unit 1 — Key Metrics Every Executive Tracks', icon:'📈', duration:'20 min', content: `<ul><li><strong>Issued AP:</strong> Total annualized premium of all placed policies</li><li><strong>Placement rate:</strong> Below 70% signals issues requiring attention</li><li><strong>Persistency rate:</strong> 80%+ is industry standard</li><li><strong>Agent activity ratio:</strong> 60%+ healthy — below 50% indicates a culture problem</li><li><strong>Recruiting pipeline:</strong> Applicants submitted, approved, contracted, licensed, actively writing</li></ul>` },
-              { id:'exec_1_2', title:'Unit 2 — Business Forecasting', icon:'🔮', duration:'20 min', content: `<p>Set monthly AP targets for each team and review weekly progress. Build a 90-day rolling forecast — know what is in the pipeline, placed, and at chargeback risk. Use persistency data to project chargeback exposure before problems arise, not after.</p>` },
-              { id:'exec_1_3', title:'Unit 3 — Scaling to Other States', icon:'🗺', duration:'25 min', content: `<p>Research non-resident license requirements. Identify high-opportunity markets: states with aging populations and low insurance penetration. Build virtual sales systems before expanding. Contract agents who are already resident-licensed in target states.</p>` },
-              { id:'exec_1_4', title:'Unit 4 — Recruiting Downline Executives', icon:'🏗', duration:'20 min', content: `<p>The most scalable move is recruiting agents who want to build teams. Position LLFG as an ownership opportunity — they build their book, their team, their legacy. Target professionals frustrated with their current FMO's support or commission levels.</p>` },
+              { id:'exec_1_1', title:'Unit 1 — Key Performance Metrics', duration:'20 min', content: `<p>At the Executive level you are managing organizational performance across multiple teams and generations of downlines. The metrics that matter at this level are aggregate and trend-based, not individual. Total issued AP across your downline, placement rate by team, persistency rate by team leader, agent activity ratio (percentage of contracted agents who wrote business in a given period), and recruiting pipeline velocity are your primary indicators.</p><p>A placement rate below 70% in any team signals underwriting quality issues — agents writing applications that are being declined or modified. A persistency rate below 80% in any team signals either poor client qualification or inadequate post-issue follow-up. An agent activity ratio below 60% indicates a culture or accountability issue at the Manager level that requires your direct intervention.</p>` },
+              { id:'exec_1_2', title:'Unit 2 — Business Forecasting & Pipeline Management', duration:'20 min', content: `<p>Build a 90-day rolling production forecast for your entire downline. At any point, you should be able to answer: how much AP is currently in underwriting, how much is approved but not yet placed, how much is at chargeback risk, and what is the projected net AP for each of the next three months. This level of visibility is the difference between reactive management and strategic leadership.</p><p>Use chargeback risk data proactively. An agent with a chargeback rate above 7% is not just losing their own income — they are creating a debt risk that flows up the hierarchy. Address it directly and immediately through coaching, not through avoidance.` },
+              { id:'exec_1_3', title:'Unit 3 — Promoting & Developing Managers', duration:'25 min', content: `<p>Your highest-leverage activity is identifying the agents within your hierarchy who have the capability and ambition to become Managers, and investing in their development before they self-identify as leaders. The agents who become your best Managers are often not the ones who ask for the role first — they are the ones who lead informally, who others naturally gravitate toward for advice, and who take accountability seriously.</p><p>Begin the Manager conversation with high-potential agents 60–90 days before you believe they are ready. Walk them through the requirements — three teams of four or more producing agents, $150,000 in monthly team AP — and begin designing their path toward those requirements with them. The path to promotion should never come as a surprise.` },
+              { id:'exec_1_4', title:'Unit 4 — Multi-State Expansion', duration:'20 min', content: `<p>Market expansion begins with a specific thesis: which state, which demographic, and why. High-opportunity markets share common characteristics: large populations of underinsured middle-income households, a relatively low density of established FMO presence, and an agent-friendly regulatory environment. Texas, Florida, Georgia, the Carolinas, Ohio, and Illinois consistently meet these criteria.</p><p>Always recruit an anchor agent before committing to a physical presence. The anchor agent is resident-licensed, locally embedded, and capable of building a team independently with your remote support. Validate the market through virtual operations for three to six months before establishing a physical office. A premature physical commitment creates fixed overhead that constrains the flexibility you need in a new market.`}
             ]
           }
         ]
       },
       {
-        id: 'managing_partner',
-        role: 'managing_partner',
-        roleLabel: 'Managing Partner',
-        icon: '🌐',
-        color: 'var(--gold)',
+        id: 'director', role: 'director', roleLabel: 'Director',
+        icon: '', color: '#ff9f43',
         chapters: [
           {
-            title: 'Managing Partner Chapter 1 — Scaling Nationwide & Opening New Offices',
+            title: 'Director Chapter 1 — Enterprise Leadership & Office Expansion',
             units: [
-              { id:'mp_1_1', title:'Unit 1 — The Managing Partner Mindset', icon:'🧭', duration:'20 min', content: `<p>At this level, your primary responsibility is no longer writing personal business — it is building systems, teams, and infrastructure that generate results independent of your direct involvement. Scaling requires strategic thinking, operational discipline, and a long-term vision.</p>` },
-              { id:'mp_1_2', title:'Unit 2 — The Replication Model', icon:'🔄', duration:'25 min', content: `<p>Before you expand, ensure your existing operation runs consistently without your constant intervention. Document your onboarding process, training curriculum, accountability structure, and recruiting pipeline. A system that cannot be replicated cannot be scaled.</p>` },
-              { id:'mp_1_3', title:'Unit 3 — Opening New Markets (5-Phase Plan)', icon:'🏢', duration:'30 min', content: `<p><strong>Phase 1 — Market Research:</strong> Population demographics, household income levels, insurance penetration rates, regulatory environments.</p><p><strong>Phase 2 — Recruit Your Anchor Agent:</strong> A strong local agent who is resident-licensed and embedded in the community. Recruit before committing to a physical location.</p><p><strong>Phase 3 — Virtual Launch:</strong> Begin operations virtually before establishing a physical office. Validate the market before making long-term commitments.</p><p><strong>Phase 4 — Establish Physical Office:</strong> After 3–6 months of stable AP output. Start with coworking or a small professional suite.</p><p><strong>Phase 5 — Appoint a Market Leader:</strong> A local Managing Partner or Executive to lead independently. Your role transitions to oversight and strategic guidance.</p>` },
-              { id:'mp_1_4', title:'Unit 4 — Multi-State Licensing Strategy', icon:'📜', duration:'20 min', content: `<p>Apply through NIPR.com. Prioritize states where you are actively recruiting. High-value states: Texas, Florida, Georgia, California, Illinois, Ohio, and the Carolinas. Build a licensing calendar to keep non-resident licenses current.</p>` },
-              { id:'mp_1_5', title:'Unit 5 — Operating as a Business Owner', icon:'💼', duration:'25 min', content: `<p><strong>Legal structure:</strong> At this level, an LLC or S-Corporation is essential. An S-Corp election can provide significant self-employment tax savings as override income grows.</p><p><strong>Hiring support staff:</strong> A virtual assistant, customer service coordinator, or onboarding specialist frees you to focus on high-value activities.</p><p><strong>Building a brand:</strong> Professional photography, polished LinkedIn presence, business website, consistent social content. A strong brand attracts the right agents, clients, and partnerships.</p>` },
+              { id:'dir_1_1', title:'Unit 1 — The Director’s Operational Model', duration:'25 min', content: `<p>The Director tier represents the transition from organizational leader to enterprise architect. At this level, your direct responsibility is the performance and development of three or more Executives, each of whom manages multiple Manager-led teams. You are no longer managing individuals — you are managing organizational systems and the leaders who operate within them.</p><p>Your primary activities are strategic: reviewing aggregate performance data across your Executives' organizations, identifying systemic issues before they become crises, coaching Executive leaders in their role-specific development, and driving the recruiting and market expansion strategies that fuel growth at the organizational level.</p>` },
+              { id:'dir_1_2', title:'Unit 2 — Opening New Markets & Offices', duration:'30 min', content: `<p>Phase 1 — Market Analysis: Evaluate demographic data, insurance penetration rates, existing competition, and regulatory environment. Identify your entry thesis: what specific opportunity exists in this market that is not being adequately served? Phase 2 — Anchor Recruitment: Identify and contract a locally embedded agent or Executive who can seed the market. This individual should have existing community relationships and resident licensure. Phase 3 — Virtual Launch: Operate the new market remotely for 90–180 days to validate production before committing to physical infrastructure. Phase 4 — Physical Establishment: Once stable production is demonstrated, establish a professional office presence — beginning with coworking before committing to a long-term commercial lease. Phase 5 — Market Leadership: Appoint a local Director or Executive to manage the market independently, freeing your attention for the next expansion.` },
+              { id:'dir_1_3', title:'Unit 3 — Building a Leadership Brand', duration:'20 min', content: `<p>At the Director level, your personal brand is an organizational asset. The professionals you recruit, the Executives you develop, and the agencies you partner with are all influenced by your professional reputation and visibility. Invest in a polished LinkedIn presence that communicates the scope of your operation, the career transformation stories of people you have developed, and your perspective on the industry. Speak at industry events where possible. Publish content that demonstrates expertise rather than simply promoting a recruiting message.</p><p>The most effective long-term recruiting happens when high-quality candidates seek you out rather than the reverse. A strong personal brand creates inbound interest from exactly the profile of professional you want on your team.`}
+            ]
+          }
+        ]
+      },
+      {
+        id: 'managing_partner', role: 'managing_partner', roleLabel: 'Managing Partner',
+        icon: '', color: 'var(--gold)',
+        chapters: [
+          {
+            title: 'Managing Partner Chapter 1 — Nationwide Scale & Business Ownership',
+            units: [
+              { id:'mp_1_1', title:'Unit 1 — Operating as a Business Owner', duration:'25 min', content: `<p>At the Managing Partner level, you have completed the transition from producer to business owner. Your income is primarily derived from overrides on a national organization rather than from personal production. This level of organizational leverage is rare in any industry — and it comes with commensurately significant responsibility.</p><p>The legal and financial infrastructure of your operation must match its scale. An S-Corporation election often provides meaningful self-employment tax savings at income levels above $80,000 annually — consult a CPA who specializes in business owners in financial services. Hire administrative support to free your time for the activities only you can perform: recruiting Directors, entering new markets, and managing Executive relationships.</p>` },
+              { id:'mp_1_2', title:'Unit 2 — The Replication Model & Systems', duration:'25 min', content: `<p>Scale is impossible without documentation. Before expanding, ensure that your existing operation runs consistently without your direct involvement. Every critical process — onboarding, training, accountability, contracting, commission disputes — must be documented in enough detail that any competent leader can execute it without your guidance.</p><p>The organizations that fail to scale beyond their founder do so because their processes live in the founder's head rather than in documented systems. The organizations that scale to national scope do so because their systems are transferable — any qualified leader in any market can implement them with the same quality of result.` },
+              { id:'mp_1_3', title:'Unit 3 — Multi-State Licensing & Compliance', duration:'20 min', content: `<p>At this level, your organization likely operates in multiple states. Maintain a current tracking system for every license — resident, non-resident, and any product-specific authorizations — across all states where your organization writes business. Build a compliance calendar with renewal reminders set 120 days before each expiration date.</p><p>Engage a licensed insurance attorney familiar with multi-state operations to review your contracts, compensation agreements, and any recruiting materials. At this scale, a compliance oversight is not merely a fine — it can threaten carrier relationships that underpin your entire organization's revenue.`}
             ]
           }
         ]
       }
     ];
 
+
     function renderTrainingCurriculum() {
       const el = document.getElementById('trainingCurriculum');
       if (!el) return;
       const u    = currentUser || window._llfgCurrentUser;
       const role = u?.role || 'financial_advisor';
+      const isOwner = u?.isOwner || u?.email === 'lorenzoparenza@llfg.us';
 
-      const roleOrder = ['financial_advisor','agent','manager','executive','managing_partner','admin'];
-      const userRoleIdx = roleOrder.indexOf(role);
-      const isAdmin = role === 'admin';
+      // Strict role order — director added
+      const roleOrder = ['financial_advisor','agent','manager','executive','director','managing_partner','admin'];
+      const userRoleIdx = roleOrder.indexOf(role === 'agent' ? 'financial_advisor' : role);
+      const isAdmin = role === 'admin' || isOwner;
+
+      // Role display names
+      const roleColors = { financial_advisor:'var(--gold)', manager:'#6ea8fe', executive:'#c084fc', director:'#ff9f43', managing_partner:'var(--gold)' };
 
       // Subtitle
       const sub = document.getElementById('trainingSubtitle');
-      if (sub) {
-        const tierNames = { financial_advisor:'Financial Advisor', agent:'Financial Advisor', manager:'Insurance Manager', executive:'Executive Producer', managing_partner:'Managing Partner', admin:'Admin' };
-        sub.textContent = isAdmin
-          ? 'Full curriculum access — all tiers unlocked. Click any chapter to expand its units.'
-          : `You are currently a ${tierNames[role]||role}. Your tier's training is highlighted. Previous tiers stay accessible. Future tiers are locked until promotion.`;
-      }
+      const roleDisplayNames = { financial_advisor:'Financial Advisor', manager:'Insurance Manager', executive:'Executive Producer', director:'Director', managing_partner:'Managing Partner', admin:'Admin', agent:'Financial Advisor' };
+      if (sub) sub.textContent = isAdmin
+        ? 'Full curriculum access across all tiers.'
+        : `You are currently a ${roleDisplayNames[role]||role}. Your active tier is highlighted. Completed tiers remain accessible. Locked tiers show a preview of upcoming content.`;
 
       el.innerHTML = TRAINING_CURRICULUM.map(section => {
         const sectionRoleIdx = roleOrder.indexOf(section.role);
+        // Strict gating: only see own level and below, unless admin/owner
         const isUnlocked = isAdmin || userRoleIdx >= sectionRoleIdx;
-        const isCurrentTier = !isAdmin && (
-          (section.role === role) ||
-          (section.role === 'financial_advisor' && role === 'agent')
-        );
-        const isPreviousTier = !isAdmin && !isCurrentTier && isUnlocked;
+        const isCurrentTier = !isAdmin && (section.role === role || (section.role === 'financial_advisor' && role === 'agent'));
+        const isPreviousTier = isUnlocked && !isCurrentTier && !isAdmin;
+        const color = roleColors[section.role] || 'var(--gold)';
 
         // Badge
-        const tierBadge = isCurrentTier
-          ? `<span style="font-size:0.52rem;background:rgba(201,168,76,0.2);color:var(--gold);padding:0.2rem 0.6rem;border:1px solid rgba(201,168,76,0.3);letter-spacing:0.1em;text-transform:uppercase;">● Current Tier</span>`
+        const badge = isCurrentTier
+          ? `<span style="font-size:0.56rem;background:rgba(201,168,76,0.18);color:var(--gold);padding:0.2rem 0.7rem;border:1px solid rgba(201,168,76,0.3);letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">Active Tier</span>`
           : isPreviousTier
-          ? `<span style="font-size:0.52rem;background:rgba(110,207,110,0.1);color:#6ecf6e;padding:0.2rem 0.6rem;border:1px solid rgba(110,207,110,0.2);letter-spacing:0.1em;text-transform:uppercase;">✓ Completed</span>`
+          ? `<span style="font-size:0.56rem;background:rgba(110,207,110,0.1);color:#6ecf6e;padding:0.2rem 0.7rem;border:1px solid rgba(110,207,110,0.2);letter-spacing:0.1em;text-transform:uppercase;">Completed</span>`
           : isAdmin
-          ? `<span style="font-size:0.52rem;background:rgba(201,168,76,0.1);color:var(--gold);padding:0.2rem 0.6rem;border:1px solid rgba(201,168,76,0.15);letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>`
-          : `<span style="font-size:0.52rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.2rem 0.6rem;border:1px solid rgba(255,255,255,0.08);letter-spacing:0.1em;text-transform:uppercase;">🔒 Locked</span>`;
+          ? `<span style="font-size:0.56rem;background:rgba(201,168,76,0.08);color:var(--gold-dim);padding:0.2rem 0.7rem;border:1px solid rgba(201,168,76,0.12);letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>`
+          : `<span style="font-size:0.56rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.2rem 0.7rem;border:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em;text-transform:uppercase;">Locked</span>`;
 
-        // Locked section — still clickable to preview, but content is blurred/teased
+        // LOCKED — show chapter titles only, no content
         if (!isUnlocked) {
-          const nextRole = section.roleLabel;
-          const chapterList = section.chapters.map((ch, ci) => `
-            <div style="padding:0.65rem 1.2rem;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:0.7rem;opacity:0.5;">
-              <div style="font-size:0.6rem;letter-spacing:0.08em;color:${section.color};font-weight:700;min-width:28px;">Ch.${ci+1}</div>
-              <div style="flex:1;font-size:0.75rem;color:var(--gray);">${ch.title}</div>
-              <div style="font-size:0.68rem;color:var(--gray);">${ch.units.length} units</div>
-              <div style="font-size:0.9rem;">🔒</div>
-            </div>`).join('');
-
-          return `<div style="border:1px solid rgba(255,255,255,0.06);overflow:hidden;background:rgba(0,0,0,0.15);">
-            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;align-items:center;gap:0.8rem;padding:1rem 1.4rem;background:rgba(0,0,0,0.1);cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);">
-              <div style="font-size:1.6rem;opacity:0.4;">${section.icon}</div>
+          return `<div style="border:1px solid rgba(255,255,255,0.05);overflow:hidden;background:rgba(0,0,0,0.1);">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;align-items:center;gap:1rem;padding:1.2rem 1.6rem;cursor:pointer;background:rgba(0,0,0,0.08);">
+              <div style="width:2px;height:36px;background:rgba(255,255,255,0.08);flex-shrink:0;"></div>
               <div style="flex:1;">
-                <div style="font-size:0.88rem;font-weight:600;color:var(--gray);">${section.roleLabel} Training ${tierBadge}</div>
-                <div style="font-size:0.62rem;color:var(--gray);margin-top:2px;">${section.chapters.reduce((s,c)=>s+c.units.length,0)} units · Unlocked upon promotion to ${nextRole}</div>
+                <div style="font-size:0.96rem;font-weight:600;color:var(--gray);display:flex;align-items:center;gap:0.6rem;">${section.roleLabel} Training ${badge}</div>
+                <div style="font-size:0.68rem;color:rgba(255,255,255,0.25);margin-top:0.3rem;">${section.chapters.reduce((s,c)=>s+c.units.length,0)} units — Unlocked upon promotion to ${section.roleLabel}</div>
               </div>
-              <div style="font-size:0.9rem;color:var(--gray);">▾</div>
+              <div style="color:rgba(255,255,255,0.15);font-size:0.85rem;">&#9660;</div>
             </div>
-            <div style="display:none;">
-              <div style="padding:0.8rem 1.2rem;background:rgba(201,168,76,0.03);border-bottom:1px solid rgba(255,255,255,0.04);">
-                <div style="font-size:0.68rem;color:var(--gray);line-height:1.6;">🔒 This training tier is unlocked when you are promoted to <strong style="color:var(--cream);">${nextRole}</strong>. Here's a preview of what's inside:</div>
-              </div>
-              ${chapterList}
+            <div style="display:none;border-top:1px solid rgba(255,255,255,0.04);">
+              <div style="padding:0.8rem 1.6rem;font-size:0.7rem;color:rgba(255,255,255,0.2);font-style:italic;border-bottom:1px solid rgba(255,255,255,0.03);">This curriculum unlocks when you achieve promotion to ${section.roleLabel}.</div>
+              ${section.chapters.map((ch,ci) => `<div style="padding:0.7rem 1.6rem 0.7rem 2.2rem;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;gap:0.8rem;">
+                <span style="font-size:0.6rem;letter-spacing:0.06em;color:rgba(255,255,255,0.15);min-width:24px;">Ch.${ci+1}</span>
+                <span style="font-size:0.78rem;color:rgba(255,255,255,0.2);">${ch.title}</span>
+                <span style="font-size:0.62rem;color:rgba(255,255,255,0.12);margin-left:auto;">${ch.units.length} units</span>
+              </div>`).join('')}
             </div>
           </div>`;
         }
 
-        // Unlocked section — full access with chapters and units
+        // UNLOCKED — full content
         const chaptersHTML = section.chapters.map((ch, ci) => `
-          <div style="border:1px solid rgba(201,168,76,${isCurrentTier?'0.12':'0.06'});margin-bottom:0.5rem;overflow:hidden;">
-            <div onclick="toggleTrainingChapter(this)" style="display:flex;align-items:center;gap:0.8rem;padding:0.9rem 1.1rem;cursor:pointer;background:rgba(201,168,76,0.03);user-select:none;" onmouseover="this.style.background='rgba(201,168,76,0.06)'" onmouseout="this.style.background='rgba(201,168,76,0.03)'">
-              <div style="width:28px;height:28px;background:${section.color}22;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <span style="font-size:0.62rem;letter-spacing:0.06em;color:${section.color};font-weight:700;">Ch.${ci+1}</span>
+          <div style="border:1px solid rgba(${isCurrentTier?'201,168,76':'255,255,255'},${isCurrentTier?'0.1':'0.05'});margin-bottom:0.6rem;overflow:hidden;">
+            <div onclick="toggleTrainingChapter(this)" style="display:flex;align-items:center;gap:0.9rem;padding:1rem 1.2rem;cursor:pointer;background:rgba(201,168,76,0.02);user-select:none;" onmouseover="this.style.background='rgba(201,168,76,0.05)'" onmouseout="this.style.background='rgba(201,168,76,0.02)'">
+              <div style="width:28px;height:28px;background:${color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span style="font-size:0.6rem;letter-spacing:0.04em;color:${color};font-weight:700;">Ch.${ci+1}</span>
               </div>
               <div style="flex:1;">
-                <div style="font-size:0.8rem;color:var(--cream);font-weight:500;">${ch.title}</div>
-                <div style="font-size:0.58rem;color:var(--gray);margin-top:2px;">${ch.units.length} unit${ch.units.length!==1?'s':''}</div>
+                <div style="font-size:0.86rem;color:var(--cream);font-weight:500;">${ch.title}</div>
+                <div style="font-size:0.62rem;color:var(--gray);margin-top:0.2rem;">${ch.units.length} unit${ch.units.length!==1?'s':''}</div>
               </div>
-              <div class="training-doc-chevron" style="color:var(--gold-dim);font-size:0.85rem;">▾</div>
+              <div class="training-doc-chevron" style="color:var(--gold-dim);font-size:0.85rem;">&#9660;</div>
             </div>
             <div class="training-chapter-body" style="display:none;border-top:1px solid rgba(255,255,255,0.04);">
               ${ch.units.map((unit, ui) => `
                 <div style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                  <div onclick="toggleTrainingUnit(this)" style="display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1.1rem 0.7rem 2rem;cursor:pointer;user-select:none;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
-                    <div style="width:24px;height:24px;background:rgba(255,255,255,0.04);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                      <span style="font-size:0.56rem;color:var(--gray);">U${ui+1}</span>
+                  <div onclick="toggleTrainingUnit(this)" style="display:flex;align-items:center;gap:0.8rem;padding:0.85rem 1.2rem 0.85rem 2.2rem;cursor:pointer;user-select:none;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
+                    <div style="width:24px;height:24px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <span style="font-size:0.54rem;color:var(--gray);">U${ui+1}</span>
                     </div>
-                    <div style="font-size:0.95rem;flex-shrink:0;">${unit.icon}</div>
                     <div style="flex:1;">
-                      <div style="font-size:0.75rem;color:var(--cream);">${unit.title}</div>
-                      <div style="font-size:0.56rem;color:var(--gray);margin-top:1px;">⏱ ${unit.duration}</div>
+                      <div style="font-size:0.82rem;color:var(--cream);">${unit.title}</div>
+                      <div style="font-size:0.6rem;color:var(--gray);margin-top:0.15rem;">${unit.duration}</div>
                     </div>
-                    <div class="training-doc-chevron" style="color:var(--gray);font-size:0.78rem;">▾</div>
+                    <div class="training-doc-chevron" style="color:var(--gray);font-size:0.78rem;">&#9660;</div>
                   </div>
-                  <div class="training-unit-body" style="display:none;padding:1rem 1.2rem 1.2rem 3.5rem;border-top:1px solid rgba(255,255,255,0.03);background:rgba(0,0,0,0.15);">
-                    <div class="training-doc-body" style="display:block;">
+                  <div class="training-unit-body" style="display:none;padding:1.5rem 1.5rem 1.8rem 3rem;border-top:1px solid rgba(255,255,255,0.03);background:rgba(0,0,0,0.12);">
+                    <div style="max-width:820px;font-size:0.92rem;line-height:1.85;color:rgba(255,255,255,0.82);">
                       ${unit.content}
                     </div>
                   </div>
@@ -7949,15 +8318,12 @@ ${reportSections}
             </div>
           </div>`).join('');
 
-        const totalUnits = section.chapters.reduce((s,c) => s+c.units.length, 0);
-        const headerBg = isCurrentTier ? 'background:rgba(201,168,76,0.06);border-bottom:2px solid rgba(201,168,76,0.2);' : 'background:rgba(201,168,76,0.03);border-bottom:1px solid rgba(201,168,76,0.08);';
-
-        return `<div style="border:1px solid rgba(201,168,76,${isCurrentTier?'0.25':'0.1'});overflow:hidden;">
-          <div style="display:flex;align-items:center;gap:0.8rem;padding:1rem 1.4rem;${headerBg}">
-            <div style="font-size:1.6rem;">${section.icon}</div>
+        return `<div style="border:1px solid rgba(201,168,76,${isCurrentTier?'0.25':'0.1'});overflow:hidden;margin-bottom:0;">
+          <div style="display:flex;align-items:center;gap:1rem;padding:1.2rem 1.6rem;background:${isCurrentTier?'rgba(201,168,76,0.06)':'rgba(201,168,76,0.02)'};${isCurrentTier?'border-bottom:2px solid rgba(201,168,76,0.2);':'border-bottom:1px solid rgba(201,168,76,0.08);'}">
+            <div style="width:2px;height:40px;background:${color};flex-shrink:0;opacity:${isCurrentTier?1:0.4};"></div>
             <div style="flex:1;">
-              <div style="font-size:0.9rem;font-weight:600;color:var(--cream);display:flex;align-items:center;gap:0.5rem;">${section.roleLabel} Training ${tierBadge}</div>
-              <div style="font-size:0.62rem;color:var(--gray);margin-top:2px;">${totalUnits} units · ${section.chapters.length} chapter${section.chapters.length!==1?'s':''}</div>
+              <div style="font-size:0.98rem;font-weight:600;color:var(--cream);display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">${section.roleLabel} Training ${badge}</div>
+              <div style="font-size:0.66rem;color:var(--gray);margin-top:0.3rem;">${section.chapters.reduce((s,c)=>s+c.units.length,0)} units · ${section.chapters.length} chapter${section.chapters.length!==1?'s':''}</div>
             </div>
           </div>
           <div style="padding:0.8rem 1rem;">
@@ -7966,6 +8332,7 @@ ${reportSections}
         </div>`;
       }).join('');
     }
+
 
     window.__R_toggleTrainingChapter = window.toggleTrainingChapter = function(header) {
       const body = header.nextElementSibling;
@@ -8505,6 +8872,218 @@ Please log into the Legacy Life portal to approve or deny this submission.`
     }
 
     // Manager approval functions
+    // ─── Hierarchy Chart ───
+    function renderHierarchyChart() {
+      const el = document.getElementById('hierarchyChartWrap');
+      if (!el) return;
+      const u    = currentUser || window._llfgCurrentUser;
+      const role = u?.role || 'financial_advisor';
+      const isOwner = u?.isOwner || u?.email === 'lorenzoparenza@llfg.us';
+
+      // Build hierarchy from TEAM_DATA — show only own generation
+      const roleColors = {
+        financial_advisor:'var(--gold)', agent:'var(--gold)',
+        manager:'#6ea8fe', executive:'#c084fc', director:'#ff9f43',
+        managing_partner:'var(--gold)', admin:'var(--gold)'
+      };
+
+      // Filter teams based on role
+      let visibleTeams = [];
+      if (isOwner || role === 'admin' || role === 'managing_partner') {
+        visibleTeams = TEAM_DATA;
+      } else if (role === 'director' || role === 'executive') {
+        visibleTeams = TEAM_DATA;
+      } else if (role === 'manager') {
+        // Manager sees only their team
+        visibleTeams = TEAM_DATA.filter(t => t.leader === u?.name).length
+          ? TEAM_DATA.filter(t => t.leader === u?.name)
+          : [TEAM_DATA[3]]; // default Team Delta
+      } else {
+        // FA sees only themselves
+        visibleTeams = [];
+      }
+
+      if (visibleTeams.length === 0) {
+        el.innerHTML = '<p style="color:var(--gray);font-size:0.78rem;padding:0.5rem 0;">Build your team to see your hierarchy chart here.</p>';
+        return;
+      }
+
+      el.innerHTML = `<div style="display:flex;gap:1.5rem;padding:0.5rem 0;min-width:max-content;">` +
+        visibleTeams.map(team => `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+            <!-- Team Leader -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="width:48px;height:48px;background:rgba(201,168,76,0.12);border:2px solid rgba(201,168,76,0.4);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--gold);margin-bottom:0.3rem;">${team.leaderInit}</div>
+              <div style="font-size:0.65rem;color:var(--cream);font-weight:600;text-align:center;max-width:80px;">${team.leader.split(' ')[0]}</div>
+              <div style="font-size:0.54rem;color:var(--gold);letter-spacing:0.06em;">${team.leaderComm}%</div>
+              <div style="font-size:0.52rem;color:var(--gray);">${team.leaderRole.split('/')[0].trim()}</div>
+            </div>
+            <!-- Connector -->
+            <div style="width:1px;height:20px;background:rgba(201,168,76,0.25);"></div>
+            <!-- Horizontal bar -->
+            <div style="display:flex;gap:0;position:relative;">
+              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:${Math.max(0,(team.agents.length-1))*72}px;height:1px;background:rgba(201,168,76,0.2);"></div>
+              ${team.agents.map((a,ai) => `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0;width:72px;">
+                  <div style="width:1px;height:20px;background:rgba(201,168,76,0.2);"></div>
+                  <div onclick="openCompModal('${a.name}',${a.comm},'${team.id}')" style="width:38px;height:38px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;color:var(--gray);margin-bottom:0.3rem;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.5)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.2)';this.style.color='var(--gray)'">${a.init}</div>
+                  <div style="font-size:0.58rem;color:var(--cream);text-align:center;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.name.split(' ')[0]}</div>
+                  <div style="font-size:0.52rem;color:${roleColors[a.role.toLowerCase().replace(' ','_')]||'var(--gold)'};">${a.comm}%</div>
+                  <div style="font-size:0.48rem;color:var(--gray);text-align:center;">${a.role.replace('Financial Advisor','FA')}</div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('') + '</div>';
+    }
+
+    // Comp change modal
+    let _compModalAgentName = null;
+    let _compModalTeamId    = null;
+
+    window.__R_openCompModal = window.openCompModal = function(agentName, currentComm, teamId) {
+      const u = currentUser || window._llfgCurrentUser;
+      const isOwner = u?.isOwner || u?.email === 'lorenzoparenza@llfg.us';
+      const myComm  = u?.comm || 100;
+      const role    = u?.role || 'manager';
+
+      // Comp change authority:
+      // Manager: can set up to 5% BELOW their own level (min 65%)
+      // Executive+: can override any comp in their hierarchy
+      // Owner/Admin: unlimited
+      let maxAllowed, minAllowed;
+      if (isOwner || role === 'admin' || role === 'managing_partner' || role === 'director') {
+        maxAllowed = 140; minAllowed = 65;
+      } else if (role === 'executive') {
+        maxAllowed = 130; minAllowed = 65;
+      } else if (role === 'manager') {
+        maxAllowed = Math.max(65, myComm - 5);
+        minAllowed = 65;
+      } else {
+        return; // FAs cannot change comps
+      }
+
+      _compModalAgentName = agentName;
+      _compModalTeamId    = teamId;
+
+      // Create modal
+      const existing = document.getElementById('compChangeModal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'compChangeModal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      modal.innerHTML = `
+        <div style="background:#111;border:1px solid rgba(201,168,76,0.2);padding:2rem;max-width:380px;width:90%;position:relative;">
+          <button onclick="document.getElementById('compChangeModal').remove()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer;">×</button>
+          <div style="font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.4rem;">Compensation Adjustment</div>
+          <h3 style="margin-bottom:0.3rem;">${agentName}</h3>
+          <div style="font-size:0.68rem;color:var(--gray);margin-bottom:1.2rem;">Current: <strong style="color:var(--cream);">${currentComm}%</strong> · Authority range: ${minAllowed}% – ${maxAllowed}%</div>
+          <div style="margin-bottom:1rem;">
+            <label style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.5rem;">New Commission Level</label>
+            <select id="compNewLevel" style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.2);color:var(--cream);padding:0.75rem;font-family:'Raleway',sans-serif;font-size:0.85rem;outline:none;">
+              ${[65,70,80,90,100,110,120,130,135,150].filter(p => p >= minAllowed && p <= maxAllowed).map(p =>
+                `<option value="${p}" ${p===currentComm?'selected':''}>${p}%${p===currentComm?' (current)':''}</option>`
+              ).join('')}
+            </select>
+          </div>
+          <div style="margin-bottom:1.2rem;">
+            <label style="font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.5rem;">Reason (optional)</label>
+            <input type="text" id="compChangeReason" placeholder="e.g. Performance milestone, tier promotion..." style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.75rem;font-family:'Raleway',sans-serif;font-size:0.82rem;outline:none;box-sizing:border-box;"/>
+          </div>
+          <button onclick="submitCompChange('${agentName}','${teamId}')" class="modal-btn" style="width:100%;">Apply Change</button>
+        </div>`;
+      document.body.appendChild(modal);
+    };
+
+    window.__R_submitCompChange = window.submitCompChange = function(agentName, teamId) {
+      const newComm  = parseInt(document.getElementById('compNewLevel')?.value);
+      const reason   = document.getElementById('compChangeReason')?.value.trim();
+      const changer  = (currentUser || window._llfgCurrentUser)?.name || 'Manager';
+
+      // Apply to TEAM_DATA
+      if (typeof TEAM_DATA !== 'undefined') {
+        TEAM_DATA.forEach(team => {
+          team.agents.forEach(a => {
+            if (a.name === agentName) a.comm = newComm;
+          });
+        });
+      }
+
+      document.getElementById('compChangeModal')?.remove();
+
+      // Notify via email
+      const subj = encodeURIComponent(`Commission Adjustment — ${agentName}: ${newComm}%`);
+      const body = encodeURIComponent(
+`Commission Level Adjustment
+============================
+Agent: ${agentName}
+New Level: ${newComm}%
+Adjusted by: ${changer}
+Date: ${new Date().toLocaleDateString()}
+${reason ? 'Reason: ' + reason : ''}
+
+This change has been applied to the agent's production record.`
+      );
+      window.location.href = `mailto:lorenzoparenza\u0040llfg.us?subject=${subj}&body=${body}`;
+
+      // Refresh chart
+      renderHierarchyChart();
+      renderAgentApprovals();
+
+      // Toast
+      const t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(110,207,110,0.3);color:#6ecf6e;padding:0.7rem 1.4rem;font-size:0.72rem;z-index:9999;font-family:"Raleway",sans-serif;';
+      t.textContent = `Commission updated to ${newComm}% for ${agentName}`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    };
+
+    // ── Comp Management List ──
+    function renderCompManagementList() {
+      const el   = document.getElementById('compManagementList');
+      const desc = document.getElementById('compMgmtDesc');
+      if (!el) return;
+      const u    = currentUser || window._llfgCurrentUser;
+      const role = u?.role || 'manager';
+      const isOwner = u?.isOwner || u?.email === 'lorenzoparenza@llfg.us';
+      const myComm  = u?.comm || 100;
+
+      let agents = [];
+      if (typeof TEAM_DATA !== 'undefined') {
+        if (isOwner || role === 'admin' || role === 'managing_partner' || role === 'director' || role === 'executive') {
+          agents = TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team: t.name})));
+        } else if (role === 'manager') {
+          // Manager sees only their direct downline agents (not managers above them)
+          agents = TEAM_DATA.flatMap(t => t.agents.map(a => ({...a, team: t.name})))
+            .filter(a => !['manager','executive','director','managing_partner','admin'].includes((a.role||'').toLowerCase().replace(' ','_')));
+        }
+      }
+
+      if (agents.length === 0) {
+        el.innerHTML = '<p style="color:var(--gray);font-size:0.78rem;padding:0.5rem 0;">No agents in your hierarchy to manage.</p>';
+        return;
+      }
+
+      if (desc) {
+        const maxAdj = role === 'manager' ? `up to ${Math.max(65, myComm - 5)}%` : '140%';
+        desc.textContent = `Manage compensation for agents in your hierarchy. ${role === 'manager' ? `As a Manager at ${myComm}%, you may set agent comp up to ${Math.max(65, myComm - 5)}% (5% below your level).` : 'As an Executive or above, you may adjust any comp level within your hierarchy.'} Click any agent to make a change.`;
+      }
+
+      el.innerHTML = agents.map(a => {
+        const roleColor = {
+          'financial advisor':'var(--gold)', 'manager':'#6ea8fe',
+          'executive':'#c084fc', 'director':'#ff9f43'
+        }[a.role?.toLowerCase()] || 'var(--gold)';
+        return `<div style="display:flex;align-items:center;gap:0.8rem;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+          <div style="width:32px;height:32px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;color:var(--gold);flex-shrink:0;">${a.init}</div>
+          <div style="flex:1;">
+            <div style="font-size:0.78rem;color:var(--cream);font-weight:500;">${a.name}</div>
+            <div style="font-size:0.6rem;color:var(--gray);">${a.role} · ${a.team}</div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:${roleColor};min-width:40px;text-align:right;">${a.comm}%</div>
+          <button onclick="openCompModal('${a.name}',${a.comm},'${a.team}')" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.3rem 0.7rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(201,168,76,0.12)'" onmouseout="this.style.background='rgba(201,168,76,0.06)'">Adjust</button>
+        </div>`;
+      }).join('');
+    }
+
     window.__R_renderAgentApprovals = window.renderAgentApprovals = function() {
       const pendEl  = document.getElementById('pendingAgentList');
       const appEl   = document.getElementById('approvedAgentList');
@@ -8512,36 +9091,45 @@ Please log into the Legacy Life portal to approve or deny this submission.`
       const appCnt  = document.getElementById('approvedAgentCount');
       if (!pendEl) return;
 
+      const u    = currentUser || window._llfgCurrentUser;
+      const role = u?.role || 'manager';
+
       pendCnt.textContent = pendingAgentQueue.length;
       appCnt.textContent  = approvedAgentQueue.length;
 
-      // Pending
+      // Pending submissions
       pendEl.innerHTML = pendingAgentQueue.length === 0
         ? '<p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No submissions awaiting approval.</p>'
         : pendingAgentQueue.map(a => `
-          <div class="team-row" style="padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-            <div class="team-avatar">${a.name.split(' ').map(n=>n[0]).join('')}</div>
-            <div style="flex:1;">
-              <div class="team-name">${a.name}</div>
-              <div class="team-role">${a.email} · NPN: <span style="color:var(--gold);">${a.npn}</span></div>
-              <div style="font-size:0.65rem;color:var(--gray-light);margin-top:2px;">State: ${a.state||'—'} · ${a.exp} · Carriers: ${a.carriers||'—'} · Submitted by: ${a.submittedBy} · ${a.date}</div>
+          <div style="border:1px solid rgba(255,255,255,0.06);padding:1rem;margin-bottom:0.6rem;">
+            <div style="display:flex;align-items:flex-start;gap:0.8rem;margin-bottom:0.8rem;">
+              <div style="width:38px;height:38px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:600;color:var(--gold);flex-shrink:0;">${a.name.split(' ').map(n=>n[0]).join('')}</div>
+              <div style="flex:1;">
+                <div style="font-size:0.82rem;color:var(--cream);font-weight:600;">${a.name}</div>
+                <div style="font-size:0.65rem;color:var(--gray);margin-top:0.2rem;">${a.email} · NPN: <span style="color:var(--gold);">${a.npn}</span></div>
+                <div style="font-size:0.62rem;color:var(--gray);margin-top:0.2rem;">State: ${a.state||'—'} · ${a.exp} · Submitted by: ${a.submittedBy} · ${a.date}</div>
+              </div>
             </div>
-            <div style="display:flex;gap:0.5rem;flex-shrink:0;">
-              <button class="app-action-btn" style="border-color:rgba(110,207,110,0.4);color:#6ecf6e;" onclick="approveAgentSubmission(${a.id})">✓ Approve</button>
-              <button class="app-action-btn" style="border-color:rgba(224,85,85,0.4);color:#e05555;"   onclick="denyAgentSubmission(${a.id})">✕ Deny</button>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <button style="background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.3);color:#6ecf6e;padding:0.4rem 1rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(110,207,110,0.15)'" onmouseout="this.style.background='rgba(110,207,110,0.08)'" onclick="approveAgentSubmission(${a.id})">Approve</button>
+              <button style="background:rgba(224,85,85,0.06);border:1px solid rgba(224,85,85,0.3);color:#e05555;padding:0.4rem 1rem;font-family:'Raleway',sans-serif;font-size:0.62rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(224,85,85,0.12)'" onmouseout="this.style.background='rgba(224,85,85,0.06)'" onclick="denyAgentSubmission(${a.id})">Decline</button>
             </div>
           </div>`).join('');
 
-      // Approved awaiting contracting
+      // Approved
       appEl.innerHTML = approvedAgentQueue.length === 0
-        ? '<p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No approved agents awaiting contracting.</p>'
+        ? '<p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No agents awaiting contracting.</p>'
         : approvedAgentQueue.map(a => `
-          <div class="team-row">
-            <div class="team-avatar">${a.name.split(' ').map(n=>n[0]).join('')}</div>
-            <div><div class="team-name">${a.name}</div><div class="team-role">NPN: ${a.npn} · Approved by: ${a.approvedBy}</div></div>
-            <span style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#6ea8fe;margin-left:auto;">Awaiting Contracting</span>
+          <div style="display:flex;align-items:center;gap:0.8rem;padding:0.65rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div style="width:32px;height:32px;background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.2);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;color:#6ecf6e;flex-shrink:0;">${a.name.split(' ').map(n=>n[0]).join('')}</div>
+            <div style="flex:1;"><div style="font-size:0.78rem;color:var(--cream);">${a.name}</div><div style="font-size:0.6rem;color:var(--gray);">NPN: ${a.npn} · Approved by: ${a.approvedBy}</div></div>
+            <span style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:#6ea8fe;">Awaiting Contracting</span>
           </div>`).join('');
-    }
+
+      // Render hierarchy chart and comp management
+      renderHierarchyChart();
+      renderCompManagementList();
+    };
 
     window.__R_approveAgentSubmission = window.approveAgentSubmission = function(id) {
       const ag = pendingAgentQueue.find(a => a.id === id);
@@ -9253,92 +9841,7 @@ contact\u0040llfg.us`
     };
 
     // ─── Business Card ───
-    window.__R_updateBizCard = window.updateBizCard = function() {
-      const u       = currentUser || window._llfgCurrentUser;
-      const name    = document.getElementById('bcName')?.value    || u?.name || 'Your Name';
-      const phone   = document.getElementById('bcPhone')?.value   || '(555) 000-0000';
-      const email   = document.getElementById('bcEmail')?.value   || u?.email || 'you\u0040llfg.us';
-      const website = document.getElementById('bcWebsite')?.value || 'llfg.us';
-      const npn     = document.getElementById('bcNPN')?.value     || '';
-      const states  = document.getElementById('bcStates')?.value  || '';
-      const roleToTitle = {
-        financial_advisor:'Financial Advisor', agent:'Financial Advisor',
-        manager:'Insurance Manager', executive:'Executive Producer',
-        managing_partner:'Managing Partner', admin:'Director'
-      };
-      const title = roleToTitle[u?.role||'financial_advisor'] || 'Financial Advisor';
-      const titleEl = document.getElementById('bcTitle');
-      if (titleEl) titleEl.value = title;
-      const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-      set('bcPreviewName',    name);
-      set('bcPreviewTitle',   title.toUpperCase());
-      set('bcPreviewPhone',   phone);
-      set('bcPreviewEmail',   email);
-      set('bcPreviewWebsite', website);
-      set('bcPreviewNPN',     npn ? 'NPN: '+npn : 'NPN: —');
-      set('bcPreviewStates',  states || '—');
-    };
-
-    // ── Business Card Photo Upload ──
-    let _bcPhotoDataUrl = null;
-
-    window.__R_handleBcPhotoUpload = window.handleBcPhotoUpload = function(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        _bcPhotoDataUrl = e.target.result;
-        // Update thumbnail in form
-        const thumb = document.getElementById('bcPhotoPreviewThumb');
-        if (thumb) thumb.innerHTML = `<img src="${_bcPhotoDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`;
-        // Show photo on card
-        const cardPhoto = document.getElementById('bcCardPhoto');
-        const cardImg   = document.getElementById('bcCardPhotoImg');
-        if (cardPhoto) cardPhoto.style.display = 'block';
-        if (cardImg)   cardImg.src = _bcPhotoDataUrl;
-      };
-      reader.readAsDataURL(file);
-    };
-
-    window.__R_clearBcPhoto = window.clearBcPhoto = function() {
-      _bcPhotoDataUrl = null;
-      const thumb = document.getElementById('bcPhotoPreviewThumb');
-      if (thumb) thumb.innerHTML = '👤';
-      const cardPhoto = document.getElementById('bcCardPhoto');
-      const cardImg   = document.getElementById('bcCardPhotoImg');
-      if (cardPhoto) cardPhoto.style.display = 'none';
-      if (cardImg)   cardImg.src = '';
-    };
-
-    // ── LinkedIn Logo Export ──
-    window.__R_downloadLinkedInLogo = window.downloadLinkedInLogo = function() {
-      const svg = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="400" fill="#0a0a0a"/>
-  <!-- Outer hexagon -->
-  <polygon points="200,30 360,115 360,285 200,370 40,285 40,115" fill="none" stroke="#c9a84c" stroke-width="8"/>
-  <!-- Middle hexagon -->
-  <polygon points="200,60 330,130 330,270 200,340 70,270 70,130" fill="rgba(201,168,76,0.06)" stroke="#c9a84c" stroke-width="4" stroke-opacity="0.4"/>
-  <!-- Inner hexagon -->
-  <polygon points="200,90 300,145 300,255 200,310 100,255 100,145" fill="rgba(201,168,76,0.03)" stroke="#c9a84c" stroke-width="2" stroke-opacity="0.25"/>
-  <!-- L lettermark -->
-  <text x="200" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="130" font-weight="bold" fill="#c9a84c">L</text>
-  <!-- Wordmark below -->
-  <text x="200" y="390" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#c9a84c" letter-spacing="6">LEGACY LIFE</text>
-</svg>`;
-      const blob = new Blob([svg], {type:'image/svg+xml'});
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = 'LLFG_LinkedIn_Logo.svg';
-      a.click();
-      URL.revokeObjectURL(url);
-      const toast = document.createElement('div');
-      toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(201,168,76,0.3);color:var(--cream);padding:0.8rem 1.5rem;font-size:0.72rem;z-index:9999;font-family:"Raleway",sans-serif;text-align:center;line-height:1.6;';
-      toast.innerHTML = '✓ <strong style="color:var(--gold);">Logo downloaded!</strong><br>Open in browser → right-click → Save as PNG for LinkedIn.';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 4500);
-    };
-
+    
     window.__R_downloadAppleWallet = window.downloadAppleWallet = function() {
       const u       = currentUser || window._llfgCurrentUser;
       const name    = document.getElementById('bcName')?.value    || u?.name || 'Agent';
