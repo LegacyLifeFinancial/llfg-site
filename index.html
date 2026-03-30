@@ -6997,9 +6997,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     ];
 
     function buildPortalOverview(user) {
-      const isAgent   = user.role === 'financial_advisor' || user.role === 'agent';
-      const isManager = user.role === 'manager';
-      const isExec    = user.role === 'executive' || user.role === 'managing_partner' || user.role === 'admin';
+      const role      = user.role || 'financial_advisor';
+      const isOwner   = user.isOwner || user.email === 'lorenzoparenza@llfg.us';
+      const isAgent   = role === 'financial_advisor' || role === 'agent';
+      const isManager = role === 'manager';
+      const isExec    = role === 'executive' || role === 'managing_partner' || role === 'admin' || isOwner;
 
       document.getElementById('portalWelcomeSub').textContent =
         isAgent   ? "Here\'s your portal overview." :
@@ -7159,12 +7161,13 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     }
 
-    // Sub-tab definitions per role
+    // Sub-tab definitions per role — strict gating
     const MYDEALS_TABS = {
       financial_advisor: ['deals','commissions'],
       agent:             ['deals','commissions'],
       manager:           ['deals','commissions','teammetrics'],
       executive:         ['deals','commissions','teammetrics'],
+      director:          ['deals','commissions','teammetrics'],
       managing_partner:  ['deals','commissions','teammetrics'],
       admin:             ['deals','commissions','teammetrics'],
     };
@@ -7173,6 +7176,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       agent:             ['training','addagents','bizcard','portals'],
       manager:           ['training','addagents','agentapprovals','bizcard','portals'],
       executive:         ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
+      director:          ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
       managing_partner:  ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
       admin:             ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
     };
@@ -7181,12 +7185,16 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       agent:             ['addagents'],
       manager:           ['addagents','agentapprovals'],
       executive:         ['addagents','agentapprovals','contracting','applications'],
+      director:          ['addagents','agentapprovals','contracting','applications'],
       managing_partner:  ['addagents','agentapprovals','contracting','applications'],
       admin:             ['addagents','agentapprovals','contracting','applications'],
     };
     const MANAGEMENT_TABS = {
+      financial_advisor: ['commreq'],
+      agent:             ['commreq'],
       manager:           ['commreq','reports'],
       executive:         ['commreq','teammetrics','reports'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports'],
       managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports'],
       admin:             ['commreq','permissions','teammetrics','downlineclients','reports'],
     };
@@ -7194,6 +7202,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', addagents:'Add Agents', agentapprovals:'Agent Approvals',
       contracting:'Send Contracts', applications:'Applications', bizcard:'Business Card',
+      portals:'Carrier Portals',
       commreq:'Commission Request', permissions:'Permissions',
       downlineclients:'All Clients', reports:'Reports',
     };
@@ -7252,12 +7261,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
       // Highlight parent dropdown tab
       if (isSubTab) {
-        const parentMap = {
-          mydeals: Object.values(MYDEALS_TABS).flat(),
-          tools:   Object.values(TOOLS_TABS).flat(),
-          management: Object.values(MANAGEMENT_TABS).flat(),
-        };
-        const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
+        const allMydeals    = ['deals','commissions','teammetrics'];
+        const allTools      = ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'];
+        const allManagement = ['commreq','permissions','teammetrics','downlineclients','reports'];
+        const parentMap = { mydeals: allMydeals, tools: allTools, management: allManagement };
+        const labelMap  = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentMap)) {
           if (subs.includes(tab)) {
             const btn = Array.from(document.querySelectorAll('#portalTabs .admin-tab')).find(b => b.textContent.includes(labelMap[parent]));
@@ -7271,54 +7279,77 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if (el2) el2.classList.add('active');
 
       // ── Tab-specific renderers ──
-      if(tab === 'agentapprovals') { renderAgentApprovals(); renderPromotionRequests(); }
-      if(tab === 'contracting')    renderContractingQueue();
-      if(tab === 'addagents')      renderMyAgentList();
+      const u2 = currentUser || window._llfgCurrentUser;
+      const isOwner2 = u2?.isOwner || u2?.email === 'lorenzoparenza@llfg.us';
+      // role already declared above from currentUser
+
+      if(tab === 'overview')       { buildPortalOverview(u2 || {role:'financial_advisor'}); }
+      if(tab === 'agentapprovals') { renderAgentApprovals(); if(typeof renderPromotionRequests==='function') renderPromotionRequests(); }
+      if(tab === 'contracting')    { if(typeof renderContractingQueue==='function') renderContractingQueue(); }
+      if(tab === 'addagents')      { renderMyAgentList(); }
       if(tab === 'dataforms')      { setTimeout(updateEmailPreview, 50); }
       if(tab === 'training')       { renderTrainingCurriculum(); }
       if(tab === 'calendar')       { renderPortalCal(); }
-      if(tab === 'emailtemplates') { renderEmailTemplates(); }
+      if(tab === 'emailtemplates') { if(typeof renderEmailTemplates==='function') renderEmailTemplates(); }
       if(tab === 'commissions')    { renderCommissionsTab(); }
-      if(tab === 'permissions')    { renderPermissionsOptions(); }
-      if(tab === 'reports')        { initReportsTab(); renderReportSummary(); }
-      if(tab === 'portals')        { /* static content, no render needed */ }
+      if(tab === 'permissions')    { if(typeof renderPermissionsOptions==='function') renderPermissionsOptions(); }
+      if(tab === 'reports')        { if(typeof initReportsTab==='function') initReportsTab(); if(typeof renderReportSummary==='function') renderReportSummary(); }
+      if(tab === 'portals')        { /* static HTML — no render needed */ }
       if(tab === 'deals')          { renderDeals(); }
-      if(tab === 'teammetrics')    { renderTeamHierarchy && renderTeamHierarchy(); }
-      if(tab === 'downlineclients') {
-        const el3 = document.getElementById('ptab-downlineclients');
-        if (el3) {
-          if (!el3.querySelector('#downlineClientsTable')) {
-            el3.innerHTML = `<div class="dash-body"><div class="dash-welcome"><h2>${role==='admin'?'All <em>Client Information</em>':'Downline <em>Client Overview</em>'}</h2><p>${role==='admin'?'Full client data across all agents — admin only view.':'Your downline agents\' clients. Private information is hidden per policy.'}</p></div><div class="dash-section"><div id="downlineClientsTable"></div></div></div>`;
-          }
-          renderDownlineClients(role);
+      if(tab === 'teammetrics')    { if(typeof renderTeamHierarchy==='function') renderTeamHierarchy(); }
+      if(tab === 'commreq')        {
+        const cr = document.getElementById('ptab-commreq');
+        if (cr && !cr.querySelector('.dash-welcome')) {
+          cr.innerHTML = `<div class="dash-body"><div class="dash-welcome"><h2>Commission <em>Requests</em></h2><p>Submit or review commission adjustment requests within your hierarchy.</p></div><div id="commReqBody"><p style="color:var(--gray);font-size:0.78rem;padding:1rem 0;">No pending commission requests.</p></div></div>`;
         }
       }
+      if(tab === 'messages') {
+        // Initialize messages tab on first open
+        const contactList = document.getElementById('msgContactList');
+        if (contactList && contactList.children.length === 0) {
+          renderMsgContactList();
+        }
+        const firstTabBtn = document.getElementById('msgtab-team');
+        if (firstTabBtn && activeMsgTab === 'team') {
+          switchMsgTab('team', firstTabBtn);
+        }
+      }
+      if(tab === 'downlineclients') {
+        let dcEl = document.getElementById('ptab-downlineclients');
+        if (!dcEl) {
+          dcEl = document.createElement('div');
+          dcEl.className = 'admin-tab-content active';
+          dcEl.id = 'ptab-downlineclients';
+          const agentDash = document.getElementById('agentDash');
+          if (agentDash) agentDash.appendChild(dcEl);
+        }
+        if (dcEl && !dcEl.querySelector('#downlineClientsTable')) {
+          dcEl.innerHTML = `<div class="dash-body"><div class="dash-welcome"><h2>${isOwner2||role==='admin'?'All <em>Client Information</em>':'Downline <em>Client Overview</em>'}</h2><p>${isOwner2||role==='admin'?'Full client data across all agents.':'Your downline agents\' clients. Private data is hidden per compliance policy.'}</p></div><div class="dash-section"><div id="downlineClientsTable"></div></div></div>`;
+        }
+        if (typeof renderDownlineClients==='function') renderDownlineClients(role);
+      }
       if(tab === 'bizcard') {
-        const u = currentUser || window._llfgCurrentUser;
-        if (u) {
-          const nameEl  = document.getElementById('bcName');  if(nameEl  && !nameEl.value)  nameEl.value  = u.name  || '';
-          const emailEl = document.getElementById('bcEmail'); if(emailEl && !emailEl.value) emailEl.value = u.email || '';
-          const phoneEl = document.getElementById('bcPhone'); if(phoneEl && !phoneEl.value) phoneEl.value = u.phone || '';
+        if (u2) {
+          const nameEl  = document.getElementById('bcName');  if(nameEl  && !nameEl.value)  nameEl.value  = u2.name  || '';
+          const emailEl = document.getElementById('bcEmail'); if(emailEl && !emailEl.value) emailEl.value = u2.email || '';
           const titleEl = document.getElementById('bcTitle'); if(titleEl) {
             const rd = {'financial_advisor':'Financial Advisor','agent':'Financial Advisor','manager':'Insurance Manager','executive':'Executive Producer','director':'Director','managing_partner':'Managing Partner','admin':'Director'};
-            titleEl.value = rd[u.role] || 'Financial Advisor';
+            titleEl.value = rd[u2.role] || 'Financial Advisor';
           }
         }
         setTimeout(() => {
           if(typeof window.__R_updateBizCard === 'function') window.__R_updateBizCard();
-          else if(typeof updateBizCard === 'function') updateBizCard();
-        }, 50);
+        }, 80);
       }
       if(tab === 'applications') {
-        const r = currentUser?.role;
-        const isManagerOnly = (r === 'manager');
+        const isManagerOnly = (role === 'manager');
         const subtitle = document.getElementById('ptabAppsSubtitle');
         if (isManagerOnly) {
           if(subtitle) subtitle.textContent = `Showing applications where you were listed as the referral.`;
-          renderApplications(currentUser?.name);
+          if(typeof renderApplications==='function') renderApplications(u2?.name);
         } else {
           if(subtitle) subtitle.textContent = `All incoming agent applications.`;
-          renderApplications();
+          if(typeof renderApplications==='function') renderApplications();
         }
       }
     };
@@ -8275,24 +8306,20 @@ ${reportSections}
           ? `<span style="font-size:0.56rem;background:rgba(201,168,76,0.08);color:var(--gold-dim);padding:0.2rem 0.7rem;border:1px solid rgba(201,168,76,0.12);letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>`
           : `<span style="font-size:0.56rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.2rem 0.7rem;border:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em;text-transform:uppercase;">Locked</span>`;
 
-        // LOCKED — show chapter titles only, no content
+        // LOCKED — show minimal info, not expandable, no chapter list
         if (!isUnlocked) {
-          return `<div style="border:1px solid rgba(255,255,255,0.05);overflow:hidden;background:rgba(0,0,0,0.1);">
-            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;align-items:center;gap:1rem;padding:1.2rem 1.6rem;cursor:pointer;background:rgba(0,0,0,0.08);">
-              <div style="width:2px;height:36px;background:rgba(255,255,255,0.08);flex-shrink:0;"></div>
+          const totalUnits = section.chapters.reduce((s,c) => s+c.units.length, 0);
+          return `<div style="border:1px solid rgba(255,255,255,0.04);overflow:hidden;background:rgba(0,0,0,0.08);opacity:0.55;">
+            <div style="display:flex;align-items:center;gap:1rem;padding:1.1rem 1.5rem;">
+              <div style="width:2px;height:32px;background:rgba(255,255,255,0.08);flex-shrink:0;"></div>
               <div style="flex:1;">
-                <div style="font-size:0.96rem;font-weight:600;color:var(--gray);display:flex;align-items:center;gap:0.6rem;">${section.roleLabel} Training ${badge}</div>
-                <div style="font-size:0.68rem;color:rgba(255,255,255,0.25);margin-top:0.3rem;">${section.chapters.reduce((s,c)=>s+c.units.length,0)} units — Unlocked upon promotion to ${section.roleLabel}</div>
+                <div style="font-size:0.88rem;font-weight:600;color:var(--gray);display:flex;align-items:center;gap:0.6rem;">
+                  ${section.roleLabel} Training
+                  <span style="font-size:0.54rem;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.2);padding:0.15rem 0.6rem;border:1px solid rgba(255,255,255,0.06);letter-spacing:0.1em;text-transform:uppercase;">Locked</span>
+                </div>
+                <div style="font-size:0.63rem;color:rgba(255,255,255,0.2);margin-top:0.25rem;">${totalUnits} units — Unlocked upon promotion to ${section.roleLabel}</div>
               </div>
-              <div style="color:rgba(255,255,255,0.15);font-size:0.85rem;">&#9660;</div>
-            </div>
-            <div style="display:none;border-top:1px solid rgba(255,255,255,0.04);">
-              <div style="padding:0.8rem 1.6rem;font-size:0.7rem;color:rgba(255,255,255,0.2);font-style:italic;border-bottom:1px solid rgba(255,255,255,0.03);">This curriculum unlocks when you achieve promotion to ${section.roleLabel}.</div>
-              ${section.chapters.map((ch,ci) => `<div style="padding:0.7rem 1.6rem 0.7rem 2.2rem;border-bottom:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;gap:0.8rem;">
-                <span style="font-size:0.6rem;letter-spacing:0.06em;color:rgba(255,255,255,0.15);min-width:24px;">Ch.${ci+1}</span>
-                <span style="font-size:0.78rem;color:rgba(255,255,255,0.2);">${ch.title}</span>
-                <span style="font-size:0.62rem;color:rgba(255,255,255,0.12);margin-left:auto;">${ch.units.length} units</span>
-              </div>`).join('')}
+              <div style="font-size:1.1rem;opacity:0.25;">&#128274;</div>
             </div>
           </div>`;
         }
