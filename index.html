@@ -2274,6 +2274,14 @@
       /* ── ADD AGENTS ── */
       #ptab-addagents .dash-sections { grid-template-columns: 1fr !important; }
 
+      /* ── BUSINESS CARD ── */
+      #ptab-bizcard .dash-sections { grid-template-columns: 1fr !important; }
+      #bizCardPreview { width: 100% !important; max-width: 380px; }
+      #ptab-bizcard .dash-sections > div:last-child { overflow-x: auto; }
+
+      /* ── AGENT APPROVALS ── */
+      #hierarchyChartWrap { padding-bottom: 1rem; }
+
       /* ── AGENT APPROVALS ── */
       .team-row { flex-wrap: wrap; gap: 0.4rem; padding: 0.8rem 0; }
       .team-avatar { width: 30px; height: 30px; font-size: 0.7rem; flex-shrink: 0; }
@@ -7229,9 +7237,12 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       };
       if (!isSubTab && dropdowns[tab]) {
         const subs = dropdowns[tab];
-        if (subs.length === 1) { showPortalTab(subs[0], null, true); return; }
+        // Always show dropdown menu AND immediately open first sub-tab
         document.querySelectorAll('#portalTabs .admin-tab').forEach(t => t.classList.remove('active'));
-        if (el) { el.classList.add('active'); openSubDropdown(el, subs); }
+        if (el) el.classList.add('active');
+        if (subs.length > 1) openSubDropdown(el, subs);
+        // Immediately activate first sub-tab content
+        showPortalTab(subs[0], null, true);
         return;
       }
 
@@ -7285,15 +7296,18 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if(tab === 'bizcard') {
         const u = currentUser || window._llfgCurrentUser;
         if (u) {
-          const nameEl = document.getElementById('bcName'); if(nameEl && !nameEl.value) nameEl.value = u.name || '';
+          const nameEl  = document.getElementById('bcName');  if(nameEl  && !nameEl.value)  nameEl.value  = u.name  || '';
           const emailEl = document.getElementById('bcEmail'); if(emailEl && !emailEl.value) emailEl.value = u.email || '';
-          const titleEl = document.getElementById('bcTitle'); if(titleEl && !titleEl.value) {
-            const rd = {'financial_advisor':'Licensed Insurance Agent','manager':'Insurance Manager','executive':'Executive Producer','managing_partner':'Managing Partner','admin':'Director'};
-            titleEl.value = rd[u.role] || 'Licensed Insurance Agent';
+          const phoneEl = document.getElementById('bcPhone'); if(phoneEl && !phoneEl.value) phoneEl.value = u.phone || '';
+          const titleEl = document.getElementById('bcTitle'); if(titleEl) {
+            const rd = {'financial_advisor':'Financial Advisor','agent':'Financial Advisor','manager':'Insurance Manager','executive':'Executive Producer','director':'Director','managing_partner':'Managing Partner','admin':'Director'};
+            titleEl.value = rd[u.role] || 'Financial Advisor';
           }
         }
-        if(typeof updateBizCard === 'function') updateBizCard();
-        else if(typeof window.__R_updateBizCard === 'function') window.__R_updateBizCard();
+        setTimeout(() => {
+          if(typeof window.__R_updateBizCard === 'function') window.__R_updateBizCard();
+          else if(typeof updateBizCard === 'function') updateBizCard();
+        }, 50);
       }
       if(tab === 'applications') {
         const r = currentUser?.role;
@@ -11046,65 +11060,45 @@ This request requires Managing Partner approval.`
       // Render carrier training
       renderCarrierTraining();
 
-      // Downline client visibility — inject tab if manager or admin
-      if (isManager || isAdmin) {
-        // Add Downline Clients tab if not already added
+      // Create ptab-downlineclients content div without adding orphan nav buttons
+      if (isManager || isExec || isMP || isAdmin) {
         if (!document.getElementById('ptab-downlineclients')) {
-          const tabsEl = document.getElementById('portalTabs');
-          if (tabsEl) {
-            const btn = document.createElement('button');
-            btn.className = 'admin-tab';
-            btn.textContent = isAdmin ? 'All Clients' : 'Downline Clients';
-            btn.onclick = function() { showPortalTab('downlineclients', this); };
-            tabsEl.appendChild(btn);
-          }
-          // Add tab content
           const agentDash = document.getElementById('agentDash');
-          const tabContent = document.createElement('div');
-          tabContent.className = 'admin-tab-content';
-          tabContent.id = 'ptab-downlineclients';
-          tabContent.innerHTML = `
-            <div class="dash-body">
-              <div class="dash-welcome">
-                <h2>${isAdmin ? 'All <em>Client Information</em>' : 'Downline <em>Client Overview</em>'}</h2>
-                <p>${isAdmin ? 'Full client data across all agents — admin only view.' : 'Your downline agents\' clients. Private information (SSN, banking, DOB) is hidden per policy.'}</p>
+          if (agentDash) {
+            const tc = document.createElement('div');
+            tc.className = 'admin-tab-content';
+            tc.id = 'ptab-downlineclients';
+            const isAdminView = isAdmin || isMP;
+            tc.innerHTML = `<div class="dash-body"><div class="dash-welcome">
+              <h2>${isAdminView ? 'All <em>Client Information</em>' : 'Downline <em>Client Overview</em>'}</h2>
+              <p>${isAdminView ? 'Full client data across all agents and teams.' : "Your downline agents' clients. Private data is hidden per compliance policy."}</p>
+            </div><div class="dash-section">
+              <div class="dash-section-title" style="justify-content:space-between;margin-bottom:0.8rem;">
+                <span>Client Records</span>
+                <input type="text" placeholder="Search clients..." oninput="filterClients(this.value)" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.12);color:var(--cream);padding:0.35rem 0.7rem;font-size:0.7rem;outline:none;font-family:'Raleway',sans-serif;width:180px;"/>
               </div>
-              <div class="dash-section">
-                <div id="downlineClientsTable"></div>
-              </div>
-            </div>`;
-          if (agentDash) agentDash.appendChild(tabContent);
+              <div id="downlineClientsTable"></div>
+            </div></div>`;
+            agentDash.appendChild(tc);
+          }
         }
         renderDownlineClients(role);
       }
 
-      // Downline metrics: executives see team production
+      // Create ptab-teammetrics content div without adding orphan nav buttons
       if (isExec || isMP || isAdmin) {
         if (!document.getElementById('ptab-teammetrics')) {
-          const tabsEl = document.getElementById('portalTabs');
-          if (tabsEl) {
-            const btn = document.createElement('button');
-            btn.className = 'admin-tab';
-            btn.textContent = 'Team Metrics';
-            btn.onclick = function() { showPortalTab('teammetrics', this); };
-            tabsEl.appendChild(btn);
-          }
           const agentDash = document.getElementById('agentDash');
-          const tabContent = document.createElement('div');
-          tabContent.className = 'admin-tab-content';
-          tabContent.id = 'ptab-teammetrics';
-          tabContent.innerHTML = `
-            <div class="dash-body">
-              <div class="dash-welcome">
-                <h2>Team <em>Production Metrics</em></h2>
-                <p>All teams you oversee — click to expand individual agents.</p>
-              </div>
-              <div class="dash-section">
-                <p style="font-size:0.68rem;color:var(--gold-dim);margin-bottom:1rem;letter-spacing:0.06em;">✦ Approved by Managing Partner · Executive view — team-level and individual metrics visible</p>
-                <div id="execTeamMetricsTable"></div>
-              </div>
-            </div>`;
-          if (agentDash) agentDash.appendChild(tabContent);
+          if (agentDash) {
+            const tc = document.createElement('div');
+            tc.className = 'admin-tab-content';
+            tc.id = 'ptab-teammetrics';
+            tc.innerHTML = `<div class="dash-body"><div class="dash-welcome">
+              <h2>Team <em>Production Metrics</em></h2>
+              <p>All teams within your hierarchy. Click any team to expand individual agent performance.</p>
+            </div><div class="dash-section"><div id="execTeamMetricsTable"></div></div></div>`;
+            agentDash.appendChild(tc);
+          }
         }
         // Populate exec team metrics using same TEAM_DATA
         setTimeout(() => {
