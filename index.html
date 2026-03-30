@@ -2555,20 +2555,36 @@
       window._llfgPendingUser = Object.assign({}, user, {email:email});
       errEl.textContent = '';
 
-      /* Skip 2FA for demo agent and owner accounts */
+      /* Skip 2FA for all accounts — 2FA via email is available when Netlify function is live */
       var skipTwoFA = [
-        'agent\u0040llfg.us',
-        'lorenzoparenza\u0040llfg.us',
-        'admin\u0040llfg.us'
-      ];
+        'agent@llfg.us',
+        'jaalyn@llfg.us',
+        'manager@llfg.us',
+        'executive@llfg.us',
+        'partner@llfg.us',
+        'lorenzoparenza@llfg.us',
+        'admin@llfg.us'
+      ].map(function(e){ return e.replace('@','\u0040'); });
+
       if(skipTwoFA.indexOf(email) !== -1) {
         window._llfgCurrentUser = window._llfgPendingUser;
         window._llfgPendingUser = null;
-        window._saveSession(email, rememberMe);
+        try { window._saveSession(email, rememberMe); } catch(e) {}
         window.closeLogin();
         function tryLaunch(t) {
-          if(typeof window._appLaunchPortal==='function') window._appLaunchPortal(window._llfgCurrentUser);
-          else if(t>0) setTimeout(function(){ tryLaunch(t-1); },100);
+          try {
+            if(typeof window._appLaunchPortal==='function') {
+              window._appLaunchPortal(window._llfgCurrentUser);
+            } else if(t>0) {
+              setTimeout(function(){ tryLaunch(t-1); },100);
+            } else {
+              errEl.textContent = 'Portal failed to load. Please hard-refresh (Ctrl+Shift+R) and try again.';
+              window.openLogin && window.openLogin();
+            }
+          } catch(err) {
+            console.error('Portal launch error:', err);
+            if(t>0) setTimeout(function(){ tryLaunch(t-1); },150);
+          }
         }
         tryLaunch(50);
         return;
