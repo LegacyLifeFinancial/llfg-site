@@ -7238,26 +7238,54 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       const rect = parentEl.getBoundingClientRect();
       const menu = document.createElement('div');
       menu.className = 'portal-dropdown';
-      menu.style.cssText = `position:fixed;top:${rect.bottom}px;left:${rect.left}px;` +
-        `background:#111;border:1px solid rgba(201,168,76,0.2);z-index:9999;` +
-        `min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
-      menu.innerHTML = subTabs.map(t => {
-        const label = (typeof SUBTAB_LABELS !== 'undefined' && SUBTAB_LABELS[t]) || t;
-        return `<div onclick="selectSubTab('${t}',this.parentElement)"
-          style="padding:0.65rem 1rem;font-size:0.72rem;color:var(--gray);cursor:pointer;
-                 letter-spacing:0.06em;border-bottom:1px solid rgba(255,255,255,0.04);"
-          onmouseover="this.style.background='rgba(201,168,76,0.08)';this.style.color='var(--cream)'"
-          onmouseout="this.style.background='';this.style.color='var(--gray)'">${label}</div>`;
+      menu.setAttribute('data-dropdown','1');
+      menu.style.cssText = [
+        'position:fixed',
+        'top:' + (rect.bottom + 2) + 'px',
+        'left:' + rect.left + 'px',
+        'background:#131313',
+        'border:1px solid rgba(201,168,76,0.35)',
+        'border-top:2px solid var(--gold, #c9a84c)',
+        'z-index:10000',
+        'min-width:' + Math.max(rect.width, 180) + 'px',
+        'box-shadow:0 12px 32px rgba(0,0,0,0.7)',
+        'overflow:hidden'
+      ].join(';');
+
+      const labels = (typeof SUBTAB_LABELS !== 'undefined') ? SUBTAB_LABELS : {};
+      menu.innerHTML = subTabs.map(function(t, i) {
+        var label = labels[t] || (t.charAt(0).toUpperCase() + t.slice(1));
+        var border = (i < subTabs.length - 1) ? 'border-bottom:1px solid rgba(255,255,255,0.05);' : '';
+        var itemStyle = 'padding:0.75rem 1.1rem;font-size:0.76rem;color:rgba(255,255,255,0.75);'
+          + 'cursor:pointer;letter-spacing:0.05em;' + border + 'transition:background 0.12s,color 0.12s;';
+        var el = document.createElement('div');
+        el.className = 'dd-item';
+        el.dataset.tab = t;
+        el.style.cssText = itemStyle;
+        el.textContent = label;
+        el.addEventListener('click', function() { selectSubTab(this.dataset.tab, this.parentElement); });
+        el.addEventListener('mouseover', function() { this.style.background = 'rgba(201,168,76,0.1)'; this.style.color = '#fff'; });
+        el.addEventListener('mouseout', function() { this.style.background = ''; this.style.color = 'rgba(255,255,255,0.75)'; });
+        if (i < subTabs.length - 1) el.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+        return el.outerHTML;
       }).join('');
+
       document.body.appendChild(menu);
+
+      // Close when clicking outside - use capture phase with delay to avoid same-click closure
       setTimeout(() => {
-        document.addEventListener('click', function close(e) {
-          if (!menu.contains(e.target) && e.target !== parentEl) {
-            menu.remove();
-            document.removeEventListener('click', close);
+        function handleOutsideClick(e) {
+          if (!menu.isConnected) {
+            document.removeEventListener('click', handleOutsideClick, true);
+            return;
           }
-        });
-      }, 10);
+          if (!menu.contains(e.target) && !parentEl.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', handleOutsideClick, true);
+          }
+        }
+        document.addEventListener('click', handleOutsideClick, true);
+      }, 200);
     }
 
     // Called from dropdown menu items
@@ -7283,10 +7311,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         // Highlight the parent nav button
         document.querySelectorAll('#portalTabs .admin-tab').forEach(t => t.classList.remove('active'));
         if (el) el.classList.add('active');
-        // Show dropdown (safe even if el is null)
-        if (subs.length > 1 && el) openSubDropdown(el, subs);
-        // Load first sub-tab content immediately
+        // Load first sub-tab content FIRST (internally calls closeAllDropdowns)
         showPortalTab(subs[0], null, true);
+        // THEN open the dropdown so it isn't killed by closeAllDropdowns above
+        if (subs.length > 1 && el) openSubDropdown(el, subs);
         return;
       }
 
