@@ -26,3 +26,16 @@
     X-Content-Type-Options     = "nosniff"
     Referrer-Policy            = "strict-origin-when-cross-origin"
     Content-Security-Policy    = "upgrade-insecure-requests"
+
+# Force no-cache on index.html so deploys are instant
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
