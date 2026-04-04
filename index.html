@@ -19,8 +19,9 @@
       --gold-dim: #8a6f32;
       --cream: #f5f0e8;
       --white: #ffffff;
-      --gray: #888888;
-      --gray-light: #444444;
+      --gray: #b0b0b0;
+      --gray-light: #555555;
+      --blue-trust: #3b82f6;
     }
 
     html { scroll-behavior: smooth; }
@@ -31,8 +32,40 @@
       color: var(--cream);
       font-family: 'Raleway', sans-serif;
       font-weight: 300;
+      font-size: 1rem;
       overflow-x: hidden;
     }
+
+    /* ─── UI/UX PRO: GLOBAL FOCUS STATES ─── */
+    :focus-visible {
+      outline: 2px solid var(--gold) !important;
+      outline-offset: 2px !important;
+    }
+    input:focus, select:focus, textarea:focus, button:focus-visible, a:focus-visible {
+      outline: 2px solid var(--gold) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* ─── UI/UX PRO: TOUCH TARGETS ─── */
+    button, a[role="button"], .nav-cta, select, .hamburger {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* ─── UI/UX PRO: ACTIVE/FOCUS FOR TOUCH DEVICES ─── */
+    .btn-primary:active, .btn-primary:focus-visible {
+      background: var(--gold-light);
+      transform: scale(0.98);
+    }
+    .btn-ghost:active, .btn-ghost:focus-visible {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .nav-cta:active, .nav-cta:focus-visible {
+      background: var(--gold) !important;
+      color: var(--black) !important;
+    }
+    nav ul a:active, nav ul a:focus-visible { color: var(--gold); }
 
     /* ─── NAV ─── */
     nav {
@@ -148,9 +181,11 @@
 
     /* Reduced motion */
     @media (prefers-reduced-motion:reduce) {
-      .floating-logo,.shimmer-text { animation:none !important; }
+      .floating-logo,.shimmer-text,.llfg-shimmer-text { animation:none !important; }
       .reveal,.reveal-left,.reveal-right,.reveal-scale { opacity:1!important;transform:none!important;transition:none!important; }
+      .stat-track { animation:none !important; }
       #hero, #about, #why, #carriers, #agency, #apply { min-height:auto; }
+      *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
     }
 
     /* ─── HERO ─── */
@@ -348,9 +383,15 @@
       flex-direction: column;
       gap: 5px;
       cursor: pointer;
-      padding: 0.4rem;
+      padding: 0.7rem;
       z-index: 201;
       flex-shrink: 0;
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
     }
 
     .hamburger span {
@@ -2349,7 +2390,7 @@
       margin-bottom: 1.2rem;
     }
 
-    .pillar h4 {
+    .pillar h3 {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.15rem;
       font-weight: 400;
@@ -3421,11 +3462,11 @@
     window.toggleSidebar = function() {
       var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),b=document.getElementById('hamburger');
       if(!s)return; var open=s.classList.contains('open');
-      s.classList.toggle('open',!open); if(o)o.classList.toggle('open',!open); if(b)b.classList.toggle('open',!open);
+      s.classList.toggle('open',!open); if(o)o.classList.toggle('open',!open); if(b){b.classList.toggle('open',!open);b.setAttribute('aria-expanded',!open);}
     };
     window.closeSidebar = function() {
       var s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay'),b=document.getElementById('hamburger');
-      if(s)s.classList.remove('open'); if(o)o.classList.remove('open'); if(b)b.classList.remove('open');
+      if(s)s.classList.remove('open'); if(o)o.classList.remove('open'); if(b){b.classList.remove('open');b.setAttribute('aria-expanded','false');}
     };
 
     /* Modal helpers */
@@ -3827,7 +3868,7 @@
   </script>
 
   <!-- NAV -->
-  <nav>
+  <nav role="navigation" aria-label="Main navigation">
     <div class="logo">
       <img src="https://image.pollinations.ai/prompt/minimalist%20luxury%20logo%20LLFG%20letters%20Legacy%20Life%20Financial%20Group%20gold%20hexagon%20emblem%20lion%20crest%20clean%20vector%20style%20black%20background%20professional%20insurance%20company%20logo%20sharp%20edges%20metallic%20gold?width=512&height=512&nologo=true" alt="LLFG" class="logo-d-icon floating-logo" style="width:32px;height:32px;border-radius:6px;object-fit:cover;"/>
       <div class="logo-d-text">
@@ -3835,16 +3876,16 @@
         <div class="logo-d-sub">Financial Group</div>
       </div>
     </div>
-    <ul>
-      <li><a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});return false;">Who We Are</a></li>
-      <li><a href="#why" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'});return false;">Why Join</a></li>
-      <li><a href="#agency" onclick="document.getElementById('agency').scrollIntoView({behavior:'smooth'});return false;">Agencies</a></li>
-      <li><a href="#" onclick="openLogin();return false;" style="opacity:0.7;">Agent Login</a></li>
-      <li><a href="#apply" class="nav-cta" onclick="openApplicationOverlay();return false;">Join Our Team</a></li>
+    <ul role="menubar" aria-label="Main navigation">
+      <li role="none"><a role="menuitem" href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});return false;">Who We Are</a></li>
+      <li role="none"><a role="menuitem" href="#why" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'});return false;">Why Join</a></li>
+      <li role="none"><a role="menuitem" href="#agency" onclick="document.getElementById('agency').scrollIntoView({behavior:'smooth'});return false;">Agencies</a></li>
+      <li role="none"><a role="menuitem" href="#" onclick="openLogin();return false;" style="opacity:0.7;">Agent Login</a></li>
+      <li role="none"><a role="menuitem" href="#apply" class="nav-cta" onclick="openApplicationOverlay();return false;">Join Our Team</a></li>
     </ul>
-    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Toggle navigation menu" aria-expanded="false">
       <span></span><span></span><span></span>
-    </div>
+    </button>
   </nav>
 
   <!-- HERO — CINEMATIC SCROLL -->
@@ -3924,22 +3965,22 @@
     <div class="about-right llfg-stagger">
       <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
-        <h4>Term Life</h4>
+        <h3>Term Life</h3>
         <p>Simple, high-demand coverage — easy to sell and essential for families at every income level.</p>
       </div>
       <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
-        <h4>Whole Life</h4>
+        <h3>Whole Life</h3>
         <p>Permanent protection with cash value that grows — a powerful tool for long-term client relationships.</p>
       </div>
       <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
-        <h4>IUL</h4>
+        <h3>IUL</h3>
         <p>Indexed Universal Life — tax-advantaged growth tied to market indexes with downside protection. A premium product with strong commissions.</p>
       </div>
       <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
-        <h4>Annuities</h4>
+        <h3>Annuities</h3>
         <p>Retirement income solutions your clients can count on — and a strong source of recurring commissions for you.</p>
       </div>
     </div>
@@ -4350,7 +4391,7 @@
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
   <!-- SIDEBAR -->
-  <div class="sidebar" id="sidebar">
+  <div class="sidebar" id="sidebar" role="dialog" aria-label="Navigation sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">Legacy Life</div>
       <div class="sidebar-tagline">Financial Group · Agent Portal</div>
@@ -9148,9 +9189,6 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         icon:'', color:'#6ea8fe',
         chapters:[
           { title:'Manager Chapter 1 — Team Building & Leadership', units:[
-,{title:'Module 4 \u2014 Mortgage Protection Deep Dive',units:[{id:'ap_4_1',title:'Why Every Homeowner Needs This',icon:'\uD83C\uDFE0',duration:'20 min',content:`<h4>The Emotional Anchor</h4><p>A mortgage is the largest financial obligation most families carry. If the primary earner dies, the surviving spouse faces an impossible choice: keep paying a mortgage on one income, or sell the family home during the worst moment of their life.</p><h4>The Numbers That Close</h4><p><strong>Average U.S. mortgage:</strong> $300,000 &mdash; $350,000<br><strong>Average monthly payment:</strong> $2,100 &mdash; $2,400<br><strong>Years remaining:</strong> 20 &mdash; 28 years for most families</p><p>A $350,000 term policy costs $25 &mdash; $45/month for a healthy 35-year-old. That is the cost of a streaming subscription to guarantee the family never loses their home.</p><h4>The Conversation Framework</h4><p><strong>Step 1:</strong> "What is your current mortgage balance?" (Gets them thinking about the number)<br><strong>Step 2:</strong> "If something happened to you, could your spouse cover that payment alone?" (Creates emotional urgency)<br><strong>Step 3:</strong> "For about $1/day, we can guarantee the mortgage gets paid off in full. Your family stays home, no matter what." (Anchors to daily cost)</p>`},{id:'ap_4_2',title:'Equity Protection Strategy',icon:'\uD83D\uDCCA',duration:'20 min',content:`<h4>What Is Equity Protection?</h4><p>Most families build equity over 15 &mdash; 30 years. A death without coverage can force a home sale at a discount, wiping out that equity. Mortgage protection preserves the full equity the family has built.</p><h4>The Equity Argument</h4><p>"You have put $120,000 of equity into this home over the last 8 years. Without protection, your family may have to sell quickly &mdash; and a quick sale rarely gets full value. This policy guarantees they keep every dollar of equity you have built."</p><h4>Level Term vs Decreasing Term</h4><ul><li><strong>Decreasing term:</strong> Face amount drops with the mortgage. Cheapest. But if you die in year 20 of a 30-year mortgage, the payout only covers the remaining $100K &mdash; and your family gets nothing extra.</li><li><strong>Level term (recommended):</strong> Face amount stays at $350K even as the mortgage drops to $200K. Your family gets $350K &mdash; pays off the $200K mortgage AND has $150K for living expenses, education, or emergencies.</li></ul><p><strong>Always recommend level term.</strong> The cost difference is small. The value difference is enormous.</p>`},{id:'ap_4_3',title:'Living Benefits for Homeowners',icon:'\u2764\uFE0F',duration:'15 min',content:`<h4>The Disability Gap</h4><p>Death is not the only risk. What if the breadwinner has a stroke, gets cancer, or becomes chronically ill? They are alive but cannot work. The mortgage payment still comes due every month.</p><h4>Living Benefits Solve This</h4><p><strong>Critical illness rider:</strong> Heart attack, stroke, cancer, organ failure &mdash; accelerates 25 &mdash; 100% of death benefit while the insured is still alive. Use the money to pay the mortgage during recovery.</p><p><strong>Chronic illness rider:</strong> Cannot perform 2 of 6 daily activities &mdash; provides annual benefit to cover ongoing expenses including mortgage payments.</p><h4>The Closing Script</h4><p>"Here is what makes this different from the mailer you got from the mortgage company. Their policy only pays if you die. This policy pays if you die, get critically ill, or become chronically ill. It protects your mortgage no matter what happens to your health. And it costs less than what they quoted you."</p>`}]},{title:'Module 5 \u2014 Income Replacement Planning',units:[{id:'ap_5_1',title:'The DIME Needs Analysis',icon:'\uD83E\uDDEE',duration:'20 min',content:`<h4>How Much Coverage Does Your Client Need?</h4><p>The DIME method is the gold standard for calculating life insurance needs:</p><p><strong>D &mdash; Debt:</strong> All outstanding debts (credit cards, car loans, student loans, personal loans). Do not include the mortgage &mdash; that is calculated separately.</p><p><strong>I &mdash; Income:</strong> Annual income multiplied by the number of years the family needs support. Standard: 10x income. Conservative: 15x income. Minimum: 7x income.</p><p><strong>M &mdash; Mortgage:</strong> Remaining mortgage balance in full.</p><p><strong>E &mdash; Education:</strong> Estimated college costs per child. Current average: $25,000 &mdash; $55,000 per year depending on school type.</p><h4>Example Calculation</h4><p>Client: 38 years old, $85,000 income, $40,000 debt, $280,000 mortgage, 2 kids</p><p><strong>D:</strong> $40,000<br><strong>I:</strong> $85,000 x 10 = $850,000<br><strong>M:</strong> $280,000<br><strong>E:</strong> $50,000 x 2 = $100,000<br><strong>Total need:</strong> $1,270,000</p><p>Round to $1,250,000 or $1,500,000. Present both options and let the client choose.</p>`},{id:'ap_5_2',title:'Selling Income Replacement',icon:'\uD83D\uDCB5',duration:'20 min',content:`<h4>The Income Gap Conversation</h4><p>Most people think life insurance is about death. Reframe it as income replacement.</p><p><strong>Script:</strong> "If you were not here tomorrow, your family would lose $85,000 a year. Every year. For the next 25 years until your youngest finishes college, that is over $2 million in lost income. How much of that gap does your current coverage fill?"</p><p>Most people have either zero coverage or $50K &mdash; $100K through work. The gap is massive. Show the number and let it speak.</p><h4>Why Income Replacement Beats Face Amount</h4><p>Clients do not connect with "$500,000 death benefit." They connect with "your family receives $4,200 every month for 10 years &mdash; enough to keep the lights on, the mortgage paid, and the kids in school."</p><p><strong>Reframe the benefit as monthly income, not a lump sum.</strong> $500,000 at 4% withdrawal = $4,166/month for 10+ years. That is what protection means.</p>`},{id:'ap_5_3',title:'Why Life Insurance Is the Foundation',icon:'\uD83C\uDFE6',duration:'15 min',content:`<h4>The 5 Benefits Every Client Needs to Hear</h4><ol><li><strong>Tax-free death benefit:</strong> The full amount goes to beneficiaries with zero income tax. No other financial product does this.</li><li><strong>Immediate liquidity:</strong> Pays within 2 &mdash; 4 weeks. No probate, no court delays, no waiting for assets to sell.</li><li><strong>Debt elimination:</strong> Mortgage, car loans, credit cards, student loans &mdash; all wiped clean so the family starts fresh.</li><li><strong>Income replacement:</strong> Replaces the earner's salary for 10 &mdash; 20 years so the surviving spouse can grieve without financial panic.</li><li><strong>Legacy and education:</strong> Funds college, creates an inheritance, or seeds a family trust for generational wealth.</li></ol><p><strong>The Bottom Line:</strong> "Life insurance is the only financial product that creates an instant estate the moment you sign the application. A 401k takes 30 years to build. This takes 30 minutes to set up."</p>`}]}]}
-      ,
-      {id:'whole_life_mastery',role:'financial_advisor',roleLabel:'Whole Life & Riders Mastery',icon:'\uD83D\uDD12',color:'#2ecc71',isCourse:true,courseTag:'PRODUCTS',description:'Complete whole life deep dive: cash value, dividends, paid-up additions, and every rider explained.',chapters:[{title:'Module 1 \u2014 Whole Life Fundamentals',units:[{id:'wl_1_1',title:'How Whole Life Actually Works',icon:'\u2699\uFE0F',duration:'20 min',content:`<h4>The Three Guarantees</h4><ol><li><strong>Guaranteed death benefit:</strong> The face amount is guaranteed for life as long as premiums are paid. It never decreases, never expires, and never requires renewal.</li><li><strong>Guaranteed cash value:</strong> A portion of every premium builds cash value on a guaranteed schedule. You can see exactly how much your policy will be worth in year 5, 10, 20, or 40. No other financial product offers this certainty.</li><li><strong>Guaranteed level premiums:</strong> The premium you pay at age 30 is the same premium you pay at age 70. It never increases regardless of health changes.</li></ol><h4>How Cash Value Grows</h4><p>Each premium payment is split three ways: cost of insurance (mortality charge), carrier expenses, and cash value accumulation. In early years, most goes to insurance costs. By year 10 &mdash; 15, the cash value growth accelerates significantly as the mortality reserve is fully funded.</p><p><strong>Key point for clients:</strong> "Think of it as a savings account with a life insurance wrapper. The savings grow guaranteed, and if anything happens to you, your family receives the full death benefit &mdash; which is always more than the cash value."</p>`},{id:'wl_1_2',title:'Dividends: The Fourth Guarantee',icon:'\uD83D\uDCB0',duration:'20 min',content:`<h4>What Are Dividends?</h4><p>Mutual insurance companies (owned by policyholders, not shareholders) distribute a portion of surplus earnings back to policyholders as dividends. While not technically guaranteed, top mutual carriers have paid dividends every year for 100+ consecutive years.</p><h4>Four Dividend Options</h4><ol><li><strong>Cash:</strong> Receive a check. Least efficient &mdash; taxable if dividends exceed total premiums paid.</li><li><strong>Premium reduction:</strong> Dividends offset your premium, reducing out-of-pocket cost.</li><li><strong>Accumulate at interest:</strong> Dividends sit in a side account earning interest. Flexible but taxable.</li><li><strong>Paid-Up Additions (PUA) &mdash; BEST OPTION:</strong> Dividends automatically purchase small blocks of fully paid-up whole life insurance. These additions have their own cash value AND earn their own dividends. This creates compound growth &mdash; dividends earning dividends earning dividends.</li></ol><p><strong>Always recommend PUA dividend option.</strong> It is the engine that makes whole life a wealth-building tool, not just a death benefit.</p>`}]},{title:'Module 2 \u2014 Every Rider Explained',units:[{id:'wl_2_1',title:'Paid-Up Additions (PUA) Rider',icon:'\uD83D\uDE80',duration:'20 min',content:`<h4>The Wealth Accelerator</h4><p>The PUA rider allows you to pay additional premium (above the base premium) that purchases fully paid-up life insurance. Every dollar put into PUA immediately becomes cash value and death benefit with no ongoing cost.</p><h4>Why PUA Matters</h4><ul><li><strong>Accelerates cash value:</strong> A $500/month base policy might have $15,000 cash value in year 5. Add a $300/month PUA rider and year-5 cash value jumps to $35,000+.</li><li><strong>Increases death benefit:</strong> Each PUA purchase adds permanent coverage that never expires.</li><li><strong>Earns dividends:</strong> PUA additions are eligible for dividends immediately, creating a compound growth engine.</li><li><strong>Flexible:</strong> Most carriers allow you to adjust PUA contributions annually. Pay more in good years, less in tight years.</li></ul><h4>The MEC Warning</h4><p>There is a maximum you can put into a life insurance policy before it becomes a Modified Endowment Contract (MEC). A MEC loses the tax-free loan advantage. Always run illustrations to confirm PUA amounts stay below MEC limits.</p>`},{id:'wl_2_2',title:'Waiver of Premium Rider',icon:'\uD83D\uDEE1\uFE0F',duration:'15 min',content:`<h4>What It Does</h4><p>If the insured becomes totally disabled for 6+ continuous months, the insurance company pays the premium for you. The policy stays in force, cash value continues to grow, and the insured pays nothing until they recover or reach age 65.</p><h4>Why Every Policy Should Have It</h4><p>Without this rider, a disabled client faces a terrible choice: keep paying premiums they cannot afford, or let the policy lapse and lose all protection and cash value. The rider typically costs $2 &mdash; $5 per month. It is the cheapest insurance-on-your-insurance available.</p><p><strong>Script:</strong> "For about $3 per month, if you ever become disabled and cannot work, the insurance company will pay your premiums for you. Your coverage stays active, your cash value keeps growing, and you do not pay a dime until you are back on your feet."</p>`},{id:'wl_2_3',title:'Accelerated Death Benefit (ADB) Rider',icon:'\u2764\uFE0F',duration:'15 min',content:`<h4>The Three ADB Triggers</h4><ol><li><strong>Terminal illness:</strong> Diagnosed with 12 &mdash; 24 months to live. Access 50 &mdash; 100% of death benefit immediately. Use for final wishes, family time, experimental treatment, or paying off debts.</li><li><strong>Critical illness:</strong> Heart attack, stroke, invasive cancer, major organ failure, end-stage renal failure. Access 25 &mdash; 100% of death benefit. Use for treatment costs, mortgage payments during recovery, or replacing lost income.</li><li><strong>Chronic illness:</strong> Unable to perform 2 of 6 activities of daily living (ADLs) or severe cognitive impairment. Access an annual percentage of death benefit. Use for long-term care costs, home modifications, or ongoing living expenses.</li></ol><h4>The Selling Point</h4><p>"Most people think life insurance only pays when you die. This rider means it pays when you need it most &mdash; when you are still alive and fighting. It turns your life insurance into a safety net for the worst health events of your life."</p><p><strong>Cost:</strong> Many carriers include basic ADB at no additional charge. Always confirm and highlight this when presenting.</p>`},{id:'wl_2_4',title:'Child Term & Guaranteed Insurability Riders',icon:'\uD83D\uDC76',duration:'15 min',content:`<h4>Child Term Rider</h4><p>Covers all children in the family (current and future) under one rider, typically $10,000 &mdash; $25,000 per child. Costs $5 &mdash; $10/month total for all children. Convertible to permanent coverage at age 18 &mdash; 25 without medical underwriting.</p><p><strong>Why it matters:</strong> "This locks in coverage for your children at today's rates. When they turn 18, they can convert to a full permanent policy &mdash; no health questions, no medical exam &mdash; even if they develop a health condition between now and then."</p><h4>Guaranteed Insurability Rider (GI)</h4><p>Allows the insured to purchase additional coverage at specific future dates (typically every 3 years or at major life events) without any medical underwriting.</p><p><strong>Why it matters:</strong> Health changes. A 25-year-old buying a $250K policy today can add another $250K at age 28, 31, 34, and 37 &mdash; even if they develop diabetes, cancer, or any other condition in between.</p><p><strong>Script:</strong> "This rider is your insurance on your insurability. No matter what happens to your health in the future, you can always get more coverage. That option alone is worth more than the cost of this entire policy."</p>`}]},{title:'Module 3 \u2014 Selling Whole Life Effectively',units:[{id:'wl_3_1',title:'The Whole Life Conversation',icon:'\uD83D\uDDE3\uFE0F',duration:'20 min',content:`<h4>Overcoming the "Too Expensive" Objection</h4><p>Whole life costs 5 &mdash; 15x more than term. Clients will always say "why would I pay more?" Here is how to reframe:</p><p><strong>The Renting vs Owning Analogy:</strong> "Term insurance is renting coverage. You pay every month, but at the end you own nothing. Whole life is owning. Every premium builds equity you can access, borrow against, or pass to your family. The question is not which costs more &mdash; the question is which one are you still paying for 30 years from now with nothing to show?"</p><h4>Who Buys Whole Life?</h4><ul><li><strong>Parents buying for children:</strong> Lock in rates at pennies/day. Cash value grows for decades before the child ever pays a premium.</li><li><strong>Final expense planning:</strong> Adults 50 &mdash; 85 securing $5K &mdash; $35K for burial and final costs.</li><li><strong>Wealth builders:</strong> High earners using PUA-heavy whole life as a tax-advantaged savings vehicle.</li><li><strong>Estate planning:</strong> Creating a guaranteed inheritance regardless of market conditions.</li><li><strong>Business owners:</strong> Key person coverage, buy-sell funding, executive benefits.</li></ul>`},{id:'wl_3_2',title:'Whole Life vs IUL: When to Recommend Each',icon:'\u2696\uFE0F',duration:'15 min',content:`<h4>Recommend Whole Life When:</h4><ul><li>Client wants maximum guarantees and minimum risk</li><li>Client is conservative and skeptical of market-linked products</li><li>The need is final expense, child coverage, or guaranteed estate</li><li>Client values simplicity &mdash; fixed premium, fixed benefit, guaranteed growth</li><li>Cash value is a secondary goal behind guaranteed death benefit</li></ul><h4>Recommend IUL When:</h4><ul><li>Client wants higher potential growth and is comfortable with caps/floors</li><li>Primary goal is tax-free retirement income</li><li>Client is younger with a long accumulation horizon (20+ years)</li><li>Client wants flexible premiums</li><li>Client has maxed out 401k/IRA and needs additional tax-advantaged growth</li></ul><h4>The Layered Approach</h4><p>Top producers do not choose one or the other. They layer both: whole life for the guaranteed foundation (death benefit + cash value floor) and IUL for the growth engine (tax-free retirement income). Present the combination and let the client's goals determine the ratio.</p>`}]}]}
             { id:'mgr_1_1', title:'Unit 1 — The Manager Mindset', icon:'', duration:'20 min', content:`<p>At the Manager level your income is no longer solely a function of personal production — it is a function of the collective output of the team you build multiplied by your override percentage. The highest-leverage activity for a Manager is developing agents who write consistently, not writing more personal business.</p>` },
             { id:'mgr_1_2', title:'Unit 2 — Recruiting with Standards', icon:'', duration:'25 min', content:`<p>Recruit people with character, coachability, and hunger — not just experience. The candidate who has never sold insurance but exhibits genuine ambition and willingness to be coached will outperform the experienced agent who is resistant to feedback in virtually every case. Recruit from your existing network first: former colleagues, acquaintances who are underemployed, and referrals from your best agents.</p>` },
             { id:'mgr_1_3', title:'Unit 3 — Onboarding & First 30 Days', icon:'', duration:'20 min', content:`<p>Week 1: Licensing education, product orientation, portal access. Week 2: Supervised presentations and upline roleplay. Week 3: First independent prospect conversations with debrief. Week 4: First independent presentations and close attempts. Do not compress or skip stages — confidence and competence must develop simultaneously.</p>` },
