@@ -1,0 +1,1 @@
+Audit commission reconciliation in the LLFG portal (index.html). Compare expected payouts (from deal calculations) against actual carrier payments. Flag variances above threshold. Check the Reconciliation Agent logic and verify commission math matches the published tier structure across all roles.

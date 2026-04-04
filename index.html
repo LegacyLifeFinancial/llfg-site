@@ -2860,6 +2860,11 @@
       .app-table th { font-size: 0.56rem; padding: 0.5rem 0.5rem; }
       .app-table td { padding: 0.5rem 0.5rem; }
 
+      /* ── REPORT CARDS ── */
+      .report-grid { grid-template-columns: 1fr 1fr; }
+      .report-card { padding: 1rem; }
+      .report-card-icon { width: 36px; height: 36px; font-size: 1.2rem; }
+
       /* ── TRAINING ── */
       .training-doc-header { padding: 0.7rem 0.85rem; gap: 0.6rem; }
       .training-doc-title { font-size: 0.76rem; }
@@ -2968,6 +2973,7 @@
       .dash-card-value { font-size: 1.3rem; }
       .modal { border-radius: 0; }
       .app-table { min-width: 480px; }
+      .report-grid { grid-template-columns: 1fr !important; }
       div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
     }
 
@@ -4881,97 +4887,70 @@
         </div>
 
         <!-- Report Cards Grid -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;" id="reportCardsGrid">
+        <div class="report-grid" id="reportCardsGrid" style="margin-bottom:1.5rem;">
 
           <!-- Team AP Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(201,168,76,0.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📊</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Team AP Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">Annual premium by team &amp; agent</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Total AP written, per-agent breakdown, team rankings, and AP growth vs prior period.</div>
-            <button onclick="downloadReport('ap')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('ap')">
+            <div class="report-card-icon">📊</div>
+            <div class="report-card-title">Team AP Report</div>
+            <div class="report-card-desc">Total AP written, per-agent breakdown, team rankings, and AP growth vs prior period.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Performance Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(110,207,110,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🏆</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Performance Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">Agent rankings &amp; comp levels</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Leaderboard, comp percentages, top producers, activity ratios, and goals vs actuals.</div>
-            <button onclick="downloadReport('performance')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('performance')">
+            <div class="report-card-icon">📈</div>
+            <div class="report-card-title">Performance Report</div>
+            <div class="report-card-desc">Leaderboard, comp percentages, top producers, activity ratios, and goals vs actuals.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Onboarding Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(110,168,254,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🚀</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Onboarding Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">New agents &amp; pipeline status</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Applications submitted, approved, contracted, licensed — full recruiting pipeline with status tracking.</div>
-            <button onclick="downloadReport('onboarding')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('onboarding')">
+            <div class="report-card-icon">🎯</div>
+            <div class="report-card-title">Onboarding Report</div>
+            <div class="report-card-desc">Applications submitted, approved, contracted, licensed — full recruiting pipeline with status tracking.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Retention Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(192,132,252,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🔒</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Retention Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">Persistency &amp; policy retention</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Persistency rates, chargeback exposure, policy lapse analysis, and at-risk policy flags per agent.</div>
-            <button onclick="downloadReport('retention')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('retention')">
+            <div class="report-card-icon">🤝</div>
+            <div class="report-card-title">Retention Report</div>
+            <div class="report-card-desc">Persistency rates, chargeback exposure, policy lapse analysis, and at-risk policy flags per agent.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Commission Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(201,168,76,0.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">💰</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Commission Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">Earnings &amp; advanced pay</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Per-agent commission breakdown, advanced pay totals, comp levels, override earnings, and debt exposure.</div>
-            <button onclick="downloadReport('commission')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('commission')">
+            <div class="report-card-icon">💰</div>
+            <div class="report-card-title">Commission Report</div>
+            <div class="report-card-desc">Per-agent commission breakdown, advanced pay totals, comp levels, override earnings, and debt exposure.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Chargeback Risk Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(224,85,85,0.1);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">⚠️</div>
-              <div>
-                <div style="font-size:0.78rem;font-weight:600;color:var(--cream);">Chargeback Risk Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">Debt &amp; chargeback exposure</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">Agents at chargeback risk, debt rollup by team, projected exposure, and recommendations for at-risk policies.</div>
-            <button onclick="downloadReport('chargeback')" class="modal-btn" style="width:100%;padding:0.65rem;font-size:0.65rem;">⬇ Download PDF</button>
+          <div class="report-card" onclick="downloadReport('chargeback')">
+            <div class="report-card-icon">⚠️</div>
+            <div class="report-card-title">Chargeback Risk Report</div>
+            <div class="report-card-desc">Agents at chargeback risk, debt rollup by team, projected exposure, and recommendations for at-risk policies.</div>
+            <div class="report-card-action">Download PDF</div>
           </div>
 
           <!-- Full Organization Report -->
-          <div class="dash-card" style="padding:1.2rem;cursor:default;border-color:rgba(201,168,76,0.4);grid-column:1/-1;">
-            <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:0.8rem;">
-              <div style="width:36px;height:36px;background:rgba(201,168,76,0.18);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📋</div>
-              <div>
-                <div style="font-size:0.82rem;font-weight:600;color:var(--gold);">Full Organization Report</div>
-                <div style="font-size:0.6rem;color:var(--gray);">All metrics combined — AP, performance, onboarding, retention, commissions, chargeback risk</div>
-              </div>
-            </div>
-            <div style="font-size:0.65rem;color:var(--gray);line-height:1.6;margin-bottom:0.9rem;">The complete picture of your organization in one downloadable document. Includes all teams, all agents, all metrics for the selected period.</div>
-            <button onclick="downloadReport('full')" class="modal-btn" style="width:auto;padding:0.8rem 2rem;font-size:0.72rem;">⬇ Download Full Organization Report</button>
+          <div class="report-card" onclick="downloadReport('full')">
+            <div class="report-card-icon">🏢</div>
+            <div class="report-card-title">Full Organization Report</div>
+            <div class="report-card-desc">The complete picture of your organization in one downloadable document. All teams, all agents, all metrics for the selected period.</div>
+            <div class="report-card-action">Download PDF</div>
+          </div>
+
+          <!-- Data Backup -->
+          <div class="report-card" onclick="downloadPortalBackup()">
+            <div class="report-card-icon">💾</div>
+            <div class="report-card-title">Data Backup</div>
+            <div class="report-card-desc">Export a full JSON backup of all portal data — agents, teams, deals, settings, and configuration.</div>
+            <div class="report-card-action">Download Backup</div>
           </div>
 
         </div>
@@ -9216,6 +9195,35 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       const url  = URL.createObjectURL(blob);
       const win  = window.open(url, '_blank');
       if (win) setTimeout(() => URL.revokeObjectURL(url), 10000);
+    };
+
+    window.__R_downloadPortalBackup = window.downloadPortalBackup = function() {
+      try {
+        const backup = {
+          exportDate: new Date().toISOString(),
+          portalVersion: 'LLFG Portal',
+          teams: (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA : [],
+          agents: (typeof AGENT_ROSTER !== 'undefined') ? AGENT_ROSTER : [],
+          deals: (typeof DEALS_DATA !== 'undefined') ? DEALS_DATA : [],
+          calendarEvents: (typeof portalCalEvents !== 'undefined') ? portalCalEvents : [],
+          settings: {
+            reportPeriod: (typeof currentReportPeriod !== 'undefined') ? currentReportPeriod : 'weekly'
+          }
+        };
+        const json = JSON.stringify(backup, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'llfg-portal-backup-' + new Date().toISOString().slice(0,10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      } catch(e) {
+        console.error('Backup export failed:', e);
+        alert('Backup export failed. Check console for details.');
+      }
     };
 
     window.__R_toggleInlineReport = window.toggleInlineReport = function() {
@@ -13492,6 +13500,9 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_TrainingCoachAgent());
         this.register(new LLFG_PreflightAgent());
         this.register(new LLFG_MarketingAgent());
+        this.register(new LLFG_ReconciliationAgent());
+        this.register(new LLFG_DocumentAgent());
+        this.register(new LLFG_BackupAgent());
 
         // Alert listener for toast display
         LLFG_EventBus.on('agent:alert', (d) => {
@@ -15777,6 +15788,121 @@ This request requires Managing Partner approval.`
         return base;
       }
     }
+
+    class LLFG_ReconciliationAgent extends LLFG_AgentBase {
+      constructor() {
+        super('reconciliation', 'Reconciliation Agent', '\uD83D\uDD0D', 'Commission reconciliation, carrier payout matching, variance detection, dispute tracking');
+        this.config = { varianceThreshold: 50, reconcilePeriod: 'monthly', autoFlagDisputes: true };
+      }
+      async run(ctx) {
+        this.status = 'running'; this.metrics.runs++;
+        const start = Date.now();
+        try {
+          const deals = ctx.deals || [], payments = ctx.payments || [];
+          let matched = 0, unmatched = 0, disputes = [];
+          deals.forEach(d => {
+            const p = payments.find(p => p.policyNum === d.policyNum);
+            if (p) { matched++; const v = Math.abs(d.expectedPay - p.actualPay); if (v > this.config.varianceThreshold) disputes.push({ agent:d.agent, policy:d.policyNum, carrier:d.carrier, expected:d.expectedPay, actual:p.actualPay, variance:v, status:'flagged' }); }
+            else unmatched++;
+          });
+          const result = { matched, unmatched, disputes: disputes.length, disputeDetails: disputes.slice(0,10) };
+          this.lastResult = result;
+          LLFG_EventBus.emit('reconciliation:complete', result);
+          if (disputes.length) LLFG_EventBus.emit('alert', { level:'warning', source:this.id, msg: disputes.length + ' commission variance(s) detected' });
+          this.metrics.duration = Date.now() - start; this.status = 'idle';
+          return result;
+        } catch(e) { this.metrics.errors++; this.status = 'error'; return { error: e.message }; }
+      }
+    }
+
+    class LLFG_DocumentAgent extends LLFG_AgentBase {
+      constructor() {
+        super('documents', 'Document Agent', '\uD83D\uDCC1', 'E&O tracking, license expiration alerts, agreement management, credential verification');
+        this.config = { expirationWarningDays: 30, requiredDocs: ['nda','debt_rollup','eo_certificate','state_license'], autoAlertOnExpiry: true };
+      }
+      async run(ctx) {
+        this.status = 'running'; this.metrics.runs++;
+        const start = Date.now();
+        try {
+          const agents = ctx.agentRoster || [], agreements = ctx.agreements || [];
+          const now = new Date(), warn = new Date(now.getTime() + this.config.expirationWarningDays * 86400000);
+          let expiring = [], missing = [], compliant = 0;
+          agents.forEach(agent => {
+            const docs = agreements.filter(a => a.agentEmail === agent.email);
+            const hasNDA = docs.some(d => d.ndaSigned), hasDR = docs.some(d => d.debtRollupSigned);
+            if (!hasNDA || !hasDR) missing.push({ agent:agent.name, email:agent.email, missingNDA:!hasNDA, missingDR:!hasDR });
+            else compliant++;
+            if (agent.eoExpiry) { const exp = new Date(agent.eoExpiry); if (exp <= warn) expiring.push({ agent:agent.name, doc:'E&O Certificate', expires:agent.eoExpiry, daysLeft:Math.ceil((exp-now)/86400000) }); }
+            if (agent.licenseExpiry) { const exp = new Date(agent.licenseExpiry); if (exp <= warn) expiring.push({ agent:agent.name, doc:'State License', expires:agent.licenseExpiry, daysLeft:Math.ceil((exp-now)/86400000) }); }
+          });
+          const result = { compliant, missingDocs:missing.length, expiringSoon:expiring.length, missingDetails:missing.slice(0,10), expiringDetails:expiring.slice(0,10) };
+          this.lastResult = result;
+          LLFG_EventBus.emit('documents:scanned', result);
+          if (expiring.length) LLFG_EventBus.emit('alert', { level:'warning', source:this.id, msg: expiring.length + ' document(s) expiring within ' + this.config.expirationWarningDays + ' days' });
+          if (missing.length) LLFG_EventBus.emit('alert', { level:'info', source:this.id, msg: missing.length + ' agent(s) missing required agreements' });
+          this.metrics.duration = Date.now() - start; this.status = 'idle';
+          return result;
+        } catch(e) { this.metrics.errors++; this.status = 'error'; return { error: e.message }; }
+      }
+    }
+
+    class LLFG_BackupAgent extends LLFG_AgentBase {
+      constructor() {
+        super('backup', 'Backup Agent', '\uD83D\uDCBE', 'Data export, localStorage backup, JSON download, scheduled snapshots, data recovery');
+        this.config = { autoBackupInterval: 'weekly', maxBackups: 5 };
+      }
+      async run(ctx) {
+        this.status = 'running'; this.metrics.runs++;
+        const start = Date.now();
+        try {
+          const backup = {}; let totalKeys = 0, totalSize = 0;
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('llfg_')) { const val = localStorage.getItem(key); backup[key] = val; totalKeys++; totalSize += (val||'').length; }
+          }
+          backup._meta = { timestamp: new Date().toISOString(), keys: totalKeys, sizeBytes: totalSize };
+          const result = { keys: totalKeys, sizeKB: Math.round(totalSize/1024), timestamp: backup._meta.timestamp, data: backup };
+          this.lastResult = result;
+          LLFG_EventBus.emit('backup:complete', result);
+          this.metrics.duration = Date.now() - start; this.status = 'idle';
+          return result;
+        } catch(e) { this.metrics.errors++; this.status = 'error'; return { error: e.message }; }
+      }
+    }
+
+    window.__R_downloadPortalBackup = window.downloadPortalBackup = function() {
+      var backup = {};
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.startsWith('llfg_')) {
+          try { backup[key] = JSON.parse(localStorage.getItem(key)); } catch(e) { backup[key] = localStorage.getItem(key); }
+        }
+      }
+      backup._exportDate = new Date().toISOString();
+      backup._exportedBy = (currentUser || window._llfgCurrentUser)?.name || 'Unknown';
+      var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'llfg-portal-backup-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    window.__R_restorePortalBackup = window.restorePortalBackup = function(file) {
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var data = JSON.parse(e.target.result);
+          var count = 0;
+          Object.keys(data).forEach(function(key) {
+            if (key.startsWith('llfg_')) { localStorage.setItem(key, typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key])); count++; }
+          });
+          alert('Restored ' + count + ' data keys. Refresh the page to apply.');
+        } catch(err) { alert('Invalid backup file: ' + err.message); }
+      };
+      reader.readAsText(file);
+    };
 
     // ── Marketing Templates Library ──
     const MKT_TEMPLATES = [

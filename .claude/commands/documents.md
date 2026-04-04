@@ -1,0 +1,1 @@
+Manage document tracking in the LLFG portal (index.html). This skill covers NDA/Debt Rollup agreement status, E&O certificate tracking, state license expiration monitoring, and compliance document verification. Check the Document Agent and verify all required documents are tracked per agent.

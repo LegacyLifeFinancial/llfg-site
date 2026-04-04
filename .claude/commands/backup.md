@@ -1,0 +1,1 @@
+Manage data backup and export for the LLFG portal (index.html). This skill covers localStorage backup to JSON, data restore from file, scheduled snapshots, and full portal data export. Check the Backup Agent and verify all critical data keys are captured.
