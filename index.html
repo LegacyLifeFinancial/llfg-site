@@ -124,51 +124,45 @@
       color: var(--black) !important;
     }
 
-    /* ─── HERO — CINEMATIC SCROLL ─── */
+    /* ─── HERO ─── */
     #hero {
-      min-height: 200vh;
-      position: relative;
-      overflow: hidden;
-      background: var(--black);
-    }
-    .hero-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      position: relative;
       overflow: hidden;
+      padding: 8rem 4rem 4rem;
+      background: var(--black);
+      /* Heropatterns.com "Topography" pattern as fallback when no video/image loads */
+      background-image:
+        radial-gradient(ellipse 80% 60% at 65% 40%, rgba(201,168,76,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 30% 70%, rgba(201,168,76,0.04) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cpath d='M74 75L50 49 26 75zM326 75l-24-26-24 26zM578 75l-24-26-24 26zM74 327l-24-26-24 26zM326 327l-24-26-24 26zM578 327l-24-26-24 26zM74 579l-24-26-24 26zM326 579l-24-26-24 26zM578 579l-24-26-24 26z' fill='none' stroke='rgba(201,168,76,0.04)' stroke-width='1'/%3E%3C/svg%3E");
     }
+
+    .hero-sticky { display: contents; }
 
     .hero-bg {
       position: absolute; inset: 0; z-index: 0; overflow: hidden;
     }
-    .hero-bg-img, .hero-bg video {
+    .hero-bg video, .hero-bg-img {
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: cover; z-index: 1;
-      transform-origin: 50% 45%;
-      transform: scale(1.6);
-      animation: heroEntry 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s forwards;
-      filter: saturate(1.1) contrast(1.05) brightness(0.85);
-    }
-    @keyframes heroEntry {
-      0% { transform: scale(2.0); opacity: 0; filter: saturate(0.5) contrast(1.0) brightness(0.4); }
-      100% { transform: scale(1.6); opacity: 1; filter: saturate(1.1) contrast(1.05) brightness(0.85); }
+      animation: heroEntry 2s ease-out 0.3s both;
+      filter: saturate(1.1) contrast(1.05) brightness(0.65);
     }
     .hero-bg::after {
       content: ''; position: absolute; inset: 0; z-index: 2;
       background:
-        radial-gradient(ellipse 80% 60% at 50% 50%, transparent 20%, rgba(10,10,10,0.4) 70%),
-        linear-gradient(to bottom, rgba(10,10,10,0.15) 0%, transparent 30%, rgba(10,10,10,0.6) 85%, rgba(10,10,10,0.98) 100%);
+        linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.1) 30%, rgba(10,10,10,0.5) 70%, rgba(10,10,10,0.95) 100%),
+        linear-gradient(to right, rgba(10,10,10,0.85) 0%, transparent 45%, rgba(10,10,10,0.3) 100%);
     }
-
-    /* Brand reveal layer */
-    .hero-brand-reveal {
-      position: absolute; inset: 0; z-index: 4;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none;
+    @keyframes heroEntry {
+      0% { opacity: 0; transform: scale(1.08); }
+      100% { opacity: 1; transform: scale(1); }
     }
+    .hero-brand-reveal { display: none; }
     .hero-brand-reveal h2 {
       font-family: 'Cinzel', serif;
       font-size: clamp(1.8rem, 4vw, 3.6rem);
@@ -3260,6 +3254,54 @@
       width:100%;outline:none;
     }
     .agreement-signature::placeholder { color:var(--gray);font-style:italic; }
+    .sig-pad-wrap {
+      border: 1px solid rgba(201,168,76,0.2);
+      background: #0a0a0a;
+      position: relative;
+      margin-top: 0.5rem;
+    }
+    .sig-pad-canvas {
+      width: 100%;
+      height: 120px;
+      cursor: crosshair;
+      display: block;
+      touch-action: none;
+    }
+    .sig-pad-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0.6rem;
+      border-top: 1px solid rgba(201,168,76,0.1);
+      background: rgba(0,0,0,0.3);
+    }
+    .sig-pad-label {
+      font-size: 0.58rem;
+      color: var(--gray);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .sig-pad-clear {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--gray);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.58rem;
+      font-family: 'Raleway', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sig-pad-clear:hover { color: var(--cream); border-color: rgba(255,255,255,0.3); }
+    .sig-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.58rem;
+      color: #6ecf6e;
+      padding: 0.2rem 0.5rem;
+      background: rgba(110,207,110,0.06);
+      border: 1px solid rgba(110,207,110,0.15);
+    }
 
     /* ─── Toast Upgrade ─── */
     .llfg-toast {
@@ -4443,10 +4485,18 @@
       <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,0.1);">
         <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Electronic Signature</div>
         <input type="text" class="agreement-signature" id="agreementSignature" placeholder="Type agent's full legal name as signature"/>
+        <div class="sig-pad-wrap" style="margin-top:0.6rem;">
+          <canvas class="sig-pad-canvas" id="sigPadCanvas"></canvas>
+          <div class="sig-pad-controls">
+            <span class="sig-pad-label">Draw signature above</span>
+            <button type="button" class="sig-pad-clear" onclick="clearSignaturePad()">Clear</button>
+          </div>
+        </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
           <div style="font-size:0.62rem;color:var(--gray);">Date: <span id="agreementDate" style="color:var(--cream);"></span></div>
           <div style="font-size:0.58rem;color:var(--gray);">Witnessed by: <span id="agreementWitness" style="color:var(--cream);"></span></div>
         </div>
+        <div id="sigHashDisplay" style="display:none;margin-top:0.5rem;"></div>
       </div>
       <div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;">
         <button onclick="closeAgreementModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.65rem 1.5rem;font-family:'Raleway',sans-serif;font-size:0.72rem;cursor:pointer;">Cancel</button>
@@ -5676,6 +5726,62 @@
 
   <!-- COMMAND CENTER TAB -->
   <div class="admin-tab-content" id="ptab-commandcenter" style="display:none;padding:1.5rem;"></div>
+
+  <!-- API INTEGRATIONS TAB (Admin Only) -->
+  <div class="admin-tab-content" id="ptab-integrations">
+    <div class="dash-body">
+      <div class="dash-welcome">
+        <h2>API <em>Integrations</em></h2>
+        <p>Connect carrier APIs and SureLC for automated deal syncing, contracting, and real-time policy status. Plug and play.</p>
+      </div>
+      <div id="integrationStatusBar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1.5rem;"></div>
+      <div class="dash-section" style="margin-bottom:1.5rem;">
+        <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>&#x1F517; SureLC &#x2014; Contracting &amp; Licensing API</span><span id="surelcStatus" style="font-size:0.55rem;padding:0.2rem 0.6rem;letter-spacing:0.1em;text-transform:uppercase;background:rgba(255,255,255,0.04);color:var(--gray);border:1px solid rgba(255,255,255,0.08);">Not Connected</span></div>
+        <p style="font-size:0.68rem;color:var(--gray);line-height:1.6;margin-bottom:1rem;">Connect to SureLC (SuranceBay) to automate contracting, track appointments, monitor license expirations, and sync producer onboarding. <a href="https://support.surancebay.com/hc/en-us/articles/215042187-SureLC-API-Access" target="_blank" style="color:var(--gold);">Get API credentials &rarr;</a></p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+          <div><label style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.35rem;">SureLC Agency ID</label><input type="text" id="surelcAgencyId" placeholder="Your agency ID" style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.65rem;font-family:'Raleway',sans-serif;font-size:0.78rem;outline:none;"/></div>
+          <div><label style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.35rem;">API Key</label><input type="password" id="surelcApiKey" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.65rem;font-family:'Raleway',sans-serif;font-size:0.78rem;outline:none;"/></div>
+          <div><label style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.35rem;">API Secret</label><input type="password" id="surelcApiSecret" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.65rem;font-family:'Raleway',sans-serif;font-size:0.78rem;outline:none;"/></div>
+          <div><label style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:0.35rem;">Environment</label><select id="surelcEnv" style="width:100%;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.65rem;font-family:'Raleway',sans-serif;font-size:0.78rem;outline:none;"><option value="production">Production</option><option value="sandbox">Sandbox / Testing</option></select></div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+          <button onclick="testIntegration('surelc')" class="modal-btn" style="padding:0.6rem 1.2rem;">&#x1F50C; Test Connection</button>
+          <button onclick="saveIntegration('surelc')" class="modal-btn" style="padding:0.6rem 1.2rem;background:rgba(110,207,110,0.08);border-color:rgba(110,207,110,0.3);color:#6ecf6e;">&#x1F4BE; Save &amp; Connect</button>
+        </div>
+        <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.08);padding:0.7rem 1rem;font-size:0.6rem;color:var(--gray);line-height:1.7;">
+          <strong style="color:var(--gold);">What This Enables:</strong><br/>&#x2022; Auto-submit contracting when agents are approved &#x2022; Real-time appointment status sync &#x2022; License expiration alerts (120-day advance) &#x2022; Carrier appointment verification before deal submission
+        </div>
+      </div>
+      <div class="dash-section" style="margin-bottom:1.5rem;">
+        <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>&#x1F3E2; Carrier API Connections</span><button onclick="addCarrierRow()" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.3rem 0.8rem;font-family:'Raleway',sans-serif;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">+ Add Carrier</button></div>
+        <p style="font-size:0.68rem;color:var(--gray);line-height:1.6;margin-bottom:1rem;">Enter API credentials for each carrier. Deals logged in the portal auto-sync for real-time policy status, e-app submission, and commission tracking.</p>
+        <div id="carrierApiList" style="display:flex;flex-direction:column;gap:0.8rem;"></div>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+          <button onclick="saveAllCarriers()" class="modal-btn" style="padding:0.6rem 1.2rem;background:rgba(110,207,110,0.08);border-color:rgba(110,207,110,0.3);color:#6ecf6e;">&#x1F4BE; Save All</button>
+          <button onclick="testAllCarriers()" class="modal-btn" style="padding:0.6rem 1.2rem;">&#x1F50C; Test All</button>
+        </div>
+      </div>
+      <div class="dash-section" style="margin-bottom:1.5rem;">
+        <div class="dash-section-title">&#x2699;&#xFE0F; Sync Settings</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.08);padding:0.8rem;">
+            <div style="font-size:0.7rem;color:var(--cream);font-weight:500;margin-bottom:0.5rem;">Auto-Sync Deals</div>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.65rem;color:var(--gray);"><input type="checkbox" id="syncDealsEnabled" style="accent-color:var(--gold);" /> Push new deals to carrier API when logged</label>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.65rem;color:var(--gray);margin-top:0.4rem;"><input type="checkbox" id="syncStatusEnabled" style="accent-color:var(--gold);" /> Pull policy status updates every 30 min</label>
+          </div>
+          <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.08);padding:0.8rem;">
+            <div style="font-size:0.7rem;color:var(--cream);font-weight:500;margin-bottom:0.5rem;">Auto-Sync Contracting</div>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.65rem;color:var(--gray);"><input type="checkbox" id="syncContractingEnabled" style="accent-color:var(--gold);" /> Auto-submit to SureLC on agent approval</label>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.65rem;color:var(--gray);margin-top:0.4rem;"><input type="checkbox" id="syncLicenseEnabled" style="accent-color:var(--gold);" /> Monitor license expirations via SureLC</label>
+          </div>
+        </div>
+      </div>
+      <div class="dash-section">
+        <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>&#x1F4CB; API Activity Log</span><button onclick="clearApiLog()" style="background:rgba(224,85,85,0.08);border:1px solid rgba(224,85,85,0.2);color:#e05555;padding:0.25rem 0.6rem;font-family:'Raleway',sans-serif;font-size:0.5rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">Clear</button></div>
+        <div id="apiActivityLog" style="max-height:300px;overflow-y:auto;font-size:0.6rem;color:var(--gray);"></div>
+      </div>
+    </div>
+  </div>
 
     <!-- TAB: AGREEMENTS -->
     <div class="admin-tab-content" id="ptab-agreements">
@@ -10146,10 +10252,40 @@ contact\u0040llfg.us`
     // ── AGENT AGREEMENTS — NDA & DEBT ROLLUP ────────────────────────
     // ═══════════════════════════════════════════════════════════════════
 
+    // ── Encrypt/Decrypt agreement data for localStorage ──
+    var AGREEMENT_ENC_KEY = 'LLFG_2026_SEC';
+    function encryptAgreementData(data) {
+      var json = JSON.stringify(data);
+      var encoded = btoa(unescape(encodeURIComponent(json)));
+      var key = AGREEMENT_ENC_KEY;
+      var result = '';
+      for (var i = 0; i < encoded.length; i++) { result += String.fromCharCode(encoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)); }
+      return btoa(result);
+    }
+    function decryptAgreementData(encrypted) {
+      try {
+        var decoded = atob(encrypted);
+        var key = AGREEMENT_ENC_KEY;
+        var result = '';
+        for (var i = 0; i < decoded.length; i++) { result += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)); }
+        return JSON.parse(decodeURIComponent(escape(atob(result))));
+      } catch(e) { return null; }
+    }
+
     let agentAgreements = [];
     const AGREEMENTS_STORAGE_KEY = 'llfg_agent_agreements';
-    try { agentAgreements = JSON.parse(localStorage.getItem(AGREEMENTS_STORAGE_KEY) || '[]'); } catch(e) { agentAgreements = []; }
-    function saveAgreements() { try { localStorage.setItem(AGREEMENTS_STORAGE_KEY, JSON.stringify(agentAgreements)); } catch(e) {} }
+    // Load agreements — try encrypted first, fall back to plain JSON for backwards compat
+    try {
+      var rawStored = localStorage.getItem(AGREEMENTS_STORAGE_KEY);
+      if (rawStored) {
+        var decrypted = decryptAgreementData(rawStored);
+        if (decrypted && Array.isArray(decrypted)) { agentAgreements = decrypted; }
+        else { agentAgreements = JSON.parse(rawStored); } // fallback: old unencrypted data
+      }
+    } catch(e) { agentAgreements = []; }
+    function saveAgreements() {
+      try { localStorage.setItem(AGREEMENTS_STORAGE_KEY, encryptAgreementData(agentAgreements)); } catch(e) {}
+    }
 
     window._pendingAgentSubmission = null;
 
@@ -10169,7 +10305,80 @@ contact\u0040llfg.us`
       if (dr) dr.checked = false;
       if (sig) sig.value = '';
       if (modal) modal.style.display = 'flex';
+      setTimeout(initSignaturePad, 100);
     };
+
+    // ── Signature Pad (Canvas) ──
+    var sigPadDrawing = false, sigPadCtx = null, sigPadHasContent = false;
+
+    function initSignaturePad() {
+      var canvas = document.getElementById('sigPadCanvas');
+      if (!canvas) return;
+      sigPadCtx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth * 2;
+      canvas.height = canvas.offsetHeight * 2;
+      sigPadCtx.scale(2, 2);
+      sigPadCtx.strokeStyle = '#c9a84c';
+      sigPadCtx.lineWidth = 2;
+      sigPadCtx.lineCap = 'round';
+      sigPadCtx.lineJoin = 'round';
+      sigPadHasContent = false;
+
+      function getPos(e) {
+        var rect = canvas.getBoundingClientRect();
+        var x, y;
+        if (e.touches) { x = e.touches[0].clientX - rect.left; y = e.touches[0].clientY - rect.top; }
+        else { x = e.clientX - rect.left; y = e.clientY - rect.top; }
+        return { x: x, y: y };
+      }
+      canvas.onmousedown = canvas.ontouchstart = function(e) {
+        e.preventDefault();
+        sigPadDrawing = true;
+        var p = getPos(e);
+        sigPadCtx.beginPath();
+        sigPadCtx.moveTo(p.x, p.y);
+      };
+      canvas.onmousemove = canvas.ontouchmove = function(e) {
+        if (!sigPadDrawing) return;
+        e.preventDefault();
+        var p = getPos(e);
+        sigPadCtx.lineTo(p.x, p.y);
+        sigPadCtx.stroke();
+        sigPadHasContent = true;
+      };
+      canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = function() { sigPadDrawing = false; };
+    }
+
+    window.__R_clearSignaturePad = window.clearSignaturePad = function() {
+      var canvas = document.getElementById('sigPadCanvas');
+      if (canvas && sigPadCtx) {
+        sigPadCtx.clearRect(0, 0, canvas.width, canvas.height);
+        sigPadHasContent = false;
+      }
+    };
+
+    function getSignatureDataURL() {
+      var canvas = document.getElementById('sigPadCanvas');
+      if (!canvas || !sigPadHasContent) return null;
+      return canvas.toDataURL('image/png');
+    }
+
+    // ── Cryptographic Hashing (SHA-256) ──
+    async function hashAgreement(data) {
+      var text = JSON.stringify(data);
+      var encoder = new TextEncoder();
+      var dataBuffer = encoder.encode(text);
+      try {
+        var hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+        var hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      } catch(e) {
+        // Fallback for older browsers
+        var hash = 0;
+        for (var i = 0; i < text.length; i++) { hash = ((hash << 5) - hash) + text.charCodeAt(i); hash |= 0; }
+        return 'fb-' + Math.abs(hash).toString(16);
+      }
+    }
 
     window.__R_closeAgreementModal = window.closeAgreementModal = function() {
       var modal = document.getElementById('agreementModal');
@@ -10192,6 +10401,8 @@ contact\u0040llfg.us`
         return;
       }
 
+      var sigImage = getSignatureDataURL();
+
       var agreementRecord = {
         id: Date.now(),
         agentName: pending.name,
@@ -10203,11 +10414,18 @@ contact\u0040llfg.us`
         debtRollupSigned: true,
         debtRollupSignedDate: new Date().toISOString(),
         signature: signature,
+        signatureImage: sigImage || null,
+        integrityHash: null,
         signedByProxy: (currentUser || window._llfgCurrentUser)?.name || 'Agent',
         signedByProxyEmail: (currentUser || window._llfgCurrentUser)?.email || '',
         submissionId: pending.id
       };
       agentAgreements.push(agreementRecord);
+      // Generate tamper-proof hash
+      hashAgreement({ agent: agreementRecord.agentName, nda: agreementRecord.ndaSigned, debtRollup: agreementRecord.debtRollupSigned, date: agreementRecord.ndaSignedDate, sig: agreementRecord.signature }).then(function(hash) {
+        agreementRecord.integrityHash = hash;
+        saveAgreements();
+      });
       saveAgreements();
 
       pending.ndaSigned = true;

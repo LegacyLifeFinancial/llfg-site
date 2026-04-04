@@ -1,0 +1,9 @@
+{
+  "name": "llfg-functions",
+  "version": "1.0.0",
+  "description": "LLFG Portal serverless backend",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "googleapis": "^140.0.0"
+  }
+}
