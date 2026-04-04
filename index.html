@@ -195,23 +195,7 @@
       position: absolute; top: 0; bottom: 0; left: 52%; width: 1px; z-index: 0;
       background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.15) 30%, rgba(201,168,76,0.15) 70%, transparent);
     }
-    .hero-brand-reveal .brand-sub {
-      font-family: 'Raleway', sans-serif;
-      font-size: clamp(0.6rem, 1.2vw, 0.85rem);
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: rgba(245,240,232,0.6);
-      margin-top: 1rem;
-    }
-    .hero-brand-reveal .brand-line {
-      width: 0; height: 1px;
-      background: var(--gold);
-      margin: 1.2rem auto;
-      transition: width 0.8s ease;
-    }
-
-    .hero-lion-wrap { display: none; }
-    .hero-line { display: none; }
+    /* orphaned rules cleaned */
 
     .hero-content {
       position: relative;
@@ -2656,8 +2640,8 @@
       .tier-grid { grid-template-columns: repeat(2, 1fr) !important; }
       
       .hero-content { padding: 0 1.2rem !important; }
-      .hero-brand-reveal h2 { font-size: clamp(1.4rem, 5vw, 2.2rem); letter-spacing: 0.15em; }
-      .hero-brand-reveal .brand-sub { font-size: 0.55rem; letter-spacing: 0.2em; }
+
+
       #floatingCTA { bottom: 1rem; right: 1rem; padding: 0.7rem 1.2rem; font-size: 0.65rem; }
       #agency { padding: 3.5rem 1.2rem !important; }
       #agency .btn-primary, #agency .btn-ghost { display: block; width: 100%; margin: 0.4rem 0 !important; text-align: center; }
@@ -2668,7 +2652,7 @@
     }
     @media (max-width: 480px) {
       .tier-grid { grid-template-columns: 1fr !important; }
-      .hero-brand-reveal h2 { font-size: clamp(1.2rem, 6vw, 1.8rem); }
+
     }
 
     /* ══════════════════════════════════════════════
@@ -17314,19 +17298,17 @@ This request requires Managing Partner approval.`
           apps.push({ tier: tier, data: appData, ts: Date.now() });
           if (apps.length > 100) apps = apps.slice(-100);
           localStorage.setItem('llfg_applications', JSON.stringify(apps));
-    // ─── CINEMATIC 4K HERO — SCROLL ZOOM + BRAND REVEAL ─────────────
-    (function initHeroCinematic() {
-      var heroMedia = document.querySelector('.hero-bg video') || document.querySelector('.hero-bg-img');
-      var heroContent = document.querySelector('#hero .hero-content');
-      var brandReveal = document.getElementById('heroBrandReveal');
-      var brandLine = document.getElementById('heroBrandLine');
-      var heroBg = document.querySelector('.hero-bg');
-      if (!heroMedia) return;
+        } catch(ex) {}
 
-      // Dynamic vignette overlay that intensifies on scroll
-      var vig = document.createElement('div');
-      vig.style.cssText = 'position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;background:radial-gradient(ellipse 70% 50% at 50% 50%,transparent 20%,rgba(10,10,10,0.8) 80%);';
-      if (heroBg) heroBg.appendChild(vig);
+      }, 1200);
+    };
+
+    // ─── HERO SCROLL PARALLAX ─────────────────────────────────────
+    (function initHeroScroll() {
+      var heroBg = document.querySelector('#hero .hero-bg');
+      var heroContent = document.querySelector('#hero .hero-content');
+      var heroLine = document.querySelector('#hero .hero-line');
+      if (!heroBg && !heroContent) return;
 
       var ticking = false;
       window.addEventListener('scroll', function() {
@@ -17335,34 +17317,20 @@ This request requires Managing Partner approval.`
         requestAnimationFrame(function() {
           var scrollY = window.scrollY || window.pageYOffset;
           var vh = window.innerHeight;
-          var pct = Math.min(scrollY / vh, 1);
+          if (scrollY > vh) { ticking = false; return; }
+          var pct = scrollY / vh;
 
-          // 4K zoom out: 1.6x to 1.0x with subtle rotation
-          var scale = 1.6 - (pct * 0.6);
-          heroMedia.style.transform = 'scale(' + Math.max(scale, 1.0) + ') rotate(' + (pct * 0.8) + 'deg)';
+          // Background parallax shift
+          if (heroBg) heroBg.style.transform = 'translateY(' + (pct * 30) + 'px)';
 
-          // Dynamic vignette + brightness shift
-          vig.style.opacity = pct * 0.7;
-          heroMedia.style.filter = 'saturate(' + (1.1 - pct * 0.3) + ') contrast(' + (1.05 + pct * 0.1) + ') brightness(' + (0.85 - pct * 0.25) + ')';
-
-          // Text fades out and rises
+          // Content fades and rises
           if (heroContent) {
-            heroContent.style.opacity = Math.max(0, 1 - (pct * 2.8));
-            heroContent.style.transform = 'translateY(' + (-pct * 120) + 'px)';
+            heroContent.style.opacity = Math.max(0, 1 - (pct * 1.5));
+            heroContent.style.transform = 'translateY(' + (-pct * 60) + 'px)';
           }
 
-          // Brand reveal at 40-75% scroll
-          if (brandReveal) {
-            var bs = 0.4, be = 0.75;
-            brandReveal.style.opacity = pct < bs ? '0' : pct > be ? '1' : ((pct - bs) / (be - bs));
-            brandReveal.style.transform = 'scale(' + (0.85 + Math.min(pct, 1) * 0.15) + ')';
-          }
-
-          // Gold line width
-          if (brandLine) {
-            var lp = Math.max(0, (pct - 0.5) / 0.3);
-            brandLine.style.width = Math.min(lp * 80, 80) + 'px';
-          }
+          // Gold line fades
+          if (heroLine) heroLine.style.opacity = Math.max(0, 1 - (pct * 2));
 
           ticking = false;
         });
