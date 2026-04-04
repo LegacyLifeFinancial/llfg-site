@@ -19289,6 +19289,139 @@ This request requires Managing Partner approval.`
       }, { threshold: 0.1 });
       if (canvas.parentElement) heroObs.observe(canvas.parentElement);
     })();
+
+    // ─── EXPANDABLE CARDS + INTERACTIVE LANDING PAGE ─────────────────
+
+    // Pillar card expand data
+    var PILLAR_DETAILS = {
+      'Term Life': 'The most straightforward and in-demand product. Affordable coverage for 10, 20, or 30 years. Families need it, they know they need it, and it closes fast. Perfect for new agents building momentum — high volume, quick sales cycles, and strong commissions on every policy.',
+      'Whole Life': 'Permanent coverage that builds cash value over time. Clients love the guarantees — fixed premiums, guaranteed death benefit, and a savings component they can borrow against. Higher premiums mean higher commissions, and the product sells itself to parents, grandparents, and estate planners.',
+      'IUL': 'Indexed Universal Life is the premium play — tax-advantaged cash value growth tied to market indexes with zero downside risk. Complex enough that clients need YOU to explain it, which means strong relationships and recurring business. Top producers build their books on IUL.',
+      'Annuities': 'Retirement income solutions your clients count on for life. Fixed, indexed, and immediate annuities create predictable income streams. Strong fit for the 50+ market, and the commissions on a single annuity can equal months of term sales.',
+      'Medicare': 'The senior market is massive and growing every day. Medicare Supplement and Advantage plans provide recurring commissions and built-in renewals. Once you place a client, they stay with you for years.',
+      'Final Expense': 'Whole life policies designed for burial and end-of-life costs. Simple to explain, easy to close, and the market is enormous. Simplified underwriting means fast approvals — many policies are issued the same day.',
+      'Mortgage Protection': 'Every homeowner with a mortgage needs this. Term life sized to cover the mortgage balance, keeping the family in their home if something happens. The conversation is emotional and the close rate is high.',
+      'Supplemental': 'Accident, critical illness, cancer, and hospital indemnity products. These fill gaps that major medical doesn\'t cover. Worksite sales through employers create volume, and the products stack on top of existing life policies for bigger deals.'
+    };
+
+    // Why card expand data
+    var WHY_DETAILS = {
+      '01': 'Our onboarding process gets you to your first presentation within 7 days. Free leads from day one mean you don\'t spend a dollar out of pocket. With our comp structure starting at 65% and climbing to 150%, the math works fast — 5 policies your first week at average premiums puts you at $10K+.',
+      '02': 'We invest in your success by providing free leads when you start. As your income grows, we teach you to reinvest strategically — $500/month in leads can generate $15K-$20K in commissions. Top producers spend $2K-$3K/month on leads and earn $50K-$100K+.',
+      '03': 'You\'re not an employee — you\'re a business owner from day one. You choose your hours, your market, your approach. Build an LLC, hire your own team, and create equity in something you own. This is entrepreneurship with a safety net.',
+      '04': 'Our training library has 10+ full courses built by million-dollar producers. Live coaching calls every week. Product deep-dives. Objection mastery. Field underwriting. Compliance. Everything you need to go from zero to closing confidently.',
+      '05': 'No ceiling. No cap. No territory restrictions. The harder you work, the more you earn. Our commission scale goes from 65% to 150%, and bonuses stack on top. Top producers have earned over $500K in a single month.',
+      '06': 'Start as a Financial Advisor, promote to Manager at $150K team AP, then Executive at $500K, Director at $1.5M, and Managing Partner at $6M. Each level adds override income on your entire downline. Leaders who build teams earn exponentially.'
+    };
+
+    // Make pillar cards expandable
+    (function initExpandableCards() {
+      // Pillars
+      document.querySelectorAll('.pillar').forEach(function(card) {
+        var h4 = card.querySelector('h4');
+        if (!h4) return;
+        var title = h4.textContent.trim();
+        var detail = PILLAR_DETAILS[title];
+        if (!detail) return;
+
+        card.style.cursor = 'pointer';
+        card.style.position = 'relative';
+
+        // Add expand icon
+        var icon = document.createElement('div');
+        icon.style.cssText = 'position:absolute;top:0.8rem;right:0.8rem;width:20px;height:20px;border:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--gold-dim);transition:transform 0.3s,border-color 0.3s;';
+        icon.textContent = '+';
+        icon.className = 'expand-icon';
+        card.appendChild(icon);
+
+        // Add hidden detail
+        var detailDiv = document.createElement('div');
+        detailDiv.style.cssText = 'max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s;opacity:0;margin-top:0;';
+        detailDiv.innerHTML = '<div style="padding-top:0.8rem;border-top:1px solid rgba(201,168,76,0.08);margin-top:0.8rem;"><p style="font-size:0.72rem;color:var(--gray);line-height:1.8;">' + detail + '</p></div>';
+        card.appendChild(detailDiv);
+
+        card.addEventListener('click', function() {
+          var isOpen = detailDiv.style.maxHeight !== '0px' && detailDiv.style.maxHeight !== '';
+          if (isOpen) {
+            detailDiv.style.maxHeight = '0px'; detailDiv.style.opacity = '0';
+            icon.textContent = '+'; icon.style.transform = '';
+          } else {
+            detailDiv.style.maxHeight = '300px'; detailDiv.style.opacity = '1';
+            icon.textContent = '-'; icon.style.transform = 'rotate(180deg)';
+          }
+        });
+      });
+
+      // Why cards
+      document.querySelectorAll('.why-card').forEach(function(card) {
+        var numEl = card.querySelector('.why-num');
+        if (!numEl) return;
+        var num = numEl.textContent.trim();
+        var detail = WHY_DETAILS[num];
+        if (!detail) return;
+
+        card.style.cursor = 'pointer';
+        card.style.position = 'relative';
+
+        var icon = document.createElement('div');
+        icon.style.cssText = 'position:absolute;top:1rem;right:1rem;width:20px;height:20px;border:1px solid rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--gold-dim);transition:transform 0.3s;';
+        icon.textContent = '+';
+        card.appendChild(icon);
+
+        var detailDiv = document.createElement('div');
+        detailDiv.style.cssText = 'max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s;opacity:0;';
+        detailDiv.innerHTML = '<div style="padding-top:0.8rem;border-top:1px solid rgba(201,168,76,0.06);margin-top:0.8rem;"><p style="font-size:0.72rem;color:var(--gray);line-height:1.8;">' + detail + '</p></div>';
+        card.appendChild(detailDiv);
+
+        card.addEventListener('click', function() {
+          var isOpen = detailDiv.style.maxHeight !== '0px' && detailDiv.style.maxHeight !== '';
+          if (isOpen) {
+            detailDiv.style.maxHeight = '0px'; detailDiv.style.opacity = '0';
+            icon.textContent = '+'; icon.style.transform = '';
+          } else {
+            detailDiv.style.maxHeight = '400px'; detailDiv.style.opacity = '1';
+            icon.textContent = '-'; icon.style.transform = 'rotate(180deg)';
+          }
+        });
+      });
+
+      // Income stat cards — click to pulse glow
+      document.querySelectorAll('.income-card').forEach(function(card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          card.classList.add('glow-gold-strong');
+          setTimeout(function() { card.classList.remove('glow-gold-strong'); }, 1500);
+        });
+      });
+
+      // Tier cards — already have onclick from agency section, add visual feedback
+      document.querySelectorAll('.tier-grid > div').forEach(function(card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          openApplicationOverlay();
+        });
+      });
+    })();
+
+    // Section reveal on scroll (for sections with section-reveal class)
+    (function initSectionReveals() {
+      var sections = document.querySelectorAll('.section-glow, .section-reveal, #income-stats');
+      if (!sections.length) return;
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.style.opacity = '1';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.transition = 'opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+          }
+        });
+      }, { threshold: 0.08 });
+      sections.forEach(function(s) {
+        s.style.opacity = '0';
+        s.style.transform = 'translateY(30px)';
+        obs.observe(s);
+      });
+    })();
   </script>
 </body>
 </html>
