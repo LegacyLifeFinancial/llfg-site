@@ -1,0 +1,1 @@
+Build or enhance the e-signature and document encryption system in the LLFG portal (index.html). This skill covers canvas-based signature capture, SHA-256 integrity hashing, agreement data encryption/decryption, signed document download, and signature verification. Check the signature pad, encryption functions, and agreement record integrity.
