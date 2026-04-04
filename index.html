@@ -124,6 +124,35 @@
       color: var(--black) !important;
     }
 
+    /* ─── SCROLL-STOP ANIMATIONS ─── */
+    @keyframes floatLogo { 0%,100%{transform:translateY(0) rotateY(0deg);} 25%{transform:translateY(-10px) rotateY(4deg);} 75%{transform:translateY(-12px) rotateY(-4deg);} }
+    @keyframes logoGlow { 0%,100%{filter:drop-shadow(0 0 6px rgba(201,168,76,0.2));} 50%{filter:drop-shadow(0 0 18px rgba(201,168,76,0.5));} }
+    @keyframes goldShimmer { 0%{background-position:-200% 0;} 100%{background-position:200% 0;} }
+    @keyframes fadeUp { 0%{opacity:0;transform:translateY(30px);} 100%{opacity:1;transform:translateY(0);} }
+    @keyframes fadeIn { 0%{opacity:0;} 100%{opacity:1;} }
+    .floating-logo { animation:floatLogo 6s ease-in-out infinite, logoGlow 4s ease-in-out infinite; }
+    .shimmer-text {
+      background:linear-gradient(90deg,#c9a84c 0%,#fff8dc 50%,#c9a84c 100%);
+      background-size:200% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      animation:goldShimmer 4s ease infinite;
+    }
+    .reveal { opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal-left { opacity:0;transform:translateX(-30px);transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal-right { opacity:0;transform:translateX(30px);transition:opacity 0.7s ease,transform 0.7s ease; }
+    .reveal-scale { opacity:0;transform:scale(0.95);transition:opacity 0.6s ease,transform 0.6s ease; }
+    .reveal.visible,.reveal-left.visible,.reveal-right.visible,.reveal-scale.visible { opacity:1;transform:none; }
+
+    /* Full-page section feel — scoped to landing page only */
+    #hero, #about, #why, #carriers, #agency, #apply { min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative; }
+    #about::before, #why::before, #carriers::before, #agency::before, #apply::before { content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.12),transparent); }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce) {
+      .floating-logo,.shimmer-text { animation:none !important; }
+      .reveal,.reveal-left,.reveal-right,.reveal-scale { opacity:1!important;transform:none!important;transition:none!important; }
+      #hero, #about, #why, #carriers, #agency, #apply { min-height:auto; }
+    }
+
     /* ─── HERO ─── */
     #hero {
       min-height: 100vh;
@@ -2990,10 +3019,62 @@
     @keyframes llfgShimmer   { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
     @keyframes llfgGlow      { 0%,100% { box-shadow:0 0 0 rgba(201,168,76,0); } 50% { box-shadow:0 0 16px rgba(201,168,76,0.15); } }
 
-    .llfg-anim-up    { animation: llfgSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-    .llfg-anim-in    { animation: llfgSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
-    .llfg-anim-fade  { animation: llfgFadeIn 0.4s ease both; }
-    .llfg-anim-scale { animation: llfgScaleIn 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+    /* ─── Enhanced Animations v2 ─── */
+    @keyframes llfgSlideDown  { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes llfgSlideRight { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes llfgFlipIn     { from { opacity:0; transform:perspective(600px) rotateX(-15deg); } to { opacity:1; transform:perspective(600px) rotateX(0); } }
+    @keyframes llfgBounceIn   { 0% { opacity:0; transform:scale(0.3); } 50% { opacity:1; transform:scale(1.05); } 70% { transform:scale(0.95); } 100% { transform:scale(1); } }
+    @keyframes llfgSwingIn    { 0% { opacity:0; transform:rotateX(-30deg); transform-origin:top center; } 100% { opacity:1; transform:rotateX(0); } }
+    @keyframes llfgBlurIn     { from { opacity:0; filter:blur(8px); } to { opacity:1; filter:blur(0); } }
+    @keyframes llfgFloat      { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+    @keyframes llfgRotateIn   { from { opacity:0; transform:rotate(-8deg) scale(0.9); } to { opacity:1; transform:rotate(0) scale(1); } }
+    @keyframes llfgGoldShimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+    @keyframes llfgBorderTrace { 0% { border-color:rgba(201,168,76,0.1); } 50% { border-color:rgba(201,168,76,0.4); } 100% { border-color:rgba(201,168,76,0.1); } }
+    @keyframes llfgCountPop   { 0% { transform:scale(1); } 50% { transform:scale(1.15); color:var(--gold); } 100% { transform:scale(1); } }
+    @keyframes llfgConfetti    { 0% { opacity:1; transform:translateY(0) rotate(0); } 100% { opacity:0; transform:translateY(-60px) rotate(720deg); } }
+    @keyframes llfgRipple      { 0% { box-shadow:0 0 0 0 rgba(201,168,76,0.3); } 100% { box-shadow:0 0 0 20px rgba(201,168,76,0); } }
+    @keyframes llfgTypewriter  { from { width:0; } to { width:100%; } }
+
+    .llfg-anim-up      { animation: llfgSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-down    { animation: llfgSlideDown 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-in      { animation: llfgSlideIn 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-right   { animation: llfgSlideRight 0.4s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-fade    { animation: llfgFadeIn 0.4s ease both; }
+    .llfg-anim-scale   { animation: llfgScaleIn 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-flip    { animation: llfgFlipIn 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-bounce  { animation: llfgBounceIn 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-swing   { animation: llfgSwingIn 0.5s ease both; }
+    .llfg-anim-blur    { animation: llfgBlurIn 0.5s ease both; }
+    .llfg-anim-float   { animation: llfgFloat 3s ease-in-out infinite; }
+    .llfg-anim-rotate  { animation: llfgRotateIn 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    .llfg-anim-ripple  { animation: llfgRipple 1.5s ease infinite; }
+
+    .llfg-shimmer-text {
+      background: linear-gradient(90deg, var(--gold) 0%, #fff8dc 50%, var(--gold) 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: llfgGoldShimmer 3s ease infinite;
+    }
+    .llfg-border-glow  { animation: llfgBorderTrace 3s ease infinite; }
+    .llfg-count-pop    { animation: llfgCountPop 0.4s ease; }
+
+    .llfg-tilt {
+      transition: transform 0.15s ease;
+      transform-style: preserve-3d;
+    }
+    .llfg-flip-card { perspective: 1000px; }
+    .llfg-flip-inner {
+      position: relative; width:100%; height:100%;
+      transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+      transform-style: preserve-3d;
+    }
+    .llfg-flip-card:hover .llfg-flip-inner,
+    .llfg-flip-card.flipped .llfg-flip-inner { transform: rotateY(180deg); }
+    .llfg-flip-front, .llfg-flip-back {
+      position: absolute; width:100%; height:100%;
+      backface-visibility: hidden;
+    }
+    .llfg-flip-back { transform: rotateY(180deg); }
 
     .llfg-stagger > * { animation: llfgSlideUp 0.45s cubic-bezier(0.22,1,0.36,1) both; }
     .llfg-stagger > *:nth-child(1) { animation-delay: 0.05s; }
@@ -3002,6 +3083,17 @@
     .llfg-stagger > *:nth-child(4) { animation-delay: 0.20s; }
     .llfg-stagger > *:nth-child(5) { animation-delay: 0.25s; }
     .llfg-stagger > *:nth-child(6) { animation-delay: 0.30s; }
+    .llfg-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+    .llfg-stagger > *:nth-child(8) { animation-delay: 0.40s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .llfg-anim-up, .llfg-anim-down, .llfg-anim-in, .llfg-anim-right,
+      .llfg-anim-fade, .llfg-anim-scale, .llfg-anim-flip, .llfg-anim-bounce,
+      .llfg-anim-swing, .llfg-anim-blur, .llfg-anim-float, .llfg-anim-rotate,
+      .llfg-anim-ripple, .llfg-shimmer-text, .llfg-border-glow, .llfg-stagger > *
+      { animation: none !important; }
+      .llfg-tilt, .llfg-flip-inner { transition: none !important; }
+    }
 
     /* ─── Chart Containers ─── */
     .llfg-chart-wrap {
@@ -3752,11 +3844,7 @@
   <!-- NAV -->
   <nav>
     <div class="logo">
-      <svg class="logo-d-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
-        <polygon points="14,6 22,10 22,18 14,22 6,18 6,10" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="0.6"/>
-        <text x="14" y="16" text-anchor="middle" fill="#c9a84c" font-family="Cormorant Garamond, serif" font-size="9" font-weight="600">L</text>
-      </svg>
+      <img src="https://image.pollinations.ai/prompt/minimalist%20luxury%20logo%20LLFG%20letters%20Legacy%20Life%20Financial%20Group%20gold%20hexagon%20emblem%20lion%20crest%20clean%20vector%20style%20black%20background%20professional%20insurance%20company%20logo%20sharp%20edges%20metallic%20gold?width=512&height=512&nologo=true" alt="LLFG" class="logo-d-icon floating-logo" style="width:32px;height:32px;border-radius:6px;object-fit:cover;"/>
       <div class="logo-d-text">
         <div class="logo-d-wordmark"><strong>Legacy</strong> Life</div>
         <div class="logo-d-sub">Financial Group</div>
@@ -3784,7 +3872,7 @@
     </div>
     <div class="hero-content" style="z-index:5;">
       <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
-      <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
+      <h1>Build a Business<br>You're <em class="shimmer-text">Proud</em><br>to Own</h1>
       <p class="hero-sub">
         Join the nation's fastest-growing financial services organization. 30+ top-rated carriers. Free leads. Uncapped commissions. Your legacy starts here.
       </p>
@@ -3813,11 +3901,36 @@
         </div>
       </div>
     </div>
-  </section>  <!-- ABOUT -->
+  </section>
+
+  <!-- STATS COUNTER BAR — Scroll Stop -->
+  <div style="background:linear-gradient(135deg,#0a0a0a,#111);border-top:1px solid rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.08);padding:3rem 4rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;" id="statsBar">
+    <div style="text-align:center;" class="reveal-scale">
+      <div data-counter data-target="35" data-suffix="+" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--gold);">0</div>
+      <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Carrier Partners</div>
+    </div>
+    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="text-align:center;" class="reveal-scale">
+      <div data-counter data-target="50" data-suffix=" States" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--cream);">0</div>
+      <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Licensed Nationwide</div>
+    </div>
+    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="text-align:center;" class="reveal-scale">
+      <div data-counter data-target="140" data-suffix="%" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--gold);">0</div>
+      <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Max Commission</div>
+    </div>
+    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="text-align:center;" class="reveal-scale">
+      <div data-counter data-target="500" data-prefix="$" data-suffix="K+" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:#6ecf6e;">0</div>
+      <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Top Producer Income</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
   <section id="about">
-    <div class="about-left">
+    <div class="about-left llfg-anim-in">
       <p class="section-tag">Who We Are</p>
-      <h2>A Company Built for<br><em>Agent Success</em></h2>
+      <h2>A Company Built for<br><em class="llfg-shimmer-text">Agent Success</em></h2>
       <div class="gold-divider"></div>
       <p class="body-text">
         Legacy Life Financial Group is a Field Marketing Organization (FMO) — meaning we sit at the top of the distribution chain, giving our agents access to dozens of the nation's top-rated carriers, the highest available contract levels, and resources that independent agents simply can't access on their own.
@@ -3827,23 +3940,23 @@
       </p>
     </div>
 
-    <div class="about-right">
-      <div class="pillar">
+    <div class="about-right llfg-stagger">
+      <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
         <h4>Term Life</h4>
         <p>Simple, high-demand coverage — easy to sell and essential for families at every income level.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
         <h4>Whole Life</h4>
         <p>Permanent protection with cash value that grows — a powerful tool for long-term client relationships.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
         <h4>IUL</h4>
         <p>Indexed Universal Life — tax-advantaged growth tied to market indexes with downside protection. A premium product with strong commissions.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar llfg-tilt">
         <div class="pillar-icon"></div>
         <h4>Annuities</h4>
         <p>Retirement income solutions your clients can count on — and a strong source of recurring commissions for you.</p>
@@ -3940,29 +4053,29 @@
   <section id="why" style="padding: 8rem 4rem; border-top: 1px solid rgba(201,168,76,0.1);">
     <div style="text-align:center; margin-bottom: 4rem;">
       <p class="section-tag" style="display:inline-block;">Why Legacy Life</p>
-      <h2 style="max-width:560px; margin: 0.6rem auto 0;">Everything You Need to<br><em>Earn Big from Day One</em></h2>
+      <h2 style="max-width:560px; margin: 0.6rem auto 0;">Everything You Need to<br><em class="llfg-shimmer-text">Earn Big from Day One</em></h2>
     </div>
-    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;" class="llfg-stagger">
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">01</div>
         <h3 class="why-title">$10K–$15K in Your First Month</h3>
         <p class="why-body">New agents consistently earn $10,000–$15,000 in their first month. Get your systems dialed in and the momentum builds fast — months 3 through 6 average $30,000–$50,000 for committed producers. Top producers reach $500,000+ per month.</p>
       </div>
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">02</div>
         <h3 class="why-title">Free Leads to Start — Then Scale</h3>
         <p class="why-body">We provide free leads when you're starting out so you can hit the ground running with zero out-of-pocket. As you grow and your income increases, we'll show you how to strategically invest in additional lead sources to scale your business even further.</p>
       </div>
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">03</div>
         <h3 class="why-title">Own Your Business</h3>
         <p class="why-body">You're not just an employee — you're building your own book of business. Enjoy the freedom of entrepreneurship with the support of an established organization behind you.</p>
       </div>
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">04</div>
         <h3 class="why-title">Specialized Training</h3>
         <p class="why-body">Our onboarding and ongoing training programs are built by top producers who've been where you are. From licensing to closing, we guide every step of your journey.</p>
@@ -13805,6 +13918,7 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_ReconciliationAgent());
         this.register(new LLFG_DocumentAgent());
         this.register(new LLFG_BackupAgent());
+        this.register(new LLFG_AutoOptimizerAgent());
 
         // Alert listener for toast display
         LLFG_EventBus.on('agent:alert', (d) => {
@@ -16172,6 +16286,99 @@ This request requires Managing Partner approval.`
       }
     }
 
+    // ─── AI Auto-Optimizer Agent ─────────────────────────────────────
+    class LLFG_AutoOptimizerAgent extends LLFG_AgentBase {
+      constructor() {
+        super('auto_optimizer', 'Auto-Optimizer', '\u2728', 'Continuously monitors and optimizes portal performance, animations, data integrity, and agent health');
+        this._interval = null;
+        this._optimizations = [];
+      }
+      onStart() {
+        var self = this;
+        setTimeout(function(){ self.run(); }, 3000);
+        this._interval = setInterval(function(){ self.run(); }, 5 * 60 * 1000);
+      }
+      onStop() { if (this._interval) { clearInterval(this._interval); this._interval = null; } }
+      async run(ctx) {
+        this.status = 'running'; this.metrics.runs++;
+        var start = Date.now(), fixes = [], totalSize = 0;
+        try {
+          // 1. Reduce animations on low-end devices
+          if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+            if (!document.documentElement.classList.contains('llfg-low-perf')) {
+              document.documentElement.classList.add('llfg-low-perf');
+              fixes.push('Reduced animations for ' + navigator.hardwareConcurrency + '-core device');
+            }
+          }
+          // 2. Destroy orphaned Chart.js instances
+          if (window._llfgCharts) {
+            Object.keys(window._llfgCharts).forEach(function(key) {
+              var ch = window._llfgCharts[key];
+              if (ch && ch.canvas && !document.body.contains(ch.canvas)) {
+                ch.destroy(); delete window._llfgCharts[key];
+                fixes.push('Cleaned orphaned chart: ' + key);
+              }
+            });
+          }
+          // 3. Trim oversized localStorage arrays
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key && key.startsWith('llfg_')) {
+              var val = localStorage.getItem(key);
+              totalSize += (val || '').length;
+              if ((val || '').length > 512000) {
+                try { var arr = JSON.parse(val); if (Array.isArray(arr) && arr.length > 200) { localStorage.setItem(key, JSON.stringify(arr.slice(-200))); fixes.push('Trimmed ' + key + ' to 200 entries'); } } catch(e) {}
+              }
+            }
+          }
+          // 4. Restart crashed agents
+          if (typeof LLFG_Brain !== 'undefined' && LLFG_Brain.agents) {
+            Object.keys(LLFG_Brain.agents).forEach(function(id) {
+              var agent = LLFG_Brain.agents[id];
+              if (agent && agent.status === 'error' && id !== 'auto_optimizer') {
+                agent.status = 'idle'; agent.lastError = null;
+                fixes.push('Recovered: ' + agent.name);
+                try { if (typeof agent.run === 'function') agent.run(); } catch(e) {}
+              }
+            });
+          }
+          // 5. Remove stale toasts
+          document.querySelectorAll('.llfg-toast').forEach(function(t) { if (!t.dataset.ts || (Date.now() - parseInt(t.dataset.ts)) > 10000) { t.remove(); } });
+          // 6. Lazy-load offscreen images
+          var lazyImgs = document.querySelectorAll('img[data-src]:not([src])');
+          if (lazyImgs.length > 0) {
+            var io = new IntersectionObserver(function(entries, obs) { entries.forEach(function(e) { if (e.isIntersecting) { e.target.src = e.target.dataset.src; e.target.removeAttribute('data-src'); obs.unobserve(e.target); } }); }, { rootMargin: '200px' });
+            lazyImgs.forEach(function(img) { io.observe(img); });
+            fixes.push('Lazy-loaded ' + lazyImgs.length + ' images');
+          }
+          // 7. Accessibility — add roles to open modals
+          document.querySelectorAll('.modal-overlay[style*="flex"]').forEach(function(m) {
+            if (!m.getAttribute('role')) { m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); fixes.push('Added aria to modal'); }
+          });
+          // 8. Data integrity — validate TEAM_DATA
+          if (typeof TEAM_DATA !== 'undefined' && Array.isArray(TEAM_DATA)) {
+            TEAM_DATA.forEach(function(t) { if (!t.agents || !Array.isArray(t.agents)) { t.agents = []; fixes.push('Fixed agents array on ' + t.name); } });
+          }
+          // 9. Preconnect to external resources for speed
+          ['https://cdn.jsdelivr.net', 'https://fonts.googleapis.com', 'https://accounts.google.com'].forEach(function(url) {
+            if (!document.querySelector('link[href="' + url + '"][rel="preconnect"]')) {
+              var link = document.createElement('link'); link.rel = 'preconnect'; link.href = url;
+              document.head.appendChild(link);
+            }
+          });
+
+          this._optimizations = fixes;
+          this.lastResult = { fixes: fixes.length, details: fixes, memoryKB: Math.round(totalSize / 1024), timestamp: new Date().toISOString() };
+          if (fixes.length > 0) {
+            LLFG_EventBus.emit('agent:alert', { agentId: 'auto_optimizer', agentName: 'Auto-Optimizer', message: fixes.length + ' optimization' + (fixes.length > 1 ? 's' : '') + ' applied', severity: 'info', ts: Date.now() });
+          }
+          this.metrics.duration = Date.now() - start; this.status = 'idle';
+          return this.lastResult;
+        } catch(e) { this.metrics.errors++; this.lastError = e.message; this.status = 'error'; return { error: e.message }; }
+      }
+      getState() { return Object.assign(LLFG_AgentBase.prototype.getState.call(this), { optimizations: this._optimizations, nextRun: this._interval ? 'auto (5 min)' : 'stopped' }); }
+    }
+
     window.__R_downloadPortalBackup = window.downloadPortalBackup = function() {
       var backup = {};
       for (var i = 0; i < localStorage.length; i++) {
@@ -16740,6 +16947,109 @@ This request requires Managing Partner approval.`
           cta.classList.remove('show');
         }
       }, { passive: true });
+    })();
+
+    // ── SCROLL-STOP EFFECTS (Professional) ──
+
+    // 1. Scroll Progress Bar
+    (function initProgressBar() {
+      var bar = document.createElement('div');
+      bar.id = 'scrollProgressBar';
+      bar.style.cssText = 'position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,#c9a84c,#ffd700,#c9a84c);z-index:10000;width:0;transition:width 0.08s linear;pointer-events:none;';
+      document.body.appendChild(bar);
+      window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+      }, { passive: true });
+    })();
+
+    // 2. Hero Parallax Depth
+    (function initHeroParallax() {
+      window.addEventListener('scroll', function() {
+        var y = window.scrollY;
+        var hero = document.getElementById('hero');
+        if (!hero || y > window.innerHeight * 1.2) return;
+        var bg = hero.querySelector('.hero-bg');
+        var content = hero.querySelector('.hero-content');
+        if (bg) bg.style.transform = 'translateY(' + (y * 0.25) + 'px) scale(' + (1 + y * 0.0002) + ')';
+        if (content) content.style.transform = 'translateY(' + (y * -0.1) + 'px)';
+        hero.style.opacity = Math.max(0, 1 - y / (window.innerHeight * 0.9));
+      }, { passive: true });
+    })();
+
+    // 3. Counter Tickers (stats count up when visible)
+    (function initCounters() {
+      function animateCounter(el, target, prefix, suffix, duration) {
+        var startTime = null;
+        function step(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (prefix||'') + Math.floor(eased * target).toLocaleString() + (suffix||'');
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = (prefix||'') + target.toLocaleString() + (suffix||'');
+        }
+        requestAnimationFrame(step);
+      }
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting && !e.target.dataset.counted) {
+            e.target.dataset.counted = '1';
+            var t = parseInt(e.target.dataset.target) || 0;
+            animateCounter(e.target, t, e.target.dataset.prefix||'', e.target.dataset.suffix||'', 2200);
+          }
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll('[data-counter]').forEach(function(el) { obs.observe(el); });
+    })();
+
+    // 4. 3D Tilt Cards on Mouse Move
+    (function initTiltCards() {
+      function enableTilt(selector, intensity) {
+        intensity = intensity || 8;
+        document.querySelectorAll(selector).forEach(function(card) {
+          card.style.transition = 'transform 0.2s ease';
+          card.style.transformStyle = 'preserve-3d';
+          card.addEventListener('mousemove', function(e) {
+            var rect = card.getBoundingClientRect();
+            var x = (e.clientX - rect.left) / rect.width - 0.5;
+            var y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = 'perspective(800px) rotateY(' + (x * intensity) + 'deg) rotateX(' + (-y * intensity) + 'deg) scale(1.02)';
+          });
+          card.addEventListener('mouseleave', function() {
+            card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) scale(1)';
+          });
+        });
+      }
+      // Apply to landing page cards
+      setTimeout(function() {
+        enableTilt('.pillar', 6);
+        enableTilt('.why-card', 8);
+      }, 500);
+    })();
+
+    // 5. Nav frosted glass on scroll
+    (function initNavScroll() {
+      var nav = document.querySelector('nav');
+      if (!nav) return;
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 60) {
+          nav.style.background = 'rgba(10,10,10,0.85)';
+          nav.style.backdropFilter = 'blur(16px)';
+          nav.style.webkitBackdropFilter = 'blur(16px)';
+          nav.style.borderBottom = '1px solid rgba(201,168,76,0.1)';
+        } else {
+          nav.style.background = '';
+          nav.style.backdropFilter = '';
+          nav.style.webkitBackdropFilter = '';
+          nav.style.borderBottom = '';
+        }
+      }, { passive: true });
+    })();
+
+    // 6. Smooth scroll
+    (function initSmoothSections() {
+      document.documentElement.style.scrollBehavior = 'smooth';
     })();
 
     // Income calculator
