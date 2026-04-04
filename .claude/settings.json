@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -q \"index.html\"; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"index.html was modified. Run /health-check to validate the portal before deploying.\"}}'; fi",
+            "timeout": 10,
+            "statusMessage": "Checking if index.html was modified..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -q \"git commit\"; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"REMINDER: Run /deploy-prep before committing index.html to validate the portal.\"}}'; fi",
+            "timeout": 10,
+            "statusMessage": "Checking for git commit..."
+          }
+        ]
+      }
+    ]
+  }
+}

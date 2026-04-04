@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>if(location.protocol!=='https:'){location.replace('https://'+location.host+location.pathname+location.search);}</script>
+  <script>if(location.protocol!=='https:'&&location.protocol!=='file:'&&location.hostname!=='localhost'){location.replace('https://'+location.host+location.pathname+location.search);}</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Legacy Life Financial Group — Build Your Future</title>
@@ -2418,8 +2418,8 @@
       var subj = encodeURIComponent('Portal Password Reset Request');
       var body = encodeURIComponent(
         'Password reset requested for: ' + email +
-        (user ? '\n\nName: ' + user.name + '\nCurrent password: ' + user.password : '\n\nAccount not found — may need to be created.') +
-        '\n\nPlease send credentials to the agent directly.'
+        (user ? '\n\nName: ' + user.name + '\nRole: ' + (user.role || 'unknown') : '\n\nAccount not found — may need to be created.') +
+        '\n\nPlease reset credentials and send to the agent directly.'
       );
       var a = document.createElement('a');
       a.href = 'mailto:contact\u0040llfg.us?subject=' + subj + '&body=' + body;
@@ -4830,6 +4830,9 @@
     </div>
   </div>
 
+  <!-- COMMAND CENTER TAB -->
+  <div class="admin-tab-content" id="ptab-commandcenter" style="display:none;padding:1.5rem;"></div>
+
   </div><!-- close agentDash -->
 
   <!-- ADMIN DASHBOARD -->
@@ -5345,7 +5348,7 @@
             <div class="cal-field"><label>Temporary Password</label><input type="text" id="addAccPass" placeholder="welcome123" value="welcome123"/></div>
           </div>
           <!-- Preview strip -->
-          <div id="accPreviewStrip" style="display:none;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:0.8rem 1.2rem;margin-bottom:1rem;display:flex;gap:2rem;flex-wrap:wrap;align-items:center;">
+          <div id="accPreviewStrip" style="display:none;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);padding:0.8rem 1.2rem;margin-bottom:1rem;gap:2rem;flex-wrap:wrap;align-items:center;">
             <div style="font-size:0.7rem;color:var(--gray);">Portal login: <span id="prevPortalEmail" style="color:var(--gold);"></span></div>
             <div style="font-size:0.7rem;color:var(--gray);">Google Workspace: <span id="prevWorkspaceEmail" style="color:var(--gold);"></span></div>
             <div style="font-size:0.7rem;color:var(--gray);">Credentials sent to: <span id="prevPersonalEmail" style="color:var(--cream);"></span></div>
@@ -5725,10 +5728,10 @@ Legacy Life Financial Group`
       const succ = document.getElementById('addAccSuccess');
       if (succ) {
         succ.innerHTML = `
-          ✓ <strong>${name}</strong> added as <strong>${roleDisplay}</strong><br>
+          ✓ <strong>${escHTML(name)}</strong> added as <strong>${escHTML(roleDisplay)}</strong><br>
           <span style="font-size:0.7rem;opacity:0.85;">
-            Portal login: <strong style="color:var(--gold);">${llfgEmail}</strong> · 
-            Credentials sent${personalEmail ? ' to personal email' : ' to company email'} · 
+            Portal login: <strong style="color:var(--gold);">${escHTML(llfgEmail)}</strong> ·
+            Credentials sent${personalEmail ? ' to personal email' : ' to company email'} ·
             Google Workspace Admin opened in new tab
           </span>`;
         succ.style.display = 'block';
@@ -5778,11 +5781,11 @@ Legacy Life Financial Group`
       } else {
         pendingEl.innerHTML = pendingAccounts.map(acc => `
           <div class="team-row" style="padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-            <div class="team-avatar">${acc.name.split(' ').map(n=>n[0]).join('')}</div>
+            <div class="team-avatar">${escHTML(acc.name.split(' ').map(n=>n[0]).join(''))}</div>
             <div style="flex:1;">
-              <div class="team-name">${acc.name}</div>
-              <div class="team-role">${acc.email} · ${acc.phone}</div>
-              <div style="font-size:0.65rem;color:var(--gold-dim);margin-top:2px;">Requested: <span style="color:var(--gold);text-transform:capitalize;">${acc.requestedRole}</span> · Upline: ${acc.upline} · ${acc.date}</div>
+              <div class="team-name">${escHTML(acc.name)}</div>
+              <div class="team-role">${escHTML(acc.email)} · ${escHTML(acc.phone)}</div>
+              <div style="font-size:0.65rem;color:var(--gold-dim);margin-top:2px;">Requested: <span style="color:var(--gold);text-transform:capitalize;">${escHTML(acc.requestedRole)}</span> · Upline: ${escHTML(acc.upline)} · ${acc.date}</div>
             </div>
             <div style="display:flex;gap:0.5rem;flex-shrink:0;">
               <button class="app-action-btn" style="border-color:rgba(110,207,110,0.4);color:#6ecf6e;" onclick="approveAccount(${acc.id})">✓ Approve</button>
@@ -5996,8 +5999,8 @@ Legacy Life Financial Group`
       const body = document.getElementById('profileBody');
       body.innerHTML = fields.map(([k,v]) => `
         <div>
-          <div style="font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:3px;">${k}</div>
-          <div style="font-size:0.84rem;color:var(--cream);line-height:1.4;">${v}</div>
+          <div style="font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:3px;">${escHTML(k)}</div>
+          <div style="font-size:0.84rem;color:var(--cream);line-height:1.4;">${escHTML(v)}</div>
         </div>`).join('');
 
       // Message/notes section
@@ -6627,6 +6630,12 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       initMsgContacts(proxyUser);
       const commSub = document.getElementById('dealCommSub');
       if (commSub) commSub.textContent = `Advance × ${user.comm}%`;
+
+      // Initialize LLFG Command Center for manager+ roles
+      const ccRoles = ['manager','executive','director','managing_partner','admin'];
+      if (ccRoles.includes(effectiveRole) && typeof LLFG_Brain !== 'undefined' && !LLFG_Brain._initialized) {
+        try { LLFG_Brain.init(); } catch(e) { console.error('[CommandCenter] Init error:', e); }
+      }
     };
 
     window.__R_adminGoToPortal = window.adminGoToPortal = function() {
@@ -7208,11 +7217,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
       agent:             ['commreq'],
-      manager:           ['commreq','reports'],
-      executive:         ['commreq','teammetrics','reports'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports'],
+      manager:           ['commreq','reports','commandcenter'],
+      executive:         ['commreq','teammetrics','reports','commandcenter'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
@@ -7221,6 +7230,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       portals:'Carrier Portals',
       commreq:'Commission Request', permissions:'Permissions',
       downlineclients:'All Clients', reports:'Reports',
+      commandcenter:'Command Center',
     };
 
     // ═══════════════════════════════════════════════════════════
@@ -7253,11 +7263,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       ].join(';');
 
       const labels = (typeof SUBTAB_LABELS !== 'undefined') ? SUBTAB_LABELS : {};
-      menu.innerHTML = subTabs.map(function(t, i) {
+      subTabs.forEach(function(t, i) {
         var label = labels[t] || (t.charAt(0).toUpperCase() + t.slice(1));
-        var border = (i < subTabs.length - 1) ? 'border-bottom:1px solid rgba(255,255,255,0.05);' : '';
         var itemStyle = 'padding:0.75rem 1.1rem;font-size:0.76rem;color:rgba(255,255,255,0.75);'
-          + 'cursor:pointer;letter-spacing:0.05em;' + border + 'transition:background 0.12s,color 0.12s;';
+          + 'cursor:pointer;letter-spacing:0.05em;transition:background 0.12s,color 0.12s;';
         var el = document.createElement('div');
         el.className = 'dd-item';
         el.dataset.tab = t;
@@ -7267,8 +7276,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         el.addEventListener('mouseover', function() { this.style.background = 'rgba(201,168,76,0.1)'; this.style.color = '#fff'; });
         el.addEventListener('mouseout', function() { this.style.background = ''; this.style.color = 'rgba(255,255,255,0.75)'; });
         if (i < subTabs.length - 1) el.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-        return el.outerHTML;
-      }).join('');
+        menu.appendChild(el);
+      });
 
       document.body.appendChild(menu);
 
@@ -7329,7 +7338,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
           tools:      ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
-          management: ['commreq','permissions','teammetrics','downlineclients','reports'],
+          management: ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentGroups)) {
@@ -7484,6 +7493,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         }
 
         if (tab === 'emailtemplates')  { if (typeof renderEmailTemplates === 'function') renderEmailTemplates(); }
+
+        if (tab === 'commandcenter') {
+          if (typeof LLFG_Brain !== 'undefined' && !LLFG_Brain._initialized) LLFG_Brain.init();
+          if (typeof renderCommandCenter === 'function') renderCommandCenter();
+        }
       } catch(err) {
         console.error('[showPortalTab] Error rendering tab "' + tab + '":', err);
       }
@@ -7599,9 +7613,9 @@ Object.defineProperty(window, "_llfgCurrentUser", {
               {name:'Ryan Nguyen',     role:'Financial Advisor',comm:80,  ap:41000},
               {name:'Karen Ford',      role:'Financial Advisor',comm:80,  ap:36000},
             ].filter(a => {
-              // Role visibility cap
+              // Role visibility cap — each role can only see commissions up to their cap
               const agentCap = COMM_CAP[role] || 120;
-              return a.comm <= agentCap || isManagerPlus;
+              return a.comm <= agentCap;
             });
             const rColors = {'Managing Partner':'var(--gold)','Executive':'#c084fc','Manager':'#6ea8fe'};
             orgBody.innerHTML = orgData.map(a => {
@@ -7609,8 +7623,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
               const earn = Math.round(adv * a.comm / 100);
               const rc   = rColors[a.role] || 'var(--gray)';
               return `<tr>
-                <td style="font-weight:500;">${a.name}</td>
-                <td style="color:${rc};font-size:0.72rem;">${a.role}</td>
+                <td style="font-weight:500;">${escHTML(a.name)}</td>
+                <td style="color:${rc};font-size:0.72rem;">${escHTML(a.role)}</td>
                 <td style="color:var(--gold);">${a.comm}%</td>
                 <td>$${a.ap.toLocaleString()}</td>
                 <td style="color:var(--gold-light);">$${adv.toLocaleString()}</td>
@@ -8194,8 +8208,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         const myPay   = advance * comm;
         totalAP += ap;
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${d.client}</td><td>${d.policy||'—'}</td><td>${d.carrier||'—'}</td>
-          <td style="color:var(--gold-dim);font-size:0.7rem;">${d.policyNum||'—'}</td>
+        tr.innerHTML = `<td>${escHTML(d.client)}</td><td>${escHTML(d.policy||'—')}</td><td>${escHTML(d.carrier||'—')}</td>
+          <td style="color:var(--gold-dim);font-size:0.7rem;">${escHTML(d.policyNum||'—')}</td>
           <td>$${d.premium.toLocaleString()}</td>
           <td style="color:var(--gold);">$${ap.toLocaleString()}</td>
           <td>$${Math.round(advance).toLocaleString()}</td>
@@ -8308,10 +8322,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         return `
           <div style="border:1px solid rgba(201,168,76,0.12);background:var(--black-card);padding:1rem 1.2rem;margin-bottom:0.6rem;cursor:pointer;" onclick="this.querySelector('.bob-detail').style.display=this.querySelector('.bob-detail').style.display==='none'?'grid':'none'">
             <div style="display:flex;align-items:center;gap:1rem;">
-              <div class="team-avatar">${d.client.split(' ').map(n=>n[0]).join('').substr(0,2)}</div>
+              <div class="team-avatar">${escHTML(d.client.split(' ').map(n=>n[0]).join('').substr(0,2))}</div>
               <div style="flex:1;">
-                <div style="font-size:0.85rem;color:var(--cream);font-weight:500;">${d.client}</div>
-                <div style="font-size:0.65rem;color:var(--gray);">${d.carrier||'—'} · ${d.policy||'—'} · Logged ${d.date}</div>
+                <div style="font-size:0.85rem;color:var(--cream);font-weight:500;">${escHTML(d.client)}</div>
+                <div style="font-size:0.65rem;color:var(--gray);">${escHTML(d.carrier||'—')} · ${escHTML(d.policy||'—')} · Logged ${d.date}</div>
               </div>
               <div style="text-align:right;">
                 <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);">$${ap.toLocaleString()} AP</div>
@@ -9415,7 +9429,85 @@ contact\u0040llfg.us`
     };
 
     // ─── Business Card ───
-    
+
+    // Escape HTML to prevent XSS in innerHTML
+    function escHTML(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+    let _bcSelectedLogo = 'hexagon';
+    let _bcPhotoDataUrl = null;
+
+    window.__R_openSureLc = window.openSureLc = function() {
+      const emailEl = document.getElementById('surelcEmail');
+      const email = emailEl ? emailEl.value.trim() : '';
+      if (email) {
+        window.open('https://www.surelc.com/agent', '_blank');
+      } else {
+        window.open('https://www.surelc.com/agent', '_blank');
+      }
+    };
+
+    window.__R_clearBcPhoto = window.clearBcPhoto = function() {
+      _bcPhotoDataUrl = null;
+      const thumb = document.getElementById('bcPhotoPreviewThumb');
+      if (thumb) thumb.innerHTML = '👤';
+      const cardPhoto = document.getElementById('bcCardPhoto');
+      if (cardPhoto) cardPhoto.style.display = 'none';
+      const cardPhotoImg = document.getElementById('bcCardPhotoImg');
+      if (cardPhotoImg) cardPhotoImg.src = '';
+    };
+
+    window.__R_selectBcLogo = window.selectBcLogo = function(style, el) {
+      _bcSelectedLogo = style;
+      document.querySelectorAll('.bc-logo-opt').forEach(o => o.classList.remove('active'));
+      if (el) el.classList.add('active');
+      // Update the card preview logo
+      const logoMark = document.getElementById('bcCardLogoMark');
+      if (logoMark) {
+        const svgs = {
+          hexagon: '<svg width="26" height="26" viewBox="0 0 40 40" fill="none"><polygon points="20,2 38,11 38,29 20,38 2,29 2,11" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>',
+          shield: '<svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M20 3 L36 9 L36 22 C36 30 20 38 20 38 C20 38 4 30 4 22 L4 9 Z" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>',
+          diamond: '<svg width="26" height="26" viewBox="0 0 40 40" fill="none"><polygon points="20,2 38,20 20,38 2,20" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>',
+          circle: '<svg width="26" height="26" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="17" fill="none" stroke="#c9a84c" stroke-width="2"/><text x="20" y="25" text-anchor="middle" font-family="serif" font-size="12" font-weight="bold" fill="#c9a84c">L</text></svg>',
+          wordmark: '<div style="font-family:\'Cinzel\',serif;font-size:0.5rem;letter-spacing:0.2em;color:var(--gold);white-space:nowrap;">LEGACY LIFE</div>'
+        };
+        logoMark.innerHTML = svgs[style] || svgs.hexagon;
+      }
+    };
+
+    window.__R_handleBcPhotoUpload = window.handleBcPhotoUpload = function(input) {
+      if (!input.files || !input.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        _bcPhotoDataUrl = e.target.result;
+        const thumb = document.getElementById('bcPhotoPreviewThumb');
+        if (thumb) thumb.innerHTML = '<img src="' + escHTML(e.target.result) + '" style="width:100%;height:100%;object-fit:cover;"/>';
+        const cardPhoto = document.getElementById('bcCardPhoto');
+        if (cardPhoto) cardPhoto.style.display = 'block';
+        const cardPhotoImg = document.getElementById('bcCardPhotoImg');
+        if (cardPhotoImg) cardPhotoImg.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    };
+
+    window.__R_updateBizCard = window.updateBizCard = function() {
+      const u = currentUser || window._llfgCurrentUser || {};
+      const name    = document.getElementById('bcName')?.value    || u.name || 'Your Name';
+      const npn     = document.getElementById('bcNPN')?.value     || '';
+      const phone   = document.getElementById('bcPhone')?.value   || '(555) 000-0000';
+      const email   = document.getElementById('bcEmail')?.value   || 'jane@llfg.us';
+      const website = document.getElementById('bcWebsite')?.value || 'llfg.us';
+      const states  = document.getElementById('bcStates')?.value  || '';
+      const brand   = document.getElementById('bcBrandName')?.value || 'Legacy Life Financial Group';
+
+      const pName    = document.getElementById('bcPreviewName');    if (pName) pName.textContent = name;
+      const pPhone   = document.getElementById('bcPreviewPhone');   if (pPhone) pPhone.textContent = phone;
+      const pNPN     = document.getElementById('bcPreviewNPN');     if (pNPN) pNPN.textContent = npn ? 'NPN: ' + npn : 'NPN: —';
+      const pEmail   = document.getElementById('bcPreviewEmail');   if (pEmail) pEmail.textContent = email;
+      const pWebsite = document.getElementById('bcPreviewWebsite'); if (pWebsite) pWebsite.textContent = website;
+      const pStates  = document.getElementById('bcPreviewStates');  if (pStates) pStates.textContent = states || '—';
+      const pBrand   = document.getElementById('bcPreviewBrand');   if (pBrand) pBrand.textContent = brand;
+    };
+
     window.__R_downloadAppleWallet = window.downloadAppleWallet = function() {
       const u       = currentUser || window._llfgCurrentUser;
       const name    = document.getElementById('bcName')?.value    || u?.name || 'Agent';
@@ -10809,9 +10901,1872 @@ This request requires Managing Partner approval.`
       renderPermTable();
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    //  LLFG COMMAND CENTER — AI AGENT SYSTEM
+    //  12-Agent orchestration framework for business automation & security
+    // ═══════════════════════════════════════════════════════════════════
+
+    // ─── Event Bus ───────────────────────────────────────────────────
+    const LLFG_EventBus = {
+      _listeners: {},
+      _history: [],
+      on(event, cb) {
+        if (!this._listeners[event]) this._listeners[event] = [];
+        this._listeners[event].push(cb);
+      },
+      off(event, cb) {
+        if (!this._listeners[event]) return;
+        this._listeners[event] = this._listeners[event].filter(f => f !== cb);
+      },
+      emit(event, data) {
+        const entry = { event, data, ts: Date.now() };
+        this._history.push(entry);
+        if (this._history.length > 500) this._history = this._history.slice(-400);
+        (this._listeners[event] || []).forEach(cb => { try { cb(data); } catch(e) { console.error('[EventBus]', event, e); } });
+      },
+      history(event, limit) {
+        const h = event ? this._history.filter(e => e.event === event) : this._history;
+        return limit ? h.slice(-limit) : h;
+      }
+    };
+
+    // ─── Agent Base Class ────────────────────────────────────────────
+    class LLFG_AgentBase {
+      constructor(id, name, icon, description) {
+        this.id = id;
+        this.name = name;
+        this.icon = icon;
+        this.description = description;
+        this.status = 'stopped';
+        this.lastRun = null;
+        this.lastError = null;
+        this.metrics = { runs: 0, errors: 0, alerts: 0 };
+        this._intervals = [];
+      }
+      start() {
+        this.status = 'running';
+        try { this.onStart(); } catch(e) { this.lastError = e.message; this.metrics.errors++; }
+        LLFG_EventBus.emit('agent:started', { id: this.id });
+      }
+      stop() {
+        this._intervals.forEach(id => clearInterval(id));
+        this._intervals = [];
+        this.status = 'stopped';
+        try { this.onStop(); } catch(e) {}
+        LLFG_EventBus.emit('agent:stopped', { id: this.id });
+      }
+      pause() { this.status = 'paused'; LLFG_EventBus.emit('agent:paused', { id: this.id }); }
+      resume() { this.status = 'running'; LLFG_EventBus.emit('agent:resumed', { id: this.id }); }
+      schedule(fn, ms) {
+        const self = this;
+        const id = setInterval(() => {
+          if (self.status !== 'running') return;
+          try { fn.call(self); self.metrics.runs++; self.lastRun = Date.now(); }
+          catch(e) { self.lastError = e.message; self.metrics.errors++; }
+        }, ms);
+        this._intervals.push(id);
+        return id;
+      }
+      alert(message, severity, data) {
+        severity = severity || 'info';
+        this.metrics.alerts++;
+        LLFG_EventBus.emit('agent:alert', { agentId: this.id, agentName: this.name, message, severity, data, ts: Date.now() });
+      }
+      getState() {
+        return { id: this.id, status: this.status, lastRun: this.lastRun, lastError: this.lastError, metrics: { ...this.metrics } };
+      }
+      onStart() {}
+      onStop() {}
+    }
+
+    // ─── The Brain — Central Orchestrator ────────────────────────────
+    const LLFG_Brain = {
+      agents: {},
+      _stateKey: 'llfg_agents_state',
+      _alertsKey: 'llfg_agents_alerts',
+      _initialized: false,
+
+      init() {
+        if (this._initialized) return;
+        this._initialized = true;
+
+        // Register all 12 agents
+        this.register(new LLFG_SecurityAgent());
+        this.register(new LLFG_KPIAgent());
+        this.register(new LLFG_SalesPerformanceAgent());
+        this.register(new LLFG_RecruitingAgent());
+        this.register(new LLFG_EmailAgent());
+        this.register(new LLFG_ComplianceAgent());
+        this.register(new LLFG_TrainingAgent());
+        this.register(new LLFG_RetentionAgent());
+        this.register(new LLFG_ClientLifecycleAgent());
+        this.register(new LLFG_TeamBuilderAgent());
+        this.register(new LLFG_NotificationsAgent());
+        this.register(new LLFG_AnalyticsAgent());
+        this.register(new LLFG_UIOptimizationAgent());
+
+        // Alert listener for toast display
+        LLFG_EventBus.on('agent:alert', (d) => {
+          this._storeAlert(d);
+          const colors = { info: '#6ea8fe', warning: '#ffa500', critical: '#e05555' };
+          this._showToast(`${d.agentName}: ${d.message}`, colors[d.severity] || '#6ea8fe');
+        });
+
+        // Auto-save state every 30s
+        setInterval(() => this._saveState(), 30000);
+
+        // Restore previous agent states
+        this._restoreAgentStates();
+
+        // Always auto-start security agent
+        if (this.agents.security && this.agents.security.status !== 'running') {
+          this.startAgent('security');
+        }
+      },
+
+      register(agent) { this.agents[agent.id] = agent; },
+
+      startAgent(id) {
+        const a = this.agents[id];
+        if (a && a.status !== 'running') { a.start(); this._saveState(); }
+      },
+      stopAgent(id) {
+        const a = this.agents[id];
+        if (a && a.status === 'running') { a.stop(); this._saveState(); }
+      },
+      startAll() { Object.keys(this.agents).forEach(id => this.startAgent(id)); },
+      stopAll() { Object.keys(this.agents).forEach(id => this.stopAgent(id)); },
+
+      getStatus() {
+        const s = {};
+        Object.entries(this.agents).forEach(([id, a]) => { s[id] = a.getState(); });
+        return s;
+      },
+
+      healthCheck() {
+        return Object.values(this.agents).map(a => ({
+          id: a.id, name: a.name, status: a.status, healthy: a.status === 'running' && !a.lastError,
+          lastRun: a.lastRun, errorRate: a.metrics.runs > 0 ? (a.metrics.errors / a.metrics.runs * 100).toFixed(1) + '%' : '0%'
+        }));
+      },
+
+      _saveState() {
+        try {
+          const s = {};
+          Object.entries(this.agents).forEach(([id, a]) => {
+            s[id] = { wasRunning: a.status === 'running', metrics: { ...a.metrics } };
+          });
+          localStorage.setItem(this._stateKey, JSON.stringify(s));
+        } catch(e) {}
+      },
+
+      _restoreAgentStates() {
+        try {
+          const raw = localStorage.getItem(this._stateKey);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          Object.entries(s).forEach(([id, state]) => {
+            if (state.wasRunning && this.agents[id]) {
+              this.agents[id].metrics = state.metrics || { runs: 0, errors: 0, alerts: 0 };
+              this.startAgent(id);
+            }
+          });
+        } catch(e) {}
+      },
+
+      _storeAlert(data) {
+        try {
+          let alerts = JSON.parse(localStorage.getItem(this._alertsKey) || '[]');
+          alerts.push({ ...data, iso: new Date(data.ts).toISOString() });
+          if (alerts.length > 200) alerts = alerts.slice(-150);
+          localStorage.setItem(this._alertsKey, JSON.stringify(alerts));
+        } catch(e) {}
+      },
+
+      getAlerts(agentId, limit) {
+        try {
+          let alerts = JSON.parse(localStorage.getItem(this._alertsKey) || '[]');
+          if (agentId) alerts = alerts.filter(a => a.agentId === agentId);
+          return limit ? alerts.slice(-limit) : alerts;
+        } catch(e) { return []; }
+      },
+
+      _showToast(msg, color) {
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#111;border:1px solid ${color}40;color:${color};padding:0.7rem 1.4rem;font-size:0.72rem;z-index:9999;font-family:"Raleway",sans-serif;max-width:500px;text-align:center;`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 4000);
+      }
+    };
+
+    // ─── 1. SECURITY AGENT ───────────────────────────────────────────
+    class LLFG_SecurityAgent extends LLFG_AgentBase {
+      constructor() {
+        super('security', 'Security Agent', '🛡️', 'Audit logging, session monitoring, anomaly detection, PII masking');
+        this._auditKey = 'llfg_security_audit';
+        this._failedKey = 'llfg_failed_logins';
+        this._lastActivity = Date.now();
+        this._hooked = false;
+      }
+
+      onStart() {
+        if (!this._hooked) this._installHooks();
+        this._activityHandler = () => { this._lastActivity = Date.now(); };
+        document.addEventListener('click', this._activityHandler, { passive: true });
+        document.addEventListener('keypress', this._activityHandler, { passive: true });
+        this.schedule(() => this._checkIdleSession(), 60000);
+        this.schedule(() => this._anomalyDetection(), 300000);
+        this.logEvent('system', 'agent_started', 'Security Agent activated');
+      }
+
+      onStop() {
+        if (this._activityHandler) {
+          document.removeEventListener('click', this._activityHandler);
+          document.removeEventListener('keypress', this._activityHandler);
+        }
+      }
+
+      logEvent(category, action, details) {
+        const user = currentUser || window._llfgCurrentUser;
+        const entry = {
+          id: 'sec_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          category, action,
+          user: user?.email || 'anonymous',
+          role: user?.role || 'unknown',
+          details: typeof details === 'string' ? details : JSON.stringify(details),
+          timestamp: Date.now(),
+          iso: new Date().toISOString()
+        };
+        try {
+          let log = JSON.parse(localStorage.getItem(this._auditKey) || '[]');
+          log.push(entry);
+          if (log.length > 1000) log = log.slice(-800);
+          localStorage.setItem(this._auditKey, JSON.stringify(log));
+        } catch(e) {}
+        return entry;
+      }
+
+      _installHooks() {
+        this._hooked = true;
+        const self = this;
+
+        // Hook handleLogin
+        const origLogin = window.handleLogin;
+        window.handleLogin = function() {
+          const email = document.getElementById('loginEmail')?.value?.trim()?.toLowerCase();
+          const result = origLogin.apply(this, arguments);
+          if (window._llfgCurrentUser) {
+            self.logEvent('auth', 'login_success', `${email} logged in as ${window._llfgCurrentUser.role}`);
+            self._resetFailedLogins(email);
+          } else if (email) {
+            self.recordFailedLogin(email);
+          }
+          return result;
+        };
+
+        // Hook logout
+        const origLogout = window.logout;
+        window.logout = function() {
+          const user = currentUser || window._llfgCurrentUser;
+          if (user) self.logEvent('auth', 'logout', `${user.email} logged out`);
+          return origLogout.apply(this, arguments);
+        };
+
+        // Hook adminViewAs
+        const origViewAs = window.adminViewAs;
+        if (origViewAs) {
+          window.__R_adminViewAs = window.adminViewAs = function(val) {
+            const user = currentUser || window._llfgCurrentUser;
+            self.logEvent('admin', 'view_as', `${user?.email} viewing portal as: ${val}`);
+            return origViewAs.apply(this, arguments);
+          };
+        }
+
+        // Hook grantPermission
+        const origGrant = window.grantPermission;
+        if (origGrant) {
+          window.__R_grantPermission = window.grantPermission = function() {
+            const email = document.getElementById('permEmail')?.value?.trim();
+            const level = document.getElementById('permLevel')?.value;
+            self.logEvent('permission', 'grant_permission', `Granting ${level} to ${email}`);
+            return origGrant.apply(this, arguments);
+          };
+        }
+
+        // Hook revokePermission
+        const origRevoke = window.revokePermission;
+        if (origRevoke) {
+          window.__R_revokePermission = window.revokePermission = function(email) {
+            self.logEvent('permission', 'revoke_permission', `Revoking permissions from ${email}`);
+            return origRevoke.apply(this, arguments);
+          };
+        }
+      }
+
+      recordFailedLogin(email) {
+        this.logEvent('auth', 'login_failed', `Failed login attempt for ${email}`);
+        try {
+          let fails = JSON.parse(localStorage.getItem(this._failedKey) || '{}');
+          if (!fails[email]) fails[email] = { count: 0, lockedUntil: 0 };
+          fails[email].count++;
+          fails[email].lastAttempt = Date.now();
+          if (fails[email].count >= 5) {
+            fails[email].lockedUntil = Date.now() + 15 * 60 * 1000;
+            this.alert(`Account locked: ${email} — 5 failed login attempts`, 'critical');
+          }
+          localStorage.setItem(this._failedKey, JSON.stringify(fails));
+        } catch(e) {}
+      }
+
+      _resetFailedLogins(email) {
+        try {
+          let fails = JSON.parse(localStorage.getItem(this._failedKey) || '{}');
+          delete fails[email];
+          localStorage.setItem(this._failedKey, JSON.stringify(fails));
+        } catch(e) {}
+      }
+
+      isLocked(email) {
+        try {
+          const fails = JSON.parse(localStorage.getItem(this._failedKey) || '{}');
+          return fails[email] && fails[email].lockedUntil > Date.now();
+        } catch(e) { return false; }
+      }
+
+      _checkIdleSession() {
+        const user = currentUser || window._llfgCurrentUser;
+        if (!user) return;
+        const idle = Date.now() - this._lastActivity;
+        if (idle > 30 * 60 * 1000) {
+          this.logEvent('auth', 'idle_timeout', `${user.email} timed out after 30min idle`);
+          this.alert('Session timed out due to inactivity', 'warning');
+          if (typeof window.logout === 'function') window.logout();
+        }
+      }
+
+      _anomalyDetection() {
+        try {
+          const log = JSON.parse(localStorage.getItem(this._auditKey) || '[]');
+          const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+          const recent = log.filter(e => e.timestamp > fiveMinAgo);
+
+          // Check for rapid permission changes
+          const permChanges = recent.filter(e => e.category === 'permission');
+          if (permChanges.length >= 3) {
+            this.alert(`Anomaly: ${permChanges.length} permission changes in 5 minutes`, 'critical');
+          }
+
+          // Check for off-hours access
+          const hour = new Date().getHours();
+          if ((hour < 6 || hour > 23) && recent.some(e => e.category === 'data_access')) {
+            this.alert('Off-hours sensitive data access detected', 'warning');
+          }
+        } catch(e) {}
+      }
+
+      maskPII(client, viewerRole) {
+        const canSeePII = ['admin', 'managing_partner', 'director'].includes(viewerRole);
+        if (canSeePII) return client;
+        return { ...client, ssn: '•••-••-••••', bank: '••••••••', dob: '••••-••-••' };
+      }
+
+      getAuditLog(filters) {
+        try {
+          let log = JSON.parse(localStorage.getItem(this._auditKey) || '[]');
+          if (filters?.category) log = log.filter(e => e.category === filters.category);
+          if (filters?.user) log = log.filter(e => e.user === filters.user);
+          if (filters?.since) log = log.filter(e => e.timestamp >= filters.since);
+          if (filters?.limit) log = log.slice(-filters.limit);
+          return log;
+        } catch(e) { return []; }
+      }
+    }
+
+    // ─── 2. KPI AGENT ────────────────────────────────────────────────
+    class LLFG_KPIAgent extends LLFG_AgentBase {
+      constructor() {
+        super('kpi', 'KPI Agent', '📊', 'Real-time KPI calculations, goal tracking, threshold alerts, promotion scoring');
+        this._goalsKey = 'llfg_kpi_goals';
+        this._historyKey = 'llfg_kpi_history';
+        this.thresholds = {
+          persistency: { warning: 80, critical: 75 },
+          chargeback: { warning: 5, critical: 8 },
+          retention: { warning: 82, critical: 78 }
+        };
+        this.snapshot = null;
+        this.promotionScores = {};
+      }
+
+      onStart() {
+        this._runAll();
+        this.schedule(() => this._runAll(), 60000);
+      }
+
+      _runAll() {
+        this.snapshot = this.getSnapshot();
+        this._checkThresholds();
+        this._calculateTrends();
+        this._updatePromotionScores();
+        LLFG_EventBus.emit('kpi:updated', this.snapshot);
+      }
+
+      getSnapshot() {
+        if (typeof TEAM_DATA === 'undefined') return null;
+        let totalAP = 0, totalPersist = 0, totalCB = 0, totalRet = 0, agentCount = 0, highRisk = 0, highDebt = 0;
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            totalAP += a.ap; totalPersist += a.persist; totalCB += a.cb; totalRet += a.ret;
+            agentCount++;
+            if (a.cb >= 7) highRisk++;
+            if (a.debt !== 'Low') highDebt++;
+          });
+        });
+        return {
+          totalAP, agentCount,
+          avgPersistency: agentCount ? (totalPersist / agentCount).toFixed(1) : 0,
+          avgChargeback: agentCount ? (totalCB / agentCount).toFixed(1) : 0,
+          avgRetention: agentCount ? (totalRet / agentCount).toFixed(1) : 0,
+          highRiskAgents: highRisk,
+          highDebtAgents: highDebt,
+          teamCount: TEAM_DATA.length,
+          ts: Date.now()
+        };
+      }
+
+      _checkThresholds() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            if (a.persist < this.thresholds.persistency.critical)
+              this.alert(`${a.name}: Persistency CRITICAL at ${a.persist}%`, 'critical', { agent: a.name, metric: 'persistency', value: a.persist });
+            else if (a.persist < this.thresholds.persistency.warning)
+              this.alert(`${a.name}: Persistency low at ${a.persist}%`, 'warning', { agent: a.name, metric: 'persistency', value: a.persist });
+
+            if (a.cb >= this.thresholds.chargeback.critical)
+              this.alert(`${a.name}: Chargeback CRITICAL at ${a.cb}%`, 'critical', { agent: a.name, metric: 'chargeback', value: a.cb });
+            else if (a.cb >= this.thresholds.chargeback.warning)
+              this.alert(`${a.name}: Chargeback elevated at ${a.cb}%`, 'warning', { agent: a.name, metric: 'chargeback', value: a.cb });
+          });
+        });
+      }
+
+      _calculateTrends() {
+        if (!this.snapshot) return;
+        try {
+          let history = JSON.parse(localStorage.getItem(this._historyKey) || '[]');
+          const today = new Date().toDateString();
+          const existing = history.findIndex(h => h.date === today);
+          const entry = { date: today, ...this.snapshot };
+          if (existing >= 0) history[existing] = entry; else history.push(entry);
+          if (history.length > 90) history = history.slice(-90);
+          localStorage.setItem(this._historyKey, JSON.stringify(history));
+        } catch(e) {}
+      }
+
+      _updatePromotionScores() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        this.promotionScores = {};
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            let score = 0;
+            score += Math.min(30, (a.persist / 100) * 30);
+            score += Math.max(0, 25 - (a.cb * 3));
+            score += Math.min(25, (a.ret / 100) * 25);
+            score += a.debt === 'Low' ? 20 : a.debt === 'Medium' ? 10 : 0;
+            this.promotionScores[a.name] = Math.round(score);
+          });
+        });
+      }
+
+      setGoal(agentName, period, target) {
+        try {
+          let goals = JSON.parse(localStorage.getItem(this._goalsKey) || '{}');
+          if (!goals[agentName]) goals[agentName] = {};
+          goals[agentName][period] = { target, setAt: Date.now() };
+          localStorage.setItem(this._goalsKey, JSON.stringify(goals));
+        } catch(e) {}
+      }
+
+      getGoals(agentName) {
+        try {
+          const goals = JSON.parse(localStorage.getItem(this._goalsKey) || '{}');
+          return agentName ? goals[agentName] || {} : goals;
+        } catch(e) { return {}; }
+      }
+    }
+
+    // ─── 3. SALES PERFORMANCE AGENT ──────────────────────────────────
+    class LLFG_SalesPerformanceAgent extends LLFG_AgentBase {
+      constructor() {
+        super('sales', 'Sales Performance Agent', '💰', 'Leaderboard automation, chargeback risk monitoring, commission projections');
+        this.leaderboard = [];
+        this.chargebackRisk = [];
+        this.projections = {};
+        this.debtAnalysis = {};
+      }
+
+      onStart() {
+        this._runAll();
+        this.schedule(() => this._runAll(), 120000);
+      }
+
+      _runAll() {
+        this._updateLeaderboard();
+        this._monitorChargebackRisk();
+        this._calculateProjections();
+        this._analyzeDebtRollup();
+        LLFG_EventBus.emit('sales:updated', { leaderboard: this.leaderboard.slice(0, 5) });
+      }
+
+      _updateLeaderboard() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        const all = [];
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            all.push({ name: a.name, team: t.name, role: a.role, ap: a.ap, comm: a.comm, persist: a.persist, cb: a.cb });
+          });
+        });
+        this.leaderboard = all.sort((a, b) => b.ap - a.ap).map((a, i) => ({ ...a, rank: i + 1 }));
+      }
+
+      _monitorChargebackRisk() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        this.chargebackRisk = [];
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            if (a.cb >= 7) {
+              this.chargebackRisk.push({ name: a.name, team: t.name, cb: a.cb, debt: a.debt });
+              this.alert(`${a.name} chargeback risk: ${a.cb}% — ${a.debt} debt`, a.cb >= 8 ? 'critical' : 'warning');
+            }
+          });
+        });
+      }
+
+      _calculateProjections() {
+        const deals = typeof myDeals !== 'undefined' ? myDeals : [];
+        const user = currentUser || window._llfgCurrentUser;
+        const comm = user?.comm || 65;
+        const totalAP = deals.reduce((s, d) => s + (d.premium || 0) * 12, 0);
+        const avgDealAP = deals.length > 0 ? totalAP / deals.length : 0;
+        this.projections = {
+          currentAP: totalAP,
+          projectedMonthlyAP: avgDealAP * Math.max(deals.length, 1),
+          projectedAdvance: totalAP * 0.75,
+          projectedEarnings: totalAP * 0.75 * (comm / 100),
+          dealCount: deals.length,
+          avgDealSize: avgDealAP
+        };
+      }
+
+      _analyzeDebtRollup() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        this.debtAnalysis = { low: 0, medium: 0, high: 0, teams: [] };
+        TEAM_DATA.forEach(t => {
+          const teamDebt = { name: t.name, agents: [] };
+          t.agents.forEach(a => {
+            if (a.debt === 'Low') this.debtAnalysis.low++;
+            else if (a.debt === 'Medium') { this.debtAnalysis.medium++; teamDebt.agents.push(a.name); }
+            else { this.debtAnalysis.high++; teamDebt.agents.push(a.name); }
+          });
+          if (teamDebt.agents.length > 0) this.debtAnalysis.teams.push(teamDebt);
+        });
+      }
+    }
+
+    // ─── 4. RECRUITING AGENT ─────────────────────────────────────────
+    class LLFG_RecruitingAgent extends LLFG_AgentBase {
+      constructor() {
+        super('recruiting', 'Recruiting Agent', '🎯', 'Pipeline automation, follow-up tracking, application scoring, funnel analytics');
+        this._pipelineKey = 'llfg_recruiting_pipeline';
+        this.stages = ['new', 'contacted', 'interviewed', 'scheduled', 'approved', 'contracting', 'onboarded'];
+        this.funnel = {};
+        this.pipeline = [];
+      }
+
+      onStart() {
+        this._loadPipeline();
+        this._syncFromApplications();
+        this._runAll();
+        this.schedule(() => this._runAll(), 120000);
+      }
+
+      _runAll() {
+        this._checkFollowUps();
+        this._updateFunnelAnalytics();
+        LLFG_EventBus.emit('recruiting:updated', { funnel: this.funnel, pipelineCount: this.pipeline.length });
+      }
+
+      _loadPipeline() {
+        try { this.pipeline = JSON.parse(localStorage.getItem(this._pipelineKey) || '[]'); } catch(e) { this.pipeline = []; }
+      }
+
+      _savePipeline() {
+        try { localStorage.setItem(this._pipelineKey, JSON.stringify(this.pipeline)); } catch(e) {}
+      }
+
+      _syncFromApplications() {
+        if (typeof applications === 'undefined') return;
+        applications.forEach(app => {
+          if (!this.pipeline.find(p => p.appId === app.id)) {
+            this.pipeline.push({
+              appId: app.id, name: app.name, email: app.email, stage: app.status === 'new' ? 'new' : app.status === 'scheduled' ? 'scheduled' : 'contacted',
+              score: this._scoreApplication(app), lastContact: Date.now(), assignedTo: app.referral || 'Unassigned',
+              history: [{ stage: 'new', date: Date.now(), note: 'Application received' }],
+              createdAt: Date.now()
+            });
+          }
+        });
+        this._savePipeline();
+      }
+
+      _scoreApplication(app) {
+        let score = 50;
+        if (app.licensed === 'Yes') score += 20;
+        if (app.exp && app.exp !== 'No experience') score += 15;
+        if (app.goal && app.goal.includes('100')) score += 10;
+        if (app.referral && !['Instagram', 'LinkedIn', 'Website'].includes(app.referral)) score += 15;
+        return Math.min(100, score);
+      }
+
+      _checkFollowUps() {
+        const now = Date.now();
+        this.pipeline.forEach(p => {
+          const daysSinceContact = (now - p.lastContact) / (86400000);
+          if (p.stage === 'new' && daysSinceContact > 3) {
+            this.alert(`${p.name}: No contact for ${Math.round(daysSinceContact)} days (stage: new)`, 'warning');
+          } else if (p.stage === 'contacted' && daysSinceContact > 5) {
+            this.alert(`${p.name}: Follow-up overdue — ${Math.round(daysSinceContact)} days since contact`, 'warning');
+          } else if (p.stage === 'interviewed' && daysSinceContact > 7) {
+            this.alert(`${p.name}: Decision pending — ${Math.round(daysSinceContact)} days since interview`, 'warning');
+          }
+        });
+      }
+
+      _updateFunnelAnalytics() {
+        this.funnel = {};
+        this.stages.forEach(s => { this.funnel[s] = 0; });
+        this.pipeline.forEach(p => { if (this.funnel[p.stage] !== undefined) this.funnel[p.stage]++; });
+      }
+
+      advanceStage(appId, note) {
+        const p = this.pipeline.find(r => r.appId === appId);
+        if (!p) return;
+        const idx = this.stages.indexOf(p.stage);
+        if (idx < this.stages.length - 1) {
+          p.stage = this.stages[idx + 1];
+          p.lastContact = Date.now();
+          p.history.push({ stage: p.stage, date: Date.now(), note: note || 'Advanced to ' + p.stage });
+          this._savePipeline();
+          LLFG_EventBus.emit('recruiting:stageChanged', { appId, name: p.name, stage: p.stage });
+        }
+      }
+
+      getAnalytics() {
+        return {
+          funnel: this.funnel,
+          totalApplications: this.pipeline.length,
+          avgScore: this.pipeline.length ? Math.round(this.pipeline.reduce((s, p) => s + p.score, 0) / this.pipeline.length) : 0,
+          overdueFollowUps: this.pipeline.filter(p => {
+            const days = (Date.now() - p.lastContact) / 86400000;
+            return (p.stage === 'new' && days > 3) || (p.stage === 'contacted' && days > 5);
+          }).length
+        };
+      }
+    }
+
+    // ─── 5. EMAIL AGENT ──────────────────────────────────────────────
+    class LLFG_EmailAgent extends LLFG_AgentBase {
+      constructor() {
+        super('email', 'Email Agent', '📧', 'Drip campaigns, template automation, scheduling queue, stage-triggered sends');
+        this._campaignsKey = 'llfg_email_campaigns';
+        this._queueKey = 'llfg_email_queue';
+        this.campaigns = [];
+        this.queue = [];
+        this.sent = [];
+      }
+
+      onStart() {
+        this._loadData();
+        this._setupTriggers();
+        this.schedule(() => this._processQueue(), 60000);
+        this.schedule(() => this._checkCampaignTriggers(), 60000);
+      }
+
+      _loadData() {
+        try { this.campaigns = JSON.parse(localStorage.getItem(this._campaignsKey) || '[]'); } catch(e) { this.campaigns = []; }
+        try { this.queue = JSON.parse(localStorage.getItem(this._queueKey) || '[]'); } catch(e) { this.queue = []; }
+      }
+
+      _saveData() {
+        try {
+          localStorage.setItem(this._campaignsKey, JSON.stringify(this.campaigns));
+          localStorage.setItem(this._queueKey, JSON.stringify(this.queue));
+        } catch(e) {}
+      }
+
+      createCampaign(name, templateIds, intervalHours, triggerStage) {
+        const campaign = {
+          id: 'camp_' + Date.now(), name, templateIds, intervalHours: intervalHours || 24,
+          triggerStage: triggerStage || null, active: true, enrollees: [], createdAt: Date.now()
+        };
+        this.campaigns.push(campaign);
+        this._saveData();
+        LLFG_EventBus.emit('email:campaignCreated', campaign);
+        return campaign;
+      }
+
+      enrollInCampaign(campaignId, email, name, variables) {
+        const campaign = this.campaigns.find(c => c.id === campaignId);
+        if (!campaign) return;
+        if (campaign.enrollees.find(e => e.email === email)) return;
+        campaign.enrollees.push({
+          email, name, variables: variables || {}, currentStep: 0, enrolledAt: Date.now(), lastSentAt: null
+        });
+        this._saveData();
+      }
+
+      scheduleEmail(templateId, recipientEmail, recipientName, sendAt, variables) {
+        this.queue.push({
+          id: 'email_' + Date.now(), templateId, recipientEmail, recipientName,
+          sendAt: sendAt || Date.now(), variables: variables || {}, status: 'pending', createdAt: Date.now()
+        });
+        this._saveData();
+      }
+
+      _processQueue() {
+        const now = Date.now();
+        let processed = 0;
+        this.queue.forEach(item => {
+          if (item.status === 'pending' && item.sendAt <= now) {
+            this._sendEmail(item);
+            item.status = 'sent';
+            item.sentAt = now;
+            processed++;
+          }
+        });
+        this.queue = this.queue.filter(i => i.status !== 'sent' || (Date.now() - (i.sentAt || 0)) < 86400000);
+        if (processed > 0) {
+          this._saveData();
+          this.alert(`Processed ${processed} email(s) from queue`, 'info');
+        }
+      }
+
+      _checkCampaignTriggers() {
+        const now = Date.now();
+        this.campaigns.forEach(camp => {
+          if (!camp.active) return;
+          camp.enrollees.forEach(enrollee => {
+            if (enrollee.currentStep >= camp.templateIds.length) return;
+            const timeSinceLast = enrollee.lastSentAt ? now - enrollee.lastSentAt : now - enrollee.enrolledAt;
+            if (timeSinceLast >= camp.intervalHours * 3600000) {
+              const tplId = camp.templateIds[enrollee.currentStep];
+              this._sendEmail({ templateId: tplId, recipientEmail: enrollee.email, recipientName: enrollee.name, variables: enrollee.variables });
+              enrollee.lastSentAt = now;
+              enrollee.currentStep++;
+            }
+          });
+        });
+        this._saveData();
+      }
+
+      _sendEmail(item) {
+        const allTpls = [...(typeof EMAIL_TEMPLATES !== 'undefined' ? EMAIL_TEMPLATES : []), ...(typeof customTemplates !== 'undefined' ? customTemplates : [])];
+        const tpl = allTpls.find(t => t.id === item.templateId);
+        const user = currentUser || window._llfgCurrentUser;
+        const vars = item.variables || {};
+        let subject = tpl ? tpl.subject : 'LLFG Notification';
+        let body = tpl ? tpl.body : '';
+        const replacements = { '{{name}}': item.recipientName || vars.name || '', '{{sender}}': user?.name || 'LLFG', '{{date}}': vars.date || new Date().toLocaleDateString(), '{{time}}': vars.time || '', '{{state}}': vars.state || '', '{{phone}}': vars.phone || '' };
+        Object.entries(replacements).forEach(([k, v]) => { subject = subject.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), v); body = body.replace(new RegExp(k.replace(/[{}]/g, '\\$&'), 'g'), v); });
+        this.sent.push({ to: item.recipientEmail, subject, sentAt: Date.now(), templateId: item.templateId });
+        if (this.sent.length > 100) this.sent = this.sent.slice(-100);
+        LLFG_EventBus.emit('email:sent', { to: item.recipientEmail, subject });
+      }
+
+      _setupTriggers() {
+        LLFG_EventBus.on('recruiting:stageChanged', (data) => {
+          this.campaigns.forEach(camp => {
+            if (camp.active && camp.triggerStage === data.stage) {
+              this.enrollInCampaign(camp.id, data.name + '@prospect', data.name, {});
+            }
+          });
+        });
+      }
+    }
+
+    // ─── 6. COMPLIANCE AGENT ─────────────────────────────────────────
+    class LLFG_ComplianceAgent extends LLFG_AgentBase {
+      constructor() {
+        super('compliance', 'Compliance Agent', '⚖️', 'GLBA/HIPAA checks, PII access logging, consent tracking, data retention enforcement');
+        this._consentKey = 'llfg_compliance_consent';
+        this._piiLogKey = 'llfg_pii_access_log';
+      }
+
+      onStart() {
+        this.schedule(() => this._runChecks(), 600000);
+        this._runChecks();
+      }
+
+      _runChecks() {
+        this._checkDataRetention();
+        this._validatePIIAccess();
+        LLFG_EventBus.emit('compliance:checked', { ts: Date.now() });
+      }
+
+      logPIIAccess(userEmail, dataType, recordId, purpose) {
+        try {
+          let log = JSON.parse(localStorage.getItem(this._piiLogKey) || '[]');
+          log.push({ userEmail, dataType, recordId, purpose, ts: Date.now(), iso: new Date().toISOString() });
+          if (log.length > 500) log = log.slice(-400);
+          localStorage.setItem(this._piiLogKey, JSON.stringify(log));
+        } catch(e) {}
+      }
+
+      recordConsent(clientId, consentType, granted) {
+        try {
+          let consents = JSON.parse(localStorage.getItem(this._consentKey) || '{}');
+          if (!consents[clientId]) consents[clientId] = {};
+          consents[clientId][consentType] = { granted, date: Date.now() };
+          localStorage.setItem(this._consentKey, JSON.stringify(consents));
+        } catch(e) {}
+      }
+
+      _checkDataRetention() {
+        try {
+          const log = JSON.parse(localStorage.getItem('llfg_security_audit') || '[]');
+          const sevenYearsMs = 7 * 365.25 * 86400000;
+          const expired = log.filter(e => (Date.now() - e.timestamp) > sevenYearsMs);
+          if (expired.length > 0) {
+            this.alert(`${expired.length} audit entries exceed GLBA 7-year retention period`, 'info');
+          }
+        } catch(e) {}
+      }
+
+      _validatePIIAccess() {
+        try {
+          const piiLog = JSON.parse(localStorage.getItem(this._piiLogKey) || '[]');
+          const oneHourAgo = Date.now() - 3600000;
+          const recent = piiLog.filter(e => e.ts > oneHourAgo);
+          const unauthorized = recent.filter(e => {
+            const user = (typeof USERS !== 'undefined' && USERS[e.userEmail]) || (typeof LLFG_USERS !== 'undefined' && LLFG_USERS[e.userEmail]);
+            return user && !['admin', 'managing_partner', 'director'].includes(user.role);
+          });
+          if (unauthorized.length > 0) {
+            this.alert(`${unauthorized.length} unauthorized PII access(es) in the last hour`, 'critical');
+          }
+        } catch(e) {}
+      }
+
+      generateComplianceReport() {
+        const piiLog = JSON.parse(localStorage.getItem(this._piiLogKey) || '[]');
+        const consents = JSON.parse(localStorage.getItem(this._consentKey) || '{}');
+        const auditLog = JSON.parse(localStorage.getItem('llfg_security_audit') || '[]');
+        return {
+          generatedAt: new Date().toISOString(),
+          piiAccessCount: piiLog.length,
+          recentPIIAccess: piiLog.slice(-20),
+          consentCount: Object.keys(consents).length,
+          auditEntries: auditLog.length,
+          glbaChecklist: {
+            encryptionEnforced: true,
+            accessLogging: piiLog.length > 0,
+            dataRetentionPolicy: true,
+            consentTracking: Object.keys(consents).length > 0,
+            privacyNotice: true
+          }
+        };
+      }
+    }
+
+    // ─── 7. TRAINING AGENT ───────────────────────────────────────────
+    class LLFG_TrainingAgent extends LLFG_AgentBase {
+      constructor() {
+        super('training', 'Training Agent', '🎓', 'Auto-assignment, progress tracking, certification monitoring, onboarding checklists');
+        this._progressKey = 'llfg_training_progress';
+        this._assignKey = 'llfg_training_assignments';
+      }
+
+      onStart() {
+        this._setupTriggers();
+        this.schedule(() => this._checkExpirations(), 300000);
+      }
+
+      _setupTriggers() {
+        LLFG_EventBus.on('recruiting:stageChanged', (data) => {
+          if (data.stage === 'onboarded') {
+            this.assignTraining(data.name + '@llfg.us', 'fa_onboarding', Date.now() + 30 * 86400000, 'System');
+            this.alert(`Auto-assigned onboarding training to ${data.name}`, 'info');
+          }
+        });
+      }
+
+      trackProgress(agentEmail, curriculumId, chapterIdx, unitIdx, completed) {
+        try {
+          let progress = JSON.parse(localStorage.getItem(this._progressKey) || '{}');
+          if (!progress[agentEmail]) progress[agentEmail] = {};
+          const key = `${curriculumId}_${chapterIdx}_${unitIdx}`;
+          progress[agentEmail][key] = { completed, date: Date.now() };
+          localStorage.setItem(this._progressKey, JSON.stringify(progress));
+        } catch(e) {}
+      }
+
+      getAgentProgress(agentEmail) {
+        try {
+          const progress = JSON.parse(localStorage.getItem(this._progressKey) || '{}');
+          const agentProg = progress[agentEmail] || {};
+          const total = Object.keys(agentProg).length;
+          const completed = Object.values(agentProg).filter(p => p.completed).length;
+          return { total, completed, percentage: total > 0 ? Math.round((completed / total) * 100) : 0 };
+        } catch(e) { return { total: 0, completed: 0, percentage: 0 }; }
+      }
+
+      assignTraining(agentEmail, curriculumId, dueDate, assignedBy) {
+        try {
+          let assignments = JSON.parse(localStorage.getItem(this._assignKey) || '[]');
+          assignments.push({
+            id: 'trn_' + Date.now(), agentEmail, curriculumId,
+            dueDate, assignedBy, assignedAt: Date.now(), status: 'active'
+          });
+          localStorage.setItem(this._assignKey, JSON.stringify(assignments));
+        } catch(e) {}
+      }
+
+      _checkExpirations() {
+        try {
+          const assignments = JSON.parse(localStorage.getItem(this._assignKey) || '[]');
+          const now = Date.now();
+          const sevenDays = 7 * 86400000;
+          assignments.forEach(a => {
+            if (a.status !== 'active') return;
+            if (a.dueDate < now) {
+              this.alert(`Training overdue: ${a.agentEmail} — ${a.curriculumId}`, 'warning');
+            } else if (a.dueDate - now < sevenDays) {
+              this.alert(`Training due in ${Math.round((a.dueDate - now) / 86400000)} days: ${a.agentEmail}`, 'info');
+            }
+          });
+        } catch(e) {}
+      }
+
+      getOnboardingChecklist(agentEmail) {
+        return [
+          { task: 'Complete Licensing Requirements', key: 'licensing' },
+          { task: 'Submit Contracting Paperwork', key: 'contracting' },
+          { task: 'Watch Orientation Videos', key: 'orientation' },
+          { task: 'Complete Product Training', key: 'products' },
+          { task: 'Shadow Senior Agent (3 calls)', key: 'shadowing' },
+          { task: 'Pass Compliance Quiz', key: 'compliance' },
+          { task: 'Set Up CRM Access', key: 'crm' },
+          { task: 'First Client Presentation', key: 'first_presentation' }
+        ].map(item => {
+          const prog = this.getAgentProgress(agentEmail);
+          return { ...item, completed: false };
+        });
+      }
+    }
+
+    // ─── 8. RETENTION AGENT ──────────────────────────────────────────
+    class LLFG_RetentionAgent extends LLFG_AgentBase {
+      constructor() {
+        super('retention', 'Retention Agent', '🤝', 'Agent churn prediction, engagement monitoring, re-engagement triggers');
+        this._scoresKey = 'llfg_retention_scores';
+        this.scores = {};
+      }
+
+      onStart() {
+        this._calculateScores();
+        this.schedule(() => this._calculateScores(), 300000);
+      }
+
+      _calculateScores() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        this.scores = {};
+        TEAM_DATA.forEach(t => {
+          t.agents.forEach(a => {
+            let risk = 0;
+            // Low persistency = higher churn risk
+            if (a.persist < 78) risk += 35;
+            else if (a.persist < 85) risk += 15;
+            // High chargeback = frustration
+            if (a.cb >= 7) risk += 25;
+            else if (a.cb >= 5) risk += 10;
+            // High debt = financial pressure
+            if (a.debt === 'High') risk += 25;
+            else if (a.debt === 'Medium') risk += 10;
+            // Low AP = struggling
+            if (a.ap < 10000) risk += 15;
+            else if (a.ap < 15000) risk += 5;
+
+            this.scores[a.name] = {
+              riskScore: Math.min(100, risk),
+              riskLevel: risk >= 60 ? 'High' : risk >= 30 ? 'Medium' : 'Low',
+              factors: {
+                persistency: a.persist,
+                chargeback: a.cb,
+                debt: a.debt,
+                ap: a.ap
+              }
+            };
+
+            if (risk >= 60) {
+              this.alert(`${a.name}: HIGH churn risk (score: ${risk}) — immediate attention needed`, 'critical');
+            } else if (risk >= 40) {
+              this.alert(`${a.name}: Elevated churn risk (score: ${risk})`, 'warning');
+            }
+          });
+        });
+
+        try { localStorage.setItem(this._scoresKey, JSON.stringify(this.scores)); } catch(e) {}
+        LLFG_EventBus.emit('retention:updated', this.scores);
+      }
+
+      getAtRiskAgents() {
+        return Object.entries(this.scores)
+          .filter(([_, s]) => s.riskLevel !== 'Low')
+          .sort((a, b) => b[1].riskScore - a[1].riskScore)
+          .map(([name, data]) => ({ name, ...data }));
+      }
+    }
+
+    // ─── 9. CLIENT LIFECYCLE AGENT ───────────────────────────────────
+    class LLFG_ClientLifecycleAgent extends LLFG_AgentBase {
+      constructor() {
+        super('clientlifecycle', 'Client Lifecycle Agent', '📋', 'Policy lapse prediction, renewal reminders, cross-sell opportunities, book health');
+        this._lifecycleKey = 'llfg_client_lifecycle';
+        this.insights = {};
+      }
+
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 300000);
+      }
+
+      _analyze() {
+        if (typeof DOWNLINE_CLIENTS === 'undefined') return;
+
+        let active = 0, lapsed = 0, crossSell = [], lapseRisk = [];
+        DOWNLINE_CLIENTS.forEach(c => {
+          if (c.status === 'Active') {
+            active++;
+            // Single-product clients are cross-sell opportunities
+            const clientProducts = DOWNLINE_CLIENTS.filter(dc => dc.client === c.client);
+            if (clientProducts.length === 1) {
+              crossSell.push({ client: c.client, agent: c.agentName, currentProduct: c.product, carrier: c.carrier });
+            }
+            // Low AP clients may lapse
+            if (c.ap < 2000) {
+              lapseRisk.push({ client: c.client, agent: c.agentName, ap: c.ap, product: c.product });
+            }
+          } else {
+            lapsed++;
+          }
+        });
+
+        this.insights = {
+          totalClients: DOWNLINE_CLIENTS.length,
+          active, lapsed,
+          lapseRate: DOWNLINE_CLIENTS.length > 0 ? ((lapsed / DOWNLINE_CLIENTS.length) * 100).toFixed(1) : 0,
+          crossSellOpportunities: crossSell,
+          lapseRisk,
+          ts: Date.now()
+        };
+
+        if (lapsed > 0) {
+          this.alert(`${lapsed} lapsed policy(ies) detected — review needed`, 'warning');
+        }
+        if (crossSell.length > 0) {
+          this.alert(`${crossSell.length} cross-sell opportunity(ies) identified`, 'info');
+        }
+
+        LLFG_EventBus.emit('clientlifecycle:updated', this.insights);
+      }
+    }
+
+    // ─── 10. TEAM BUILDER AGENT ──────────────────────────────────────
+    class LLFG_TeamBuilderAgent extends LLFG_AgentBase {
+      constructor() {
+        super('teambuilder', 'Team Builder Agent', '🏗️', 'Promotion readiness, team structure optimization, headcount gap analysis');
+        this.analysis = {};
+      }
+
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 300000);
+      }
+
+      _analyze() {
+        if (typeof TEAM_DATA === 'undefined' || typeof PROMOTION_REQUIREMENTS === 'undefined') return;
+
+        const teamAnalysis = [];
+        TEAM_DATA.forEach(t => {
+          const agentCount = t.agents.length;
+          const avgAP = agentCount > 0 ? Math.round(t.totalAP / agentCount) : 0;
+          const nextPromo = this._getNextPromotion(t.leaderRole, t.totalAP);
+
+          teamAnalysis.push({
+            name: t.name,
+            leader: t.leader,
+            leaderRole: t.leaderRole,
+            agentCount,
+            totalAP: t.totalAP,
+            avgAP,
+            nextPromotion: nextPromo,
+            headcountGap: this._getHeadcountGap(t.leaderRole, agentCount),
+            recommendations: this._getRecommendations(t)
+          });
+        });
+
+        this.analysis = {
+          teams: teamAnalysis,
+          orgTotal: TEAM_DATA.reduce((s, t) => s + t.totalAP, 0),
+          orgAgents: TEAM_DATA.reduce((s, t) => s + t.agents.length, 0),
+          ts: Date.now()
+        };
+
+        // Alert on teams needing attention
+        teamAnalysis.forEach(t => {
+          if (t.headcountGap > 0) {
+            this.alert(`${t.name}: Needs ${t.headcountGap} more agent(s) for promotion requirements`, 'info');
+          }
+        });
+
+        LLFG_EventBus.emit('teambuilder:updated', this.analysis);
+      }
+
+      _getNextPromotion(currentRole, currentAP) {
+        const promoOrder = ['financial_advisor', 'agent', 'manager', 'executive', 'director', 'managing_partner'];
+        const idx = promoOrder.indexOf(currentRole?.toLowerCase?.() || '');
+        const nextRoles = ['manager', 'executive', 'director', 'managing_partner'];
+        for (const role of nextRoles) {
+          const req = PROMOTION_REQUIREMENTS[role];
+          if (req && currentAP < req.ap) {
+            return { role: req.label, apNeeded: req.ap - currentAP, apRequired: req.ap, progress: Math.round((currentAP / req.ap) * 100) };
+          }
+        }
+        return null;
+      }
+
+      _getHeadcountGap(role, currentCount) {
+        const minCounts = { 'Financial Advisor': 0, 'Manager': 4, 'Executive': 3, 'Director': 3, 'Managing Partner': 3 };
+        const needed = minCounts[role] || 4;
+        return Math.max(0, needed - currentCount);
+      }
+
+      _getRecommendations(team) {
+        const recs = [];
+        if (team.agents.length < 4) recs.push('Recruit more agents to meet team size requirements');
+        if (team.persistency < 80) recs.push('Focus on policy persistency — currently below 80% target');
+        if (team.chargeback > 5) recs.push('Address chargeback issues — team average exceeds 5%');
+        if (team.debtRisk === 'High' || team.debtRisk === 'Medium') recs.push('Reduce debt risk through improved retention practices');
+        const avgAP = team.agents.length > 0 ? team.totalAP / team.agents.length : 0;
+        if (avgAP < 10000) recs.push('Increase average agent production — consider additional training');
+        return recs;
+      }
+    }
+
+    // ─── 11. NOTIFICATIONS AGENT ─────────────────────────────────────
+    class LLFG_NotificationsAgent extends LLFG_AgentBase {
+      constructor() {
+        super('notifications', 'Notifications Agent', '🔔', 'Central notification hub, priority routing, digest mode');
+        this.notifications = [];
+        this.preferences = { digestMode: false, maxPerMinute: 5, mutedAgents: [] };
+        this._lastMinuteCount = 0;
+        this._lastMinuteReset = Date.now();
+      }
+
+      onStart() {
+        LLFG_EventBus.on('agent:alert', (d) => this._handleAlert(d));
+        this.schedule(() => this._digest(), 30000);
+      }
+
+      _handleAlert(data) {
+        // Rate limiting
+        if (Date.now() - this._lastMinuteReset > 60000) {
+          this._lastMinuteCount = 0;
+          this._lastMinuteReset = Date.now();
+        }
+        if (this._lastMinuteCount >= this.preferences.maxPerMinute && data.severity !== 'critical') return;
+        if (this.preferences.mutedAgents.includes(data.agentId)) return;
+
+        this.notifications.push({
+          ...data,
+          read: false,
+          id: 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)
+        });
+        if (this.notifications.length > 200) this.notifications = this.notifications.slice(-150);
+        this._lastMinuteCount++;
+
+        LLFG_EventBus.emit('notifications:new', { count: this.getUnreadCount() });
+      }
+
+      _digest() {
+        // Clean old notifications (older than 24h)
+        const cutoff = Date.now() - 86400000;
+        this.notifications = this.notifications.filter(n => n.ts > cutoff);
+      }
+
+      getUnreadCount() { return this.notifications.filter(n => !n.read).length; }
+
+      getRecent(limit) { return this.notifications.slice(-(limit || 20)).reverse(); }
+
+      markRead(id) {
+        const n = this.notifications.find(n => n.id === id);
+        if (n) n.read = true;
+      }
+
+      markAllRead() { this.notifications.forEach(n => { n.read = true; }); }
+
+      muteAgent(agentId) {
+        if (!this.preferences.mutedAgents.includes(agentId)) this.preferences.mutedAgents.push(agentId);
+      }
+
+      unmuteAgent(agentId) {
+        this.preferences.mutedAgents = this.preferences.mutedAgents.filter(id => id !== agentId);
+      }
+    }
+
+    // ─── 12. ANALYTICS AGENT ─────────────────────────────────────────
+    class LLFG_AnalyticsAgent extends LLFG_AgentBase {
+      constructor() {
+        super('analytics', 'Analytics Agent', '🧠', 'Cross-agent data correlation, predictive forecasting, executive summary generation');
+        this.summary = null;
+      }
+
+      onStart() {
+        this._generateSummary();
+        this.schedule(() => this._generateSummary(), 600000);
+      }
+
+      _generateSummary() {
+        const kpi = LLFG_Brain.agents.kpi;
+        const sales = LLFG_Brain.agents.sales;
+        const recruiting = LLFG_Brain.agents.recruiting;
+        const retention = LLFG_Brain.agents.retention;
+        const clientLC = LLFG_Brain.agents.clientlifecycle;
+        const teamBuilder = LLFG_Brain.agents.teambuilder;
+
+        this.summary = {
+          generatedAt: new Date().toISOString(),
+          kpi: kpi?.snapshot || null,
+          salesLeaderboard: sales?.leaderboard?.slice(0, 5) || [],
+          chargebackRisk: sales?.chargebackRisk || [],
+          projections: sales?.projections || {},
+          recruitingFunnel: recruiting?.funnel || {},
+          recruitingAnalytics: recruiting?.getAnalytics?.() || {},
+          retentionAtRisk: retention?.getAtRiskAgents?.() || [],
+          clientInsights: clientLC?.insights || {},
+          teamAnalysis: teamBuilder?.analysis || {},
+          promotionScores: kpi?.promotionScores || {},
+
+          // Cross-agent correlations
+          correlations: this._correlate(kpi, sales, retention),
+
+          // Executive insights
+          executiveInsights: this._generateInsights(kpi, sales, recruiting, retention, clientLC, teamBuilder)
+        };
+
+        LLFG_EventBus.emit('analytics:updated', { ts: Date.now() });
+      }
+
+      _correlate(kpi, sales, retention) {
+        const insights = [];
+        if (sales?.chargebackRisk?.length > 0 && retention) {
+          const cbAgents = sales.chargebackRisk.map(a => a.name);
+          const atRisk = retention.getAtRiskAgents?.() || [];
+          const overlap = atRisk.filter(a => cbAgents.includes(a.name));
+          if (overlap.length > 0) {
+            insights.push({ type: 'danger', message: `${overlap.length} agent(s) have BOTH high chargeback AND high churn risk: ${overlap.map(a => a.name).join(', ')}` });
+          }
+        }
+        if (kpi?.snapshot?.highDebtAgents > 0) {
+          insights.push({ type: 'warning', message: `${kpi.snapshot.highDebtAgents} agent(s) with non-low debt risk require debt reduction plans` });
+        }
+        return insights;
+      }
+
+      _generateInsights(kpi, sales, recruiting, retention, clientLC, teamBuilder) {
+        const insights = [];
+        if (kpi?.snapshot) {
+          const s = kpi.snapshot;
+          insights.push(`Organization: $${(s.totalAP || 0).toLocaleString()} total AP across ${s.agentCount} agents (${s.teamCount} teams)`);
+          insights.push(`Health: ${s.avgPersistency}% avg persistency, ${s.avgChargeback}% avg chargeback, ${s.avgRetention}% avg retention`);
+          if (s.highRiskAgents > 0) insights.push(`⚠ ${s.highRiskAgents} agent(s) in high chargeback risk zone (7%+)`);
+        }
+        if (recruiting?.funnel) {
+          const total = Object.values(recruiting.funnel).reduce((s, v) => s + v, 0);
+          insights.push(`Pipeline: ${total} total candidates — ${recruiting.funnel.new || 0} new, ${recruiting.funnel.onboarded || 0} onboarded`);
+        }
+        if (retention) {
+          const atRisk = retention.getAtRiskAgents?.() || [];
+          if (atRisk.length > 0) insights.push(`⚠ ${atRisk.length} agent(s) at elevated churn risk`);
+        }
+        if (clientLC?.insights) {
+          const ci = clientLC.insights;
+          insights.push(`Clients: ${ci.active} active, ${ci.lapsed} lapsed (${ci.lapseRate}% lapse rate)`);
+          if (ci.crossSellOpportunities?.length > 0) insights.push(`💡 ${ci.crossSellOpportunities.length} cross-sell opportunity(ies) identified`);
+        }
+        return insights;
+      }
+
+      getExecutiveSummary() { return this.summary; }
+    }
+
+    // ─── 13. UI OPTIMIZATION AGENT ───────────────────────────────────
+    class LLFG_UIOptimizationAgent extends LLFG_AgentBase {
+      constructor() {
+        super('uioptimize', 'UI Optimization Agent', '🎨', 'Viewport adaptation, performance monitoring, accessibility checks, responsive layout, load time tracking');
+        this._metricsKey = 'llfg_ui_metrics';
+        this.uiMetrics = {};
+        this.issues = [];
+        this._resizeHandler = null;
+        this._observer = null;
+      }
+
+      onStart() {
+        this._measurePerformance();
+        this._setupViewportMonitor();
+        this._auditAccessibility();
+        this._optimizeImages();
+        this._monitorTabPerformance();
+        this.schedule(() => this._tick(), 120000);
+      }
+
+      onStop() {
+        if (this._resizeHandler) window.removeEventListener('resize', this._resizeHandler);
+        if (this._observer) this._observer.disconnect();
+      }
+
+      _tick() {
+        this._measurePerformance();
+        this._auditAccessibility();
+        this._checkResponsive();
+        this._saveMetrics();
+        LLFG_EventBus.emit('uioptimize:updated', { issues: this.issues.length, metrics: this.uiMetrics });
+      }
+
+      // ── Performance Monitoring ──
+      _measurePerformance() {
+        const perf = window.performance;
+        if (!perf) return;
+        const nav = perf.getEntriesByType?.('navigation')?.[0];
+        const paint = perf.getEntriesByType?.('paint') || [];
+        const fcp = paint.find(p => p.name === 'first-contentful-paint');
+
+        this.uiMetrics.performance = {
+          pageLoadMs: nav ? Math.round(nav.loadEventEnd - nav.startTime) : null,
+          domContentLoaded: nav ? Math.round(nav.domContentLoadedEventEnd - nav.startTime) : null,
+          firstContentfulPaint: fcp ? Math.round(fcp.startTime) : null,
+          memoryMB: perf.memory ? Math.round(perf.memory.usedJSHeapSize / 1048576) : null,
+          domNodes: document.querySelectorAll('*').length,
+          fileSize: document.documentElement.outerHTML.length,
+          ts: Date.now()
+        };
+
+        // Alert on performance issues
+        const p = this.uiMetrics.performance;
+        if (p.domNodes > 8000) {
+          this._addIssue('perf_dom', 'warning', `High DOM node count: ${p.domNodes} — may cause sluggish interactions`);
+        }
+        if (p.memoryMB && p.memoryMB > 150) {
+          this._addIssue('perf_memory', 'warning', `Memory usage high: ${p.memoryMB}MB`);
+        }
+        if (p.pageLoadMs && p.pageLoadMs > 5000) {
+          this._addIssue('perf_load', 'warning', `Page load time: ${(p.pageLoadMs/1000).toFixed(1)}s — consider optimizing`);
+        }
+      }
+
+      // ── Viewport & Responsive Monitoring ──
+      _setupViewportMonitor() {
+        const self = this;
+        this._resizeHandler = function() {
+          self._checkResponsive();
+        };
+        window.addEventListener('resize', this._resizeHandler, { passive: true });
+        this._checkResponsive();
+      }
+
+      _checkResponsive() {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+
+        this.uiMetrics.viewport = {
+          width: vw, height: vh, dpr,
+          breakpoint: vw < 480 ? 'mobile' : vw < 768 ? 'tablet-sm' : vw < 1024 ? 'tablet' : vw < 1440 ? 'desktop' : 'wide',
+          orientation: vw > vh ? 'landscape' : 'portrait'
+        };
+
+        // Check for horizontal overflow
+        const overflowing = [];
+        document.querySelectorAll('[id^="ptab-"].active *').forEach(el => {
+          if (el.scrollWidth > el.clientWidth + 2 && el.clientWidth > 0) {
+            const id = el.id || el.className?.split?.(' ')?.[0] || el.tagName;
+            if (!overflowing.includes(id)) overflowing.push(id);
+          }
+        });
+        if (overflowing.length > 0) {
+          this._addIssue('responsive_overflow', 'info', `${overflowing.length} element(s) have horizontal overflow on ${this.uiMetrics.viewport.breakpoint}`);
+        }
+
+        // Check for elements too small to tap on mobile
+        if (vw < 768) {
+          let tinyButtons = 0;
+          document.querySelectorAll('[id^="ptab-"].active button, [id^="ptab-"].active a, [id^="ptab-"].active [onclick]').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0 && (rect.width < 32 || rect.height < 32)) {
+              tinyButtons++;
+            }
+          });
+          if (tinyButtons > 5) {
+            this._addIssue('touch_targets', 'warning', `${tinyButtons} interactive elements below 32px tap target (mobile)`);
+          }
+        }
+
+        // Apply viewport-specific optimizations
+        this._applyViewportFixes(vw);
+      }
+
+      _applyViewportFixes(vw) {
+        // Adjust grid columns based on viewport
+        const agentGrid = document.querySelector('#ptab-commandcenter .dash-section div[style*="grid-template-columns:repeat(3"]');
+        if (agentGrid) {
+          if (vw < 768) agentGrid.style.gridTemplateColumns = '1fr';
+          else if (vw < 1024) agentGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+          else agentGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        }
+
+        // Adjust KPI cards
+        const kpiGrid = document.querySelector('#ptab-commandcenter div[style*="grid-template-columns:repeat(4"]');
+        if (kpiGrid) {
+          if (vw < 768) kpiGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+          else kpiGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        }
+
+        // Adjust two-column layouts
+        document.querySelectorAll('#ptab-commandcenter div[style*="grid-template-columns:1fr 1fr"]').forEach(grid => {
+          if (vw < 768) grid.style.gridTemplateColumns = '1fr';
+          else grid.style.gridTemplateColumns = '1fr 1fr';
+        });
+
+        // Ensure tables are scrollable on mobile
+        document.querySelectorAll('#ptab-commandcenter table').forEach(table => {
+          if (!table.parentElement.style.overflowX) {
+            table.parentElement.style.overflowX = 'auto';
+          }
+        });
+      }
+
+      // ── Accessibility Audit ──
+      _auditAccessibility() {
+        this.uiMetrics.accessibility = { issues: [] };
+
+        // Check for images without alt text
+        const noAlt = document.querySelectorAll('img:not([alt])');
+        if (noAlt.length > 0) {
+          this._addIssue('a11y_alt', 'info', `${noAlt.length} image(s) missing alt text`);
+        }
+
+        // Check color contrast on active tab content
+        const activePane = document.querySelector('[id^="ptab-"].active');
+        if (activePane) {
+          let lowContrast = 0;
+          activePane.querySelectorAll('*').forEach(el => {
+            const style = window.getComputedStyle(el);
+            const color = style.color;
+            const fontSize = parseFloat(style.fontSize);
+            // Flag very small text that might be hard to read
+            if (fontSize > 0 && fontSize < 10 && el.textContent?.trim()) {
+              lowContrast++;
+            }
+          });
+          if (lowContrast > 10) {
+            this._addIssue('a11y_font_size', 'info', `${lowContrast} element(s) with font size below 10px`);
+          }
+        }
+
+        // Check for missing form labels
+        const unlabeled = document.querySelectorAll('input:not([aria-label]):not([id]), select:not([aria-label]):not([id])');
+        if (unlabeled.length > 3) {
+          this._addIssue('a11y_labels', 'info', `${unlabeled.length} form input(s) without labels or aria-label`);
+        }
+
+        // Check focus visibility
+        const focusable = document.querySelectorAll('button, a, input, select, [tabindex]');
+        this.uiMetrics.accessibility.focusableElements = focusable.length;
+      }
+
+      // ── Image Optimization ──
+      _optimizeImages() {
+        // Add lazy loading to offscreen images
+        document.querySelectorAll('img:not([loading])').forEach(img => {
+          const rect = img.getBoundingClientRect();
+          if (rect.top > window.innerHeight * 2) {
+            img.setAttribute('loading', 'lazy');
+          }
+        });
+      }
+
+      // ── Tab Render Performance ──
+      _monitorTabPerformance() {
+        const self = this;
+        this.uiMetrics.tabRenderTimes = {};
+        const origShowTab = window.showPortalTab;
+        window.__R_showPortalTab = window.showPortalTab = function(tab, el, isSubTab) {
+          const start = performance.now();
+          const result = origShowTab.apply(this, arguments);
+          const duration = Math.round(performance.now() - start);
+          self.uiMetrics.tabRenderTimes[tab] = duration;
+          if (duration > 500) {
+            self._addIssue('tab_slow_' + tab, 'warning', `Tab "${tab}" took ${duration}ms to render`);
+          }
+          return result;
+        };
+      }
+
+      // ── Scroll Performance ──
+      _checkScrollJank() {
+        const activePane = document.querySelector('[id^="ptab-"].active');
+        if (!activePane) return;
+        const scrollHeight = activePane.scrollHeight;
+        const clientHeight = activePane.clientHeight;
+        if (scrollHeight > clientHeight * 5) {
+          this._addIssue('scroll_long', 'info', `Active tab content is ${Math.round(scrollHeight/clientHeight)}x viewport height — consider pagination`);
+        }
+      }
+
+      // ── Issue Tracking ──
+      _addIssue(id, severity, message) {
+        const existing = this.issues.findIndex(i => i.id === id);
+        const issue = { id, severity, message, ts: Date.now() };
+        if (existing >= 0) this.issues[existing] = issue;
+        else {
+          this.issues.push(issue);
+          this.alert(message, severity);
+        }
+        // Cap issues list
+        if (this.issues.length > 50) this.issues = this.issues.slice(-40);
+      }
+
+      _saveMetrics() {
+        try {
+          localStorage.setItem(this._metricsKey, JSON.stringify({
+            ...this.uiMetrics, issueCount: this.issues.length, savedAt: Date.now()
+          }));
+        } catch(e) {}
+      }
+
+      getReport() {
+        return {
+          performance: this.uiMetrics.performance || {},
+          viewport: this.uiMetrics.viewport || {},
+          accessibility: this.uiMetrics.accessibility || {},
+          tabRenderTimes: this.uiMetrics.tabRenderTimes || {},
+          issues: this.issues,
+          recommendations: this._generateRecommendations()
+        };
+      }
+
+      _generateRecommendations() {
+        const recs = [];
+        const p = this.uiMetrics.performance || {};
+        const v = this.uiMetrics.viewport || {};
+
+        if (p.domNodes > 5000) recs.push('Consider virtualizing long lists or lazy-loading tab content to reduce DOM nodes');
+        if (p.memoryMB > 100) recs.push('Memory usage elevated — check for detached DOM elements or event listener leaks');
+        if (p.pageLoadMs > 3000) recs.push('Page load exceeds 3s — defer non-critical scripts and inline images');
+        if (p.fileSize > 700000) recs.push(`File size is ${Math.round(p.fileSize/1024)}KB — consider minifying CSS/JS or extracting to separate files`);
+
+        if (v.breakpoint === 'mobile' || v.breakpoint === 'tablet-sm') {
+          recs.push('On smaller viewport — ensure all grids collapse to single column');
+          recs.push('Check modal widths do not exceed viewport');
+        }
+
+        const slowTabs = Object.entries(this.uiMetrics.tabRenderTimes || {}).filter(([_, ms]) => ms > 200);
+        if (slowTabs.length > 0) {
+          recs.push(`Slow tabs: ${slowTabs.map(([t, ms]) => `${t} (${ms}ms)`).join(', ')} — optimize render functions`);
+        }
+
+        if (this.issues.filter(i => i.severity === 'warning').length > 3) {
+          recs.push('Multiple UI warnings active — prioritize performance and responsive fixes');
+        }
+
+        return recs;
+      }
+    }
+
+    // ─── COMMAND CENTER UI RENDERER ──────────────────────────────────
+    window.__R_renderCommandCenter = window.renderCommandCenter = function() {
+      const el = document.getElementById('ptab-commandcenter');
+      if (!el) return;
+      if (!LLFG_Brain._initialized) LLFG_Brain.init();
+
+      const user = currentUser || window._llfgCurrentUser;
+      const role = user?._viewAsRole || user?.role || 'financial_advisor';
+      const isAdmin = ['admin', 'managing_partner'].includes(role);
+      const isExecPlus = ['admin', 'managing_partner', 'executive', 'director'].includes(role);
+
+      const agents = Object.values(LLFG_Brain.agents);
+      const statusDot = (s) => s === 'running' ? '#6ecf6e' : s === 'paused' ? '#ffa500' : 'var(--gray)';
+
+      // Agent status cards
+      const agentCards = agents.map(a => `
+        <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.08);padding:0.8rem;display:flex;align-items:center;gap:0.7rem;">
+          <div style="font-size:1.3rem;flex-shrink:0;">${a.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.72rem;color:var(--cream);font-weight:500;display:flex;align-items:center;gap:0.4rem;">
+              <span style="width:7px;height:7px;border-radius:50%;background:${statusDot(a.status)};flex-shrink:0;"></span>
+              ${a.name}
+            </div>
+            <div style="font-size:0.56rem;color:var(--gray);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.description}</div>
+            <div style="font-size:0.52rem;color:var(--gray);margin-top:0.2rem;">Runs: ${a.metrics.runs} · Alerts: ${a.metrics.alerts}${a.lastError ? ' · <span style="color:#e05555;">Err</span>' : ''}</div>
+          </div>
+          <button onclick="LLFG_Brain.${a.status==='running'?'stopAgent':'startAgent'}('${a.id}');setTimeout(renderCommandCenter,100);"
+            style="background:${a.status==='running'?'rgba(224,85,85,0.1)':'rgba(110,207,110,0.1)'};border:1px solid ${a.status==='running'?'rgba(224,85,85,0.3)':'rgba(110,207,110,0.3)'};color:${a.status==='running'?'#e05555':'#6ecf6e'};padding:0.2rem 0.6rem;font-family:'Raleway',sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;flex-shrink:0;">
+            ${a.status==='running'?'Stop':'Start'}
+          </button>
+        </div>
+      `).join('');
+
+      // KPI summary
+      const kpi = LLFG_Brain.agents.kpi;
+      const kpiSnap = kpi?.snapshot || {};
+      const kpiCards = `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1.2rem;">
+          <div class="dash-card"><div class="dash-card-label">Total Org AP</div><div class="dash-card-value" style="font-family:'Cormorant Garamond',serif;">$${(kpiSnap.totalAP||0).toLocaleString()}</div></div>
+          <div class="dash-card"><div class="dash-card-label">Avg Persistency</div><div class="dash-card-value" style="font-family:'Cormorant Garamond',serif;color:${persistColor(parseFloat(kpiSnap.avgPersistency)||0)};">${kpiSnap.avgPersistency||'—'}%</div></div>
+          <div class="dash-card"><div class="dash-card-label">High Risk Agents</div><div class="dash-card-value" style="font-family:'Cormorant Garamond',serif;color:${(kpiSnap.highRiskAgents||0)>0?'#e05555':'#6ecf6e'};">${kpiSnap.highRiskAgents||0}</div></div>
+          <div class="dash-card"><div class="dash-card-label">Avg Chargeback</div><div class="dash-card-value" style="font-family:'Cormorant Garamond',serif;color:${cbColor(parseFloat(kpiSnap.avgChargeback)||0)};">${kpiSnap.avgChargeback||'—'}%</div></div>
+        </div>`;
+
+      // Recruiting funnel
+      const recruiting = LLFG_Brain.agents.recruiting;
+      const funnel = recruiting?.funnel || {};
+      const stages = ['new','contacted','interviewed','scheduled','approved','contracting','onboarded'];
+      const maxFunnel = Math.max(1, ...stages.map(s => funnel[s] || 0));
+      const funnelHTML = `
+        <div style="margin-bottom:1rem;">
+          ${stages.map(s => {
+            const count = funnel[s] || 0;
+            const pct = (count / maxFunnel * 100);
+            return `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
+              <div style="width:80px;font-size:0.6rem;color:var(--gray);text-transform:capitalize;text-align:right;">${s}</div>
+              <div style="flex:1;height:16px;background:rgba(201,168,76,0.06);overflow:hidden;">
+                <div style="width:${pct}%;height:100%;background:rgba(201,168,76,0.25);display:flex;align-items:center;padding-left:0.4rem;">
+                  <span style="font-size:0.55rem;color:var(--cream);font-weight:600;">${count}</span>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+
+      // Sales leaderboard
+      const sales = LLFG_Brain.agents.sales;
+      const lb = sales?.leaderboard?.slice(0, 8) || [];
+      const leaderboardHTML = lb.map((a, i) => `
+        <div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+          <div style="width:20px;font-size:0.65rem;color:${i<3?'var(--gold)':'var(--gray)'};font-weight:700;text-align:center;">${a.rank}</div>
+          <div style="flex:1;">
+            <span style="font-size:0.7rem;color:var(--cream);">${a.name}</span>
+            <span style="font-size:0.55rem;color:var(--gray);margin-left:0.4rem;">${a.team}</span>
+          </div>
+          <div style="font-size:0.7rem;color:var(--gold);font-weight:600;font-family:'Cormorant Garamond',serif;">$${a.ap.toLocaleString()}</div>
+        </div>
+      `).join('');
+
+      // Recent alerts
+      const recentAlerts = LLFG_Brain.getAlerts(null, 15).reverse();
+      const alertsHTML = recentAlerts.map(a => {
+        const colors = { info: '#6ea8fe', warning: '#ffa500', critical: '#e05555' };
+        const c = colors[a.severity] || '#6ea8fe';
+        return `<div style="padding:0.5rem 0.7rem;border-left:3px solid ${c};background:rgba(${c==='#e05555'?'224,85,85':c==='#ffa500'?'255,165,0':'110,168,254'},0.04);margin-bottom:0.3rem;">
+          <div style="font-size:0.65rem;color:var(--cream);">${a.message}</div>
+          <div style="font-size:0.5rem;color:var(--gray);margin-top:0.15rem;">${a.agentName} · ${new Date(a.ts).toLocaleTimeString()}</div>
+        </div>`;
+      }).join('') || '<div style="font-size:0.7rem;color:var(--gray);padding:1rem;text-align:center;">No alerts yet. Start agents to begin monitoring.</div>';
+
+      // Security audit log (admin only)
+      const securityHTML = isAdmin ? (() => {
+        const sec = LLFG_Brain.agents.security;
+        const auditLog = sec?.getAuditLog?.({ limit: 20 }) || [];
+        const rows = auditLog.reverse().map(e => `
+          <tr>
+            <td style="font-size:0.6rem;color:var(--gray);">${new Date(e.timestamp).toLocaleString()}</td>
+            <td><span style="font-size:0.55rem;padding:0.1rem 0.35rem;background:rgba(201,168,76,0.08);color:var(--gold);">${e.category}</span></td>
+            <td style="font-size:0.6rem;color:var(--cream);">${e.action}</td>
+            <td style="font-size:0.6rem;color:var(--gray);">${e.user}</td>
+            <td style="font-size:0.58rem;color:var(--gray);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${e.details}</td>
+          </tr>
+        `).join('');
+        return `
+          <div class="dash-section" style="margin-top:1.5rem;">
+            <div class="dash-section-title">🛡️ Security Audit Log</div>
+            <div style="overflow-x:auto;">
+              <table class="app-table" style="min-width:700px;">
+                <thead><tr><th>Time</th><th>Category</th><th>Action</th><th>User</th><th>Details</th></tr></thead>
+                <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--gray);font-size:0.7rem;">No audit entries yet</td></tr>'}</tbody>
+              </table>
+            </div>
+          </div>`;
+      })() : '';
+
+      // Retention & Client Health (exec+)
+      const retentionHTML = isExecPlus ? (() => {
+        const ret = LLFG_Brain.agents.retention;
+        const atRisk = ret?.getAtRiskAgents?.() || [];
+        const clientLC = LLFG_Brain.agents.clientlifecycle;
+        const ci = clientLC?.insights || {};
+        return `
+          <div class="dash-section" style="margin-top:1.5rem;">
+            <div class="dash-section-title">🤝 Retention & Client Health</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div>
+                <div style="font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;font-weight:500;">Agent Churn Risk</div>
+                ${atRisk.length > 0 ? atRisk.map(a => `
+                  <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <span style="font-size:0.65rem;color:var(--cream);">${a.name}</span>
+                    <span style="font-size:0.6rem;color:${a.riskLevel==='High'?'#e05555':'#ffa500'};font-weight:600;">${a.riskScore}% risk</span>
+                  </div>
+                `).join('') : '<div style="font-size:0.65rem;color:#6ecf6e;">All agents in healthy range</div>'}
+              </div>
+              <div>
+                <div style="font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;font-weight:500;">Book of Business Health</div>
+                <div style="font-size:0.65rem;color:var(--cream);">Active Policies: <strong>${ci.active || 0}</strong></div>
+                <div style="font-size:0.65rem;color:var(--cream);">Lapsed: <strong style="color:${(ci.lapsed||0)>0?'#e05555':'#6ecf6e'};">${ci.lapsed || 0}</strong> (${ci.lapseRate || 0}%)</div>
+                <div style="font-size:0.65rem;color:var(--cream);">Cross-Sell Opportunities: <strong style="color:#6ea8fe;">${ci.crossSellOpportunities?.length || 0}</strong></div>
+              </div>
+            </div>
+          </div>`;
+      })() : '';
+
+      // Analytics executive summary (exec+)
+      const analyticsHTML = isExecPlus ? (() => {
+        const analytics = LLFG_Brain.agents.analytics;
+        const summary = analytics?.summary;
+        const insights = summary?.executiveInsights || [];
+        const correlations = summary?.correlations || [];
+        return `
+          <div class="dash-section" style="margin-top:1.5rem;">
+            <div class="dash-section-title">🧠 Executive Intelligence</div>
+            ${insights.map(i => `<div style="font-size:0.65rem;color:var(--cream);padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">${i}</div>`).join('')}
+            ${correlations.length > 0 ? `
+              <div style="margin-top:0.8rem;">
+                <div style="font-size:0.62rem;color:var(--gold);margin-bottom:0.3rem;font-weight:500;">Cross-Agent Insights</div>
+                ${correlations.map(c => `<div style="font-size:0.62rem;color:${c.type==='danger'?'#e05555':'#ffa500'};padding:0.25rem 0;">${c.message}</div>`).join('')}
+              </div>` : ''}
+            ${!summary ? '<div style="font-size:0.65rem;color:var(--gray);padding:0.5rem 0;">Start the Analytics Agent to generate executive insights.</div>' : ''}
+          </div>`;
+      })() : '';
+
+      // UI Optimization dashboard
+      const uiOptHTML = (() => {
+        const uiAgent = LLFG_Brain.agents.uioptimize;
+        if (!uiAgent || uiAgent.status !== 'running') return '';
+        const report = uiAgent.getReport ? uiAgent.getReport() : {};
+        const perf = report.performance || {};
+        const vp = report.viewport || {};
+        const issues = report.issues || [];
+        const recs = report.recommendations || [];
+        const tabTimes = Object.entries(report.tabRenderTimes || {}).sort(function(a,b){return b[1]-a[1];}).slice(0, 6);
+        var html = '<div class="dash-section" style="margin-top:1.5rem;">'
+          + '<div class="dash-section-title">UI Optimization</div>'
+          + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1rem;">'
+          + '<div class="dash-card"><div class="dash-card-label">DOM Nodes</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:' + ((perf.domNodes||0)>8000?'#e05555':(perf.domNodes||0)>5000?'#ffa500':'#6ecf6e') + ';">' + (perf.domNodes||0).toLocaleString() + '</div></div>'
+          + '<div class="dash-card"><div class="dash-card-label">Page Load</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">' + (perf.pageLoadMs ? (perf.pageLoadMs/1000).toFixed(1)+'s' : 'N/A') + '</div></div>'
+          + '<div class="dash-card"><div class="dash-card-label">Viewport</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;font-size:1rem;">' + (vp.width||'?') + 'x' + (vp.height||'?') + '</div><div class="dash-card-sub">' + (vp.breakpoint||'N/A') + '</div></div>'
+          + '<div class="dash-card"><div class="dash-card-label">Memory</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:' + ((perf.memoryMB||0)>150?'#e05555':'#6ecf6e') + ';">' + (perf.memoryMB ? perf.memoryMB+'MB' : 'N/A') + '</div></div>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">'
+          + '<div><div style="font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;font-weight:500;">Issues (' + issues.length + ')</div>';
+        if (issues.length > 0) {
+          issues.slice(-8).forEach(function(i){ var c = i.severity==='warning' ? '#ffa500' : '#6ea8fe'; html += '<div style="font-size:0.6rem;color:'+c+';padding:0.2rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">'+i.message+'</div>'; });
+        } else { html += '<div style="font-size:0.62rem;color:#6ecf6e;">No issues detected</div>'; }
+        html += '</div>'
+          + '<div><div style="font-size:0.68rem;color:var(--gold);margin-bottom:0.5rem;font-weight:500;">Recommendations</div>';
+        if (recs.length > 0) {
+          recs.forEach(function(r){ html += '<div style="font-size:0.6rem;color:var(--cream);padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">'+r+'</div>'; });
+        } else { html += '<div style="font-size:0.62rem;color:#6ecf6e;">All clear</div>'; }
+        html += '</div></div>';
+        if (tabTimes.length > 0) {
+          html += '<div style="margin-top:0.8rem;"><div style="font-size:0.62rem;color:var(--gold);margin-bottom:0.3rem;font-weight:500;">Tab Render Times</div>';
+          tabTimes.forEach(function(e){ html += '<div style="display:flex;justify-content:space-between;padding:0.2rem 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="font-size:0.6rem;color:var(--cream);">'+e[0]+'</span><span style="font-size:0.6rem;color:'+(e[1]>500?'#e05555':e[1]>200?'#ffa500':'#6ecf6e')+';">'+e[1]+'ms</span></div>'; });
+          html += '</div>';
+        }
+        html += '</div>';
+        return html;
+      })();
+
+      el.innerHTML = `
+        <div class="dash-body">
+          <div class="dash-welcome">
+            <h2 style="margin-bottom:0.2rem;">LLFG <em>Command Center</em></h2>
+            <p>AI-powered business automation — 13 agents monitoring KPIs, security, recruiting, compliance, UI optimization, and more.</p>
+          </div>
+
+          <!-- Control bar -->
+          <div style="display:flex;gap:0.5rem;margin-bottom:1.2rem;flex-wrap:wrap;">
+            <button onclick="LLFG_Brain.startAll();setTimeout(renderCommandCenter,300);" style="background:rgba(110,207,110,0.1);border:1px solid rgba(110,207,110,0.3);color:#6ecf6e;padding:0.35rem 1rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">▶ Start All</button>
+            <button onclick="LLFG_Brain.stopAll();setTimeout(renderCommandCenter,300);" style="background:rgba(224,85,85,0.1);border:1px solid rgba(224,85,85,0.3);color:#e05555;padding:0.35rem 1rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">■ Stop All</button>
+            <button onclick="renderCommandCenter();" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.35rem 1rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;">↻ Refresh</button>
+            <div style="flex:1;"></div>
+            <div style="font-size:0.55rem;color:var(--gray);align-self:center;">
+              ${Object.values(LLFG_Brain.agents).filter(a=>a.status==='running').length}/${agents.length} agents active
+            </div>
+          </div>
+
+          <!-- Agent Grid -->
+          <div class="dash-section">
+            <div class="dash-section-title">Agent Status</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;">
+              ${agentCards}
+            </div>
+          </div>
+
+          <!-- KPI + Alerts -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.2rem;">
+            <div class="dash-section">
+              <div class="dash-section-title">📊 KPI Summary</div>
+              ${kpiCards}
+            </div>
+            <div class="dash-section">
+              <div class="dash-section-title">🔔 Recent Alerts</div>
+              <div style="max-height:260px;overflow-y:auto;">${alertsHTML}</div>
+            </div>
+          </div>
+
+          <!-- Recruiting Funnel + Sales Leaderboard -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.2rem;">
+            <div class="dash-section">
+              <div class="dash-section-title">🎯 Recruiting Pipeline</div>
+              ${funnelHTML}
+            </div>
+            <div class="dash-section">
+              <div class="dash-section-title">💰 Sales Leaderboard</div>
+              ${leaderboardHTML || '<div style="font-size:0.65rem;color:var(--gray);">Start Sales Agent to populate.</div>'}
+            </div>
+          </div>
+
+          ${retentionHTML}
+          ${analyticsHTML}
+          ${uiOptHTML}
+          ${securityHTML}
+        </div>`;
+    };
+
+    // Make Brain globally accessible
+    window.LLFG_Brain = LLFG_Brain;
+    window.LLFG_EventBus = LLFG_EventBus;
+
     /* logout is defined in index.html early script; app.js listens via _llfgCurrentUser */
     window._appReset = function() {
       myDeals = []; activeContact = null; msgThreads = {};
+      if (typeof bookOfBusiness !== 'undefined') bookOfBusiness = [];
+      if (typeof pendingAgentQueue !== 'undefined') pendingAgentQueue = [];
+      if (typeof approvedAgentQueue !== 'undefined') approvedAgentQueue = [];
+      if (typeof contractedAgents !== 'undefined') contractedAgents = [];
+      if (typeof mySubmittedAgents !== 'undefined') mySubmittedAgents = [];
+      if (typeof permGrants !== 'undefined') permGrants = [];
+      if (typeof commRequests !== 'undefined') commRequests = [];
+      if (typeof portalCalEvents !== 'undefined') portalCalEvents = [];
     };
 
     document.getElementById('loginModal').addEventListener('click', function(e) {
