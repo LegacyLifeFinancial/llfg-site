@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Legacy Life Financial Group — Build Your Future</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght&#64;0,300;0,400;0,600;1,300;1,400&family=Raleway:wght&#64;300;400;500;600&family=Cinzel:wght&#64;400;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -138,40 +139,33 @@
     .hero-bg {
       position: absolute; inset: 0; z-index: 0; overflow: hidden;
     }
+    .hero-bg-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; z-index: 1;
+      transform-origin: center 60%;
+      transform: scale(1.12);
+      animation: heroZoomIn 1.8s ease-out 0.2s forwards;
+      filter: saturate(1.1) contrast(1.05);
+    }
+    @keyframes heroZoomIn {
+      0% { transform: scale(1.25); opacity: 0; }
+      100% { transform: scale(1.12); opacity: 1; }
+    }
     .hero-bg::after {
       content: ''; position: absolute; inset: 0; z-index: 2;
       background:
-        linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.1) 30%, rgba(10,10,10,0.5) 70%, rgba(10,10,10,0.95) 100%),
-        linear-gradient(to right, rgba(10,10,10,0.85) 0%, transparent 45%, rgba(10,10,10,0.4) 100%);
+        linear-gradient(to bottom, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.05) 25%, rgba(10,10,10,0.3) 60%, rgba(10,10,10,0.95) 100%),
+        linear-gradient(to right, rgba(10,10,10,0.8) 0%, transparent 40%, rgba(10,10,10,0.3) 100%);
     }
-    .hero-city-video {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; z-index: 1;
-      filter: sepia(0.15) saturate(0.85) brightness(0.7);
-      transform-origin: center center;
-      transition: transform 0.1s linear;
+    .hero-glow {
+      position: absolute; inset: 0; z-index: 3;
+      background: radial-gradient(ellipse 50% 40% at 55% 50%, rgba(201,168,76,0.06) 0%, transparent 70%);
+      animation: glowPulse 4s ease-in-out infinite alternate;
     }
-    .hero-lion-wrap {
-      position: absolute; top: 50%; right: 6%; transform: translateY(-50%);
-      width: 420px; height: 420px; z-index: 1; overflow: hidden; border-radius: 50%;
-      opacity: 0; animation: lionReveal 2s ease 0.6s forwards;
-    }
-    .hero-lion-wrap::after {
-      content: ''; position: absolute; inset: 0; z-index: 2;
-      background: radial-gradient(ellipse at center, transparent 35%, rgba(10,10,10,0.95) 72%);
-    }
-    .hero-lion-video {
-      width: 100%; height: 100%; object-fit: cover;
-      filter: sepia(0.1) contrast(1.15) brightness(0.85);
-    }
-    @keyframes lionReveal {
-      0% { opacity: 0; transform: translateY(-50%) scale(0.88); }
-      100% { opacity: 1; transform: translateY(-50%) scale(1); }
-    }
+    @keyframes glowPulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
 
-    .hero-line {
-      display: none;
-    }
+    .hero-lion-wrap { display: none; }
+    .hero-line { display: none; }
 
     .hero-content {
       position: relative;
@@ -1721,6 +1715,80 @@
     }
     .msg-right { display:flex;flex-direction:column;min-width:0;background:#080808; }
 
+    /* ── Gmail Email Integration ── */
+    .email-item {
+      display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0.8rem;
+      cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s;
+    }
+    .email-item:hover { background:rgba(201,168,76,0.04); }
+    .email-item.unread { background:rgba(201,168,76,0.03); }
+    .email-item.unread .email-subject { color:var(--cream);font-weight:600; }
+    .email-item.active { background:rgba(201,168,76,0.08);border-left:2px solid var(--gold); }
+    .email-avatar {
+      width:32px;height:32px;background:rgba(201,168,76,0.1);
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.6rem;color:var(--gold);font-weight:600;flex-shrink:0;border-radius:50%;
+    }
+    .email-meta { flex:1;min-width:0; }
+    .email-from { font-size:0.72rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .email-subject { font-size:0.68rem;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0.1rem; }
+    .email-snippet { font-size:0.6rem;color:rgba(136,136,136,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0.15rem; }
+    .email-date { font-size:0.55rem;color:var(--gray);flex-shrink:0;white-space:nowrap; }
+    .email-read-view { max-width:100%; }
+    .email-read-header { margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid rgba(201,168,76,0.1); }
+    .email-read-subject { font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--cream);margin-bottom:0.6rem; }
+    .email-read-from { font-size:0.75rem;color:var(--cream);font-weight:500; }
+    .email-read-to { font-size:0.62rem;color:var(--gray);margin-top:0.2rem; }
+    .email-read-date { font-size:0.6rem;color:var(--gray);margin-top:0.3rem; }
+    .email-read-body { font-size:0.82rem;color:var(--cream);line-height:1.8;word-wrap:break-word;overflow-wrap:break-word; }
+    .email-read-body a { color:var(--gold); }
+    .email-connect-prompt {
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:2rem;text-align:center;gap:1rem;height:100%;
+    }
+    .email-connect-btn {
+      background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+      color:var(--gold);padding:0.7rem 1.8rem;font-family:'Raleway',sans-serif;
+      font-size:0.72rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;
+    }
+    .email-connect-btn:hover { background:var(--gold);color:var(--black); }
+    .email-compose-overlay {
+      position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;
+      background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;
+    }
+    .email-compose-box {
+      background:var(--black-card);border:1px solid rgba(201,168,76,0.2);
+      width:90%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;
+    }
+    .email-compose-header {
+      display:flex;justify-content:space-between;align-items:center;
+      padding:0.8rem 1rem;border-bottom:1px solid rgba(201,168,76,0.1);
+    }
+    .email-compose-fields { padding:0.8rem 1rem;display:flex;flex-direction:column;gap:0.5rem; }
+    .email-compose-fields input {
+      background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);
+      padding:0.6rem 0.8rem;font-family:'Raleway',sans-serif;font-size:0.8rem;outline:none;width:100%;
+    }
+    .email-compose-fields input:focus { border-color:rgba(201,168,76,0.4); }
+    .email-compose-body {
+      flex:1;min-height:200px;padding:0.8rem 1rem;
+      background:#0e0e0e;border:none;border-top:1px solid rgba(201,168,76,0.08);
+      color:var(--cream);font-family:'Raleway',sans-serif;font-size:0.82rem;
+      line-height:1.7;resize:none;outline:none;
+    }
+    .email-compose-footer {
+      display:flex;justify-content:flex-end;gap:0.5rem;
+      padding:0.8rem 1rem;border-top:1px solid rgba(201,168,76,0.1);
+    }
+    .email-filter-row {
+      padding:0.5rem 0.6rem;border-bottom:1px solid rgba(255,255,255,0.04);
+      flex-shrink:0;display:flex;gap:0.4rem;display:none;
+    }
+    .email-filter-row select {
+      flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      color:var(--cream);padding:0.4rem 0.5rem;font-size:0.65rem;font-family:'Raleway',sans-serif;outline:none;
+    }
+
     /* Segment-control tabs (iOS style) */
     .msg-tabs { display:flex;gap:0;padding:0.6rem 0.6rem 0;flex-shrink:0; }
     .msg-tab {
@@ -1796,6 +1864,10 @@
     .msg-df-preview { background:#f5f5f5;font-family:'Helvetica Neue',Arial,sans-serif;overflow:hidden;margin-top:0.5rem;border:1px solid rgba(255,255,255,0.06);border-radius:10px; }
     .msg-profile-card { border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);padding:1rem;margin-bottom:0.6rem;cursor:pointer;transition:all 0.15s;border-radius:12px; }
     .msg-profile-card:hover { border-color:rgba(201,168,76,0.2);background:rgba(201,168,76,0.03); }
+
+    /* Gamified deal card animation */
+    @keyframes dealSlideIn { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+    @keyframes xpPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
 
     /* ─── CALENDAR LAYOUT override ─── */
     .cal-layout {
@@ -2468,15 +2540,15 @@
       .calc-wrap { margin: 1.5rem 1rem 0; }
       #floatingCTA { bottom: 1rem; right: 1rem; padding: 0.7rem 1.2rem; font-size: 0.65rem; }
       #agency > div > div:last-child { display: flex; flex-direction: column; gap: 1rem; }
-      .hero-lion { width: 220px; height: 220px; right: 3%; top: 8%; transform: translateY(0) !important; opacity: 0.35; }
-      @keyframes lionReveal { 0%{opacity:0;transform:scale(0.9)} 100%{opacity:0.35;transform:scale(1)} }
+      .hero-lion-wrap { width: 200px; height: 200px; right: 3%; top: 10%; transform: translateY(0) !important; }
+      @keyframes lionReveal { 0%{opacity:0;transform:scale(0.9)} 100%{opacity:0.7;transform:scale(1)} }
       .hero-skyline { height: 200px; }
       #applicationOverlay > div { margin: 1rem; padding: 1.5rem 1rem; }
       #appStep1 > div:last-child { grid-template-columns: 1fr !important; }
       #appStepSolo form, #appStepAgency form { grid-template-columns: 1fr !important; }
     }
     @media (max-width: 480px) {
-      .hero-lion { display: none; }
+      .hero-lion-wrap { display: none; }
     }
 
     /* ══════════════════════════════════════════════
@@ -3532,14 +3604,8 @@
   <!-- HERO -->
   <section id="hero">
     <div class="hero-bg">
-      <video class="hero-city-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920&q=80">
-        <source src="https://assets.mixkit.co/videos/42343/42343-1080.mp4" type="video/mp4"/>
-      </video>
-    </div>
-    <div class="hero-lion-wrap">
-      <video class="hero-lion-video" autoplay muted loop playsinline>
-        <source src="https://assets.mixkit.co/videos/11035/11035-720.mp4" type="video/mp4"/>
-      </video>
+      <img class="hero-bg-img" src="generated/hero_v88.jpg" alt="Lion walking through Wall Street financial district at night"/>
+      <div class="hero-glow"></div>
     </div>
 
     <div class="hero-content">
@@ -5150,6 +5216,7 @@
             <button class="msg-tab"        id="msgtab-groups"    onclick="switchMsgTab('groups',this)">Groups</button>
             <button class="msg-tab"        id="msgtab-templates" onclick="switchMsgTab('templates',this)">Templates</button>
             <button class="msg-tab"        id="msgtab-dataforms" onclick="switchMsgTab('dataforms',this)">Data Forms</button>
+            <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email</button>
           </div>
 
           <!-- Filter row (Chat tab: contact type + search) -->
@@ -5162,6 +5229,16 @@
             <input type="text" placeholder="Search..." oninput="filterMsgContacts(this.value)" id="msgSearchInput"/>
           </div>
 
+          <!-- Email folder filter -->
+          <div class="email-filter-row" id="emailFilterRow">
+            <select onchange="switchGmailFolder(this.value)">
+              <option value="inbox">Inbox</option>
+              <option value="sent">Sent</option>
+              <option value="starred">Starred</option>
+            </select>
+            <input type="text" placeholder="Search email..." oninput="filterGmailList(this.value)" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--cream);padding:0.4rem 0.5rem;font-size:0.65rem;font-family:'Raleway',sans-serif;outline:none;"/>
+          </div>
+
           <!-- Contact list -->
           <div id="msgContactList" style="flex:1;overflow-y:auto;padding:0.3rem 0;"></div>
           <!-- Template list -->
@@ -5170,6 +5247,8 @@
           <div id="msgGroupList" style="flex:1;overflow-y:auto;display:none;padding:0.3rem 0;"></div>
           <!-- Data Forms list -->
           <div id="msgDataFormsList" style="flex:1;overflow-y:auto;display:none;padding:0.3rem 0;"></div>
+          <!-- Email list -->
+          <div id="msgEmailList" style="flex:1;overflow-y:auto;display:none;padding:0.3rem 0;"></div>
 
           <!-- Action buttons (contextual) -->
           <div id="msgCreateGroupWrap" style="padding:0.5rem;border-top:1px solid rgba(201,168,76,0.08);display:none;flex-shrink:0;">
@@ -5180,6 +5259,9 @@
           </div>
           <div id="msgDirectUplineWrap" style="padding:0.5rem;border-top:1px solid rgba(201,168,76,0.08);display:none;flex-shrink:0;">
             <button onclick="openDirectUplineChat()" style="width:100%;background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.2);color:#6ecf6e;padding:0.5rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">Message My Upline</button>
+          </div>
+          <div id="msgComposeEmailWrap" style="padding:0.5rem;border-top:1px solid rgba(201,168,76,0.08);display:none;flex-shrink:0;">
+            <button onclick="composeNewEmail()" style="width:100%;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.5rem;font-family:'Raleway',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;">+ Compose Email</button>
           </div>
         </div>
 
@@ -5206,6 +5288,9 @@
 
           <!-- Data Forms panel -->
           <div id="msgDataFormsPanel" style="flex:1;overflow-y:auto;display:none;background:#080808;"></div>
+
+          <!-- Email reading panel -->
+          <div id="msgEmailReadPanel" style="flex:1;overflow-y:auto;display:none;padding:1.2rem 1.5rem;background:#080808;"></div>
 
           <!-- Input area — Apple-style -->
           <div style="padding:0.55rem 0.8rem;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:0.35rem;flex-shrink:0;background:rgba(0,0,0,0.3);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);" id="msgInputWrap">
@@ -8350,6 +8435,255 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     }
 
 
+    // ─── GAMIFICATION ENGINE ──────────────────────────────────────
+    const LLFG_Gamification = {
+      _key: 'llfg_gamification',
+      _progressKey: 'llfg_training_progress',
+      data: null,
+
+      LEVELS: [
+        { level:1,  name:'Rookie',           xp:0,      icon:'\uD83C\uDF31', color:'var(--gray)' },
+        { level:2,  name:'Licensed Agent',    xp:500,    icon:'\uD83D\uDCCB', color:'#6ea8fe' },
+        { level:3,  name:'Rising Producer',   xp:1500,   icon:'\uD83D\uDCC8', color:'#6ea8fe' },
+        { level:4,  name:'Consistent Closer', xp:3500,   icon:'\uD83C\uDFAF', color:'#c084fc' },
+        { level:5,  name:'Power Producer',    xp:7000,   icon:'\u26A1', color:'#c084fc' },
+        { level:6,  name:'Elite Advisor',     xp:12000,  icon:'\uD83D\uDC8E', color:'var(--gold)' },
+        { level:7,  name:'Senior Advisor',    xp:20000,  icon:'\uD83C\uDF1F', color:'var(--gold)' },
+        { level:8,  name:'Master Producer',   xp:35000,  icon:'\uD83D\uDD25', color:'#e05555' },
+        { level:9,  name:'Agency Leader',     xp:55000,  icon:'\uD83C\uDFC6', color:'#FFD700' },
+        { level:10, name:'Legend',            xp:100000, icon:'\uD83D\uDC51', color:'#FFD700' }
+      ],
+
+      XP_ACTIONS: {
+        complete_unit: 50, complete_chapter: 200, complete_course: 500,
+        log_deal: 100, daily_login: 25, first_deal_month: 250,
+        pass_quiz: 75, perfect_quiz: 150, referral_submitted: 100,
+        streak_7: 200, streak_30: 500, streak_90: 1500
+      },
+
+      BADGES: [
+        { id:'first_login',     name:'Portal Pioneer',        icon:'\uD83D\uDE80', desc:'First portal login', category:'milestone' },
+        { id:'first_deal',      name:'First Close',           icon:'\uD83E\uDD1D', desc:'Logged your first deal', category:'sales' },
+        { id:'ap_10k',          name:'$10K Producer',         icon:'\uD83D\uDCB0', desc:'Reached $10,000 total AP', category:'sales' },
+        { id:'ap_50k',          name:'$50K Producer',         icon:'\uD83D\uDCB5', desc:'Reached $50,000 total AP', category:'sales' },
+        { id:'ap_100k_month',   name:'$100K Month',           icon:'\uD83D\uDCA5', desc:'$100,000 AP in a single month', category:'sales' },
+        { id:'streak_7',        name:'Week Warrior',          icon:'\uD83D\uDD25', desc:'7-day login streak', category:'engagement' },
+        { id:'streak_30',       name:'Monthly Machine',       icon:'\u2B50', desc:'30-day login streak', category:'engagement' },
+        { id:'streak_90',       name:'Unstoppable',           icon:'\uD83C\uDFC6', desc:'90-day login streak', category:'engagement' },
+        { id:'course_foundations', name:'Foundations Graduate', icon:'\uD83C\uDF93', desc:'Completed Insurance Foundations course', category:'training' },
+        { id:'course_100k',     name:'$100K Blueprint',       icon:'\uD83D\uDCCA', desc:'Completed $100K AP Blueprint', category:'training' },
+        { id:'course_chargeback', name:'Zero Chargeback',     icon:'\uD83D\uDEE1\uFE0F', desc:'Completed chargeback prevention', category:'training' },
+        { id:'course_compliance', name:'Compliance Certified', icon:'\u2696\uFE0F', desc:'Completed compliance certification', category:'training' },
+        { id:'all_fa_training', name:'FA Scholar',            icon:'\uD83C\uDFAF', desc:'All Financial Advisor training complete', category:'training' },
+        { id:'chargeback_free', name:'Clean Record',          icon:'\u2705', desc:'Zero chargebacks for a quarter', category:'performance' },
+        { id:'persistency_90',  name:'Retention King',        icon:'\uD83D\uDC51', desc:'90%+ persistency rate', category:'performance' },
+        { id:'team_builder',    name:'Team Builder',          icon:'\uD83D\uDC65', desc:'Recruited 3+ agents', category:'leadership' },
+        { id:'quiz_master',     name:'Quiz Master',           icon:'\uD83E\uDDE0', desc:'Score 100% on 5 quizzes', category:'training' }
+      ],
+
+      DAILY_CHALLENGES: [
+        { id:'contacts_20',  text:'Make 20 prospect contacts today', xp:100, icon:'\uD83D\uDCDE' },
+        { id:'presentations_3', text:'Schedule 3 presentations today', xp:75, icon:'\uD83D\uDCCA' },
+        { id:'training_1',  text:'Complete 1 training unit', xp:50, icon:'\uD83D\uDCDA' },
+        { id:'followup_5',  text:'Follow up with 5 existing clients', xp:75, icon:'\uD83D\uDD04' },
+        { id:'referral_ask', text:'Ask 3 clients for referrals', xp:100, icon:'\uD83E\uDD1D' },
+        { id:'roleplay_1',  text:'Do 1 roleplay session with upline', xp:60, icon:'\uD83C\uDFAD' },
+        { id:'objection_practice', text:'Practice handling 5 objections', xp:50, icon:'\uD83D\uDCAA' },
+        { id:'social_post',  text:'Post 1 professional social media update', xp:40, icon:'\uD83D\uDCF1' },
+        { id:'pipeline_review', text:'Review and update your prospect pipeline', xp:60, icon:'\uD83D\uDCCB' },
+        { id:'compliance_review', text:'Review compliance checklist for recent applications', xp:75, icon:'\u2696\uFE0F' }
+      ],
+
+      init() {
+        try {
+          const raw = localStorage.getItem(this._key);
+          this.data = raw ? JSON.parse(raw) : null;
+        } catch(e) { this.data = null; }
+        if (!this.data) {
+          this.data = {
+            xp: 0, totalXP: 0, badges: [], streak: 0, longestStreak: 0,
+            lastLogin: null, dailyChallenges: [], challengeDate: null,
+            xpHistory: [], dealCount: 0, monthlyAP: 0, createdAt: Date.now()
+          };
+        }
+        this.recordLogin();
+        this._save();
+      },
+
+      _save() {
+        try { localStorage.setItem(this._key, JSON.stringify(this.data)); } catch(e) {}
+      },
+
+      awardXP(action, meta) {
+        const amount = this.XP_ACTIONS[action] || 0;
+        if (!amount) return 0;
+        const oldLevel = this.getLevel();
+        this.data.xp += amount;
+        this.data.totalXP += amount;
+        this.data.xpHistory.push({ action, amount, meta: meta || null, ts: Date.now() });
+        if (this.data.xpHistory.length > 200) this.data.xpHistory = this.data.xpHistory.slice(-150);
+        const newLevel = this.getLevel();
+        if (newLevel.level > oldLevel.level) {
+          LLFG_EventBus.emit('gamification:levelUp', { oldLevel, newLevel, xp: this.data.xp });
+        }
+        LLFG_EventBus.emit('gamification:xpAwarded', { action, amount, totalXP: this.data.xp });
+        this._save();
+        return amount;
+      },
+
+      getLevel() {
+        for (let i = this.LEVELS.length - 1; i >= 0; i--) {
+          if (this.data.xp >= this.LEVELS[i].xp) return this.LEVELS[i];
+        }
+        return this.LEVELS[0];
+      },
+
+      getNextLevel() {
+        const current = this.getLevel();
+        return this.LEVELS.find(l => l.xp > this.data.xp) || current;
+      },
+
+      getLevelProgress() {
+        const current = this.getLevel();
+        const next = this.getNextLevel();
+        if (current.level === next.level) return 100;
+        return Math.min(100, Math.round((this.data.xp - current.xp) / (next.xp - current.xp) * 100));
+      },
+
+      recordLogin() {
+        const today = new Date().toDateString();
+        if (this.data.lastLogin === today) return;
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        if (this.data.lastLogin === yesterday) {
+          this.data.streak++;
+        } else if (this.data.lastLogin !== today) {
+          this.data.streak = 1;
+        }
+        if (this.data.streak > this.data.longestStreak) this.data.longestStreak = this.data.streak;
+        this.data.lastLogin = today;
+        this.awardXP('daily_login');
+        if (this.data.streak === 7) { this.awardXP('streak_7'); this.awardBadge('streak_7'); }
+        if (this.data.streak === 30) { this.awardXP('streak_30'); this.awardBadge('streak_30'); }
+        if (this.data.streak === 90) { this.awardXP('streak_90'); this.awardBadge('streak_90'); }
+        if (!this.data.badges.includes('first_login')) this.awardBadge('first_login');
+      },
+
+      awardBadge(badgeId) {
+        if (this.data.badges.includes(badgeId)) return false;
+        const badge = this.BADGES.find(b => b.id === badgeId);
+        if (!badge) return false;
+        this.data.badges.push(badgeId);
+        LLFG_EventBus.emit('gamification:badgeEarned', { badge });
+        this._save();
+        return true;
+      },
+
+      hasBadge(id) { return this.data.badges.includes(id); },
+
+      getDailyChallenges() {
+        const today = new Date().toDateString();
+        if (this.data.challengeDate !== today) {
+          const seed = new Date().getDate() + new Date().getMonth() * 31;
+          const shuffled = [...this.DAILY_CHALLENGES].sort((a,b) => {
+            const ha = ((seed * 2654435761 + a.id.length) >>> 0) % 1000;
+            const hb = ((seed * 2654435761 + b.id.length) >>> 0) % 1000;
+            return ha - hb;
+          });
+          this.data.dailyChallenges = shuffled.slice(0, 3).map(c => ({ ...c, completed: false }));
+          this.data.challengeDate = today;
+          this._save();
+        }
+        return this.data.dailyChallenges;
+      },
+
+      completeChallenge(idx) {
+        if (this.data.dailyChallenges[idx] && !this.data.dailyChallenges[idx].completed) {
+          this.data.dailyChallenges[idx].completed = true;
+          this.awardXP('complete_unit', { challenge: this.data.dailyChallenges[idx].id });
+          this._save();
+          return true;
+        }
+        return false;
+      },
+
+      // Training progress
+      getTrainingProgress() {
+        try {
+          return JSON.parse(localStorage.getItem(this._progressKey) || '{}');
+        } catch(e) { return {}; }
+      },
+
+      completeUnit(unitId) {
+        const progress = this.getTrainingProgress();
+        if (!progress.completed) progress.completed = [];
+        if (progress.completed.includes(unitId)) return false;
+        progress.completed.push(unitId);
+        progress.completedAt = progress.completedAt || {};
+        progress.completedAt[unitId] = Date.now();
+        try { localStorage.setItem(this._progressKey, JSON.stringify(progress)); } catch(e) {}
+        this.awardXP('complete_unit', { unitId });
+        LLFG_EventBus.emit('gamification:unitCompleted', { unitId });
+        return true;
+      },
+
+      isUnitComplete(unitId) {
+        const progress = this.getTrainingProgress();
+        return (progress.completed || []).includes(unitId);
+      },
+
+      getCourseProgress(courseId) {
+        const progress = this.getTrainingProgress();
+        const completed = progress.completed || [];
+        const course = TRAINING_CURRICULUM.find(c => c.id === courseId);
+        if (!course) return { completed: 0, total: 0, pct: 0 };
+        const allUnits = course.chapters.reduce((arr, ch) => arr.concat(ch.units.map(u => u.id)), []);
+        const done = allUnits.filter(id => completed.includes(id)).length;
+        return { completed: done, total: allUnits.length, pct: allUnits.length > 0 ? Math.round(done / allUnits.length * 100) : 0 };
+      },
+
+      getOverallProgress() {
+        const progress = this.getTrainingProgress();
+        const completed = (progress.completed || []).length;
+        const total = TRAINING_CURRICULUM.reduce((s, c) => s + c.chapters.reduce((s2, ch) => s2 + ch.units.length, 0), 0);
+        return { completed, total, pct: total > 0 ? Math.round(completed / total * 100) : 0 };
+      },
+
+      renderXPBar() {
+        const level = this.getLevel();
+        const next = this.getNextLevel();
+        const pct = this.getLevelProgress();
+        const streak = this.data.streak;
+        return `<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);padding:0.8rem 1.2rem;margin-bottom:1.2rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <span style="font-size:1.4rem;">${level.icon}</span>
+              <div>
+                <div style="font-size:0.85rem;color:${level.color};font-weight:600;font-family:'Cormorant Garamond',serif;">Level ${level.level} — ${level.name}</div>
+                <div style="font-size:0.55rem;color:var(--gray);">${this.data.xp.toLocaleString()} XP${level.level<10?' · '+next.name+' at '+(next.xp).toLocaleString()+' XP':' · MAX LEVEL'}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:1rem;">
+              <div style="text-align:center;">
+                <div style="font-size:1.1rem;color:#ffa500;font-weight:700;font-family:'Cormorant Garamond',serif;">${streak}</div>
+                <div style="font-size:0.48rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;">${streak===1?'Day':'Days'} Streak</div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:1.1rem;color:var(--gold);font-weight:700;font-family:'Cormorant Garamond',serif;">${this.data.badges.length}</div>
+                <div style="font-size:0.48rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.1em;">Badges</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);height:10px;overflow:hidden;position:relative;">
+            <div style="height:100%;background:linear-gradient(90deg,${level.color},${next.color||level.color});width:${pct}%;transition:width 0.6s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:0.25rem;">
+            <span style="font-size:0.48rem;color:var(--gray);">${pct}% to next level</span>
+            <span style="font-size:0.48rem;color:var(--gray);">${(next.xp - this.data.xp).toLocaleString()} XP remaining</span>
+          </div>
+        </div>`;
+      }
+    };
+
     // ─── Training Curriculum Data ───────────────────────────────
     const TRAINING_CURRICULUM = [
       {
@@ -8417,6 +8751,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         ]
       }
     ];
+      ,
+      {id:'100k_blueprint',role:'financial_advisor',roleLabel:'$100K Monthly AP Blueprint',icon:'\uD83D\uDCB0',color:'#6ecf6e',isCourse:true,courseTag:'PRODUCTION',description:'The exact system to produce $100,000+ in monthly AP.',chapters:[{title:'Module 1 \u2014 The Math of $100K',units:[{id:'100k_1_1',title:'Reverse-Engineering $100K AP',icon:'\uD83E\uDDEE',duration:'15 min',content:`<h4>Know Your Numbers</h4><p>$100K monthly AP is a math problem. At $1,200 avg case you need 84 policies/month. Raise average to $5,000 (IULs+annuities) and you need 20 &mdash; 1/day.</p><p style="background:rgba(201,168,76,0.08);padding:0.8rem;border-left:3px solid var(--gold);"><strong>15 contacts &rarr; 3 presentations &rarr; 1 placement &rarr; $5K AP/day &rarr; $100K/month</strong></p><h4>The Revenue Stack</h4><p>8 IULs ($6K=$48K) + 5 conversions ($2.4K=$12K) + 10 final expense ($1.2K=$12K) + 3 annuities ($8K=$24K) = <strong>$96K+ from 26 policies</strong>. Product mix beats volume.</p>`},{id:'100k_1_2',title:'Premium Product Mix Strategy',icon:'\uD83D\uDCCA',duration:'20 min',content:`<h4>Move Up the Value Ladder</h4><ul><li><strong>IUL:</strong> $4K&ndash;$8K AP avg. Lead with tax-free retirement income.</li><li><strong>Fixed Indexed Annuities:</strong> $3K&ndash;$12K AP. Target pre-retirees 55&ndash;70.</li><li><strong>Term-to-Permanent Conversions:</strong> $2K&ndash;$4K AP. Mine your existing term book.</li><li><strong>Final Expense:</strong> $800&ndash;$1,800 AP. High volume, fast issue.</li></ul><p>Weekly target: 2 IULs + 1 annuity + 1 conversion + 2 FE = $22K/week = $88K+/month.</p>`}]},{title:'Module 2 \u2014 The 20-Contact Daily System',units:[{id:'100k_2_1',title:'Building Your Contact Pipeline',icon:'\uD83D\uDCDE',duration:'20 min',content:`<h4>Morning Block (8&ndash;10 AM) &mdash; 10 Contacts</h4><ul><li>5 warm follow-ups</li><li>3 new outreach (leads, LinkedIn)</li><li>2 center-of-influence touches (CPAs, realtors)</li></ul><h4>Afternoon Block (2&ndash;4 PM) &mdash; 10 Contacts</h4><ul><li>5 new outreach</li><li>3 social engagements (DM, comment, connect)</li><li>2 client check-ins (reviews, birthdays)</li></ul><p>Sunday evening: populate next week list. Never start a day wondering who to call.</p>`},{id:'100k_2_2',title:'Lead Sources by Close Rate',icon:'\uD83C\uDFAF',duration:'20 min',content:`<h4>Tier 1 &mdash; Referrals (50&ndash;70%)</h4><p>Ask within 48hrs of delivery. 3-Name Method: a family member, a colleague, a friend.</p><h4>Tier 2 &mdash; Centers of Influence (30&ndash;50%)</h4><p>CPAs, attorneys, realtors. Give value first.</p><h4>Tier 3 &mdash; Social Media (15&ndash;25%)</h4><p>LinkedIn for 35+. Post 3&ndash;5x/week. DM engaged prospects.</p><h4>Tier 4 &mdash; Purchased Leads (5&ndash;15%)</h4><p>Supplement only. Work within 5 minutes.</p>`},{id:'100k_2_3',title:'Time Blocking for Peak Production',icon:'\u23F0',duration:'15 min',content:`<p>7&ndash;8: Development | 8&ndash;10: Prospecting (10 contacts) | 10&ndash;12: Presentations (2) | 12&ndash;1: Admin | 1&ndash;2: Processing | 2&ndash;4: Prospecting (10) | 4&ndash;5:30: Presentation | 5:30&ndash;6: Review+prep. Guard prospecting blocks like appointments.</p>`}]},{title:'Module 3 \u2014 Closing High-Premium Cases',units:[{id:'100k_3_1',title:'The IUL Presentation Framework',icon:'\uD83D\uDCB5',duration:'25 min',content:`<h4>4-Part Close</h4><p><strong>1. Problem (3 min):</strong> Most retirement accounts fully taxable on withdrawal.</p><p><strong>2. Concept (5 min):</strong> Market gains, 0% floor, tax-free access. Do not name product yet.</p><p><strong>3. Illustration (10 min):</strong> Personalized projections vs current 401k.</p><p><strong>4. Close (2 min):</strong> Does this make sense? Let us lock in your health rating.</p>`},{id:'100k_3_2',title:'Overcoming Price Objections',icon:'\uD83D\uDCAA',duration:'20 min',content:`<h4>Reframe Method</h4><p><strong>Too expensive &rarr; Daily Cost:</strong> $600/mo = $20/day, less than lunch.</p><p><strong>&rarr; Cost of Nothing:</strong> What would it cost your family if you did not act?</p><p><strong>&rarr; Comparison:</strong> Redirect half your taxable 401k here for tax-free income.</p><p>If truly unaffordable: reduce premium, not coverage.</p>`},{id:'100k_3_3',title:'The Annuity Close',icon:'\uD83C\uDFE6',duration:'20 min',content:`<h4>The Income Gap</h4><p>Do you know your exact monthly retirement income? SS + pension + savings (4% rule) = guaranteed. Expenses minus guaranteed = the gap.</p><p><strong>Close:</strong> This annuity turns $150K into $2,100/month guaranteed for life &mdash; closing 91% of your gap. You can never outlive it.</p>`}]},{title:'Module 4 \u2014 Referral Multiplication',units:[{id:'100k_4_1',title:'The 4 Referral Moments',icon:'\uD83E\uDD1D',duration:'15 min',content:`<ol><li><strong>Application signing</strong> &mdash; enthusiasm peaks</li><li><strong>Policy delivery</strong> &mdash; gratitude natural</li><li><strong>After positive claim</strong> &mdash; product proved itself</li><li><strong>Annual review</strong> &mdash; ongoing commitment shown</li></ol><p>3-Name Method: a family member, a colleague, a friend.</p>`},{id:'100k_4_2',title:'Referral-Only Practice',icon:'\uD83D\uDD04',duration:'15 min',content:`<p>Every closed case generates 2&ndash;3 warm intros. By Month 6: 15+ warm intros/month, zero purchased leads. Thank-you within 24hrs. Gift card for converted referrals.</p>`}]}]},
+      {id:'zero_chargeback',role:'financial_advisor',roleLabel:'Zero Chargeback System',icon:'\uD83D\uDEE1\uFE0F',color:'#e05555',isCourse:true,courseTag:'RETENTION',description:'Eliminate chargebacks and protect your income.',chapters:[{title:'Module 1 \u2014 Understanding Chargebacks',units:[{id:'cb_1_1',title:'How Chargebacks Destroy Income',icon:'\uD83D\uDCC9',duration:'15 min',content:`<h4>The Silent Killer</h4><p>$80K AP x 75% comm = $60K. 9-mo advance = $45K. But 15% of last quarter lapses: <strong>$20,250 clawed back</strong>. Net: $24,750 &mdash; barely half.</p><p>Agent writing $60K with 3% chargebacks earns more than one writing $100K with 15%.</p>`},{id:'cb_1_2',title:'The 5 Root Causes',icon:'\uD83D\uDD0D',duration:'15 min',content:`<ol><li><strong>Unaffordable premium (45%)</strong></li><li><strong>Bank issues (20%)</strong></li><li><strong>Buyer remorse (15%)</strong></li><li><strong>Life circumstances (10%)</strong></li><li><strong>No relationship (10%)</strong></li></ol><p><strong>80% from causes 1&ndash;3 &mdash; all preventable at point of sale.</strong></p>`}]},{title:'Module 2 \u2014 Writing Business That Sticks',units:[{id:'cb_2_1',title:'Affordability Qualification',icon:'\uD83D\uDCB3',duration:'20 min',content:`<p>Ask: take-home &rarr; fixed expenses &rarr; disposable income. <strong>Rule:</strong> Premium should not exceed 8&ndash;10% of disposable. $400 disposable + $200 premium = WILL lapse. Start $30&ndash;40/mo.</p>`},{id:'cb_2_2',title:'Draft Date and Bank Verification',icon:'\uD83D\uDCC5',duration:'15 min',content:`<p>Set draft 2&ndash;3 days after payday (3rd or 18th). Verify: routing number, account number (read back twice), checking vs savings. One wrong digit = 20% of all chargebacks.</p>`},{id:'cb_2_3',title:'Education Close vs Pressure Close',icon:'\uD83C\uDF93',duration:'15 min',content:`<p><strong>Pressure:</strong> 50 placements x 15% lapse = 42.5 retained + debt. <strong>Education:</strong> 35 x 4% = 33.6 retained, zero debt, 90%+ persistency. Two-call process wins.</p>`}]},{title:'Module 3 \u2014 Post-Sale Retention',units:[{id:'cb_3_1',title:'7-Touch Retention Protocol',icon:'\uD83D\uDCF1',duration:'20 min',content:`<ol><li><strong>Day 0:</strong> Application submitted</li><li><strong>Day 7:</strong> Underwriting update</li><li><strong>Delivery:</strong> Full review + free-look explanation</li><li><strong>Day 14:</strong> First draft check</li><li><strong>Day 30:</strong> Check-in</li><li><strong>Day 60:</strong> Value-add article</li><li><strong>Day 90:</strong> Schedule annual review</li></ol>`},{id:'cb_3_2',title:'Saving Policies Before Lapse',icon:'\u26A0\uFE0F',duration:'15 min',content:`<p><strong>Within 24hrs of lapse notice &mdash; call.</strong> Changed banks: update on phone. Cannot afford: reduce, do not cancel. Want to cancel: What changed? <strong>40% of pending lapses saved with one call.</strong></p>`},{id:'cb_3_3',title:'Tracking Persistency',icon:'\uD83D\uDCCA',duration:'15 min',content:`<p>Weekly: first-year persistency (85%+), chargeback rate (under 5%), net AP, at-risk policies. If persistency drops below 80%, pause new business one week for retention calls.</p>`}]}]},
+      {id:'compliance_cert',role:'financial_advisor',roleLabel:'Compliance Certification',icon:'\u2696\uFE0F',color:'#6ea8fe',isCourse:true,courseTag:'COMPLIANCE',description:'GLBA, HIPAA, suitability, E and O prevention. Required for every agent.',chapters:[{title:'Module 1 \u2014 GLBA and Data Protection',units:[{id:'comp_1_1',title:'GLBA Fundamentals',icon:'\uD83D\uDD12',duration:'20 min',content:`<h4>Three Obligations</h4><ol><li><strong>Privacy Rule:</strong> Notice of NPI collection and protection</li><li><strong>Safeguards Rule:</strong> Written security plan</li><li><strong>Pretexting:</strong> Verify identity before sharing</li></ol><p>NPI: SSN, bank accounts, income, policy numbers, health info. Penalties: up to $100K per violation.</p>`},{id:'comp_1_2',title:'Daily Data Protection',icon:'\uD83D\uDCBC',duration:'15 min',content:`<ul><li>Lock physical docs</li><li>Password manager + 2FA on all portals</li><li>Never email SSN or bank info unencrypted</li><li>Verify caller ID before discussing accounts</li><li>Shred NPI documents</li><li>VPN on public Wi-Fi</li></ul>`}]},{title:'Module 2 \u2014 HIPAA for Insurance',units:[{id:'comp_2_1',title:'When HIPAA Applies',icon:'\uD83C\uDFE5',duration:'15 min',content:`<p>Health, Medicare, LTC, disability = Business Associate handling PHI. Even life apps contain health data.</p><ul><li>Only access PHI necessary for transaction</li><li>Never discuss health outside underwriting chain</li><li>Never cross-sell using health data</li></ul>`},{id:'comp_2_2',title:'Breach Response',icon:'\u26A0\uFE0F',duration:'15 min',content:`<ol><li>Contain immediately</li><li>Report within 24hrs</li><li>Notify affected within 60 days</li><li>Document everything</li></ol><p>Penalties: $100 to $50K per violation, up to $1.5M per year.</p>`}]},{title:'Module 3 \u2014 Suitability and Best Interest',units:[{id:'comp_3_1',title:'Suitability Requirements',icon:'\u2705',duration:'20 min',content:`<p>Based on: financial situation, needs, risk tolerance, age, understanding. Document: needs, why this product, what explained, alternatives. <strong>Cannot articulate suitability in writing? Do not sell it.</strong></p>`},{id:'comp_3_2',title:'Annuity Best Interest',icon:'\uD83D\uDCDC',duration:'20 min',content:`<h4>4 Obligations</h4><ol><li><strong>Care:</strong> Know products and alternatives</li><li><strong>Disclosure:</strong> Carriers, compensation, conflicts</li><li><strong>Conflict:</strong> Client interest above your commission</li><li><strong>Documentation:</strong> Basis for every recommendation</li></ol>`}]},{title:'Module 4 \u2014 E and O Prevention',units:[{id:'comp_4_1',title:'Top E and O Claims',icon:'\uD83D\uDCCB',duration:'20 min',content:`<ol><li><strong>Failure to procure (35%)</strong> &mdash; written confirmation</li><li><strong>Failure to advise (25%)</strong> &mdash; document all advice</li><li><strong>Misrepresentation (20%)</strong> &mdash; carrier materials only</li><li><strong>Failure to notify (15%)</strong> &mdash; annual reviews</li></ol><p>Not documented = did not happen. Keep records 7+ years.</p>`},{id:'comp_4_2',title:'Compliance Checklist',icon:'\uD83D\uDCDD',duration:'15 min',content:`<h4>Pre-Sale</h4><p>Fact find signed, suitability done, privacy notice, features explained, understanding confirmed.</p><h4>Post-Sale</h4><p>App confirmed, client copy, policy delivered and reviewed, receipt signed, free-look explained, docs secured, follow-ups scheduled.</p>`}]}]}
 
     // ─── Training Curriculum Renderer ───────────────────────────
     function renderTrainingCurriculum() {
@@ -9697,9 +10035,13 @@ contact\u0040llfg.us`
       const role            = document.getElementById('msgThreadRole');
       const avatar          = document.getElementById('msgThreadAvatar');
       const openStatus      = document.getElementById('msgOpenStatus');
+      const emailList       = document.getElementById('msgEmailList');
+      const emailReadPanel  = document.getElementById('msgEmailReadPanel');
+      const composeEmailWrap= document.getElementById('msgComposeEmailWrap');
+      const emailFilterRow  = document.getElementById('emailFilterRow');
 
       // Reset all lists and panels
-      [contactList,templateList,groupList,dataFormsList].forEach(e=>{if(e)e.style.display='none';});
+      [contactList,templateList,groupList,dataFormsList,emailList].forEach(e=>{if(e)e.style.display='none';});
       if(msgThread)     msgThread.style.display     = 'flex';
       if(msgTplPreview) msgTplPreview.style.display  = 'none';
       if(msgDataPanel)  msgDataPanel.style.display   = 'none';
@@ -9710,6 +10052,9 @@ contact\u0040llfg.us`
       if(avatar) avatar.style.display = 'none';
       if(openStatus) openStatus.style.display = 'none';
       document.getElementById('msgBotManageWrap').style.display = 'none';
+      if(emailReadPanel) emailReadPanel.style.display = 'none';
+      if(composeEmailWrap) composeEmailWrap.style.display = 'none';
+      if(emailFilterRow) emailFilterRow.style.display = 'none';
 
       if (tab === 'chat') {
         if(contactList) contactList.style.display = 'block';
@@ -9753,7 +10098,379 @@ contact\u0040llfg.us`
         if(role)  role.textContent  = 'Send encrypted forms and manage client profiles';
         renderMsgDataFormsList();
         renderMsgDataFormsPanel('send');
+      } else if (tab === 'email') {
+        if(filterRow) filterRow.style.display = 'none';
+        if(emailList) emailList.style.display = 'block';
+        if(msgThread)     msgThread.style.display     = 'none';
+        if(msgTplPreview) msgTplPreview.style.display  = 'none';
+        if(msgDataPanel)  msgDataPanel.style.display   = 'none';
+        if(emailReadPanel) emailReadPanel.style.display = 'block';
+        if(msgInputWrap)  msgInputWrap.style.display   = 'none';
+        if(composeEmailWrap) composeEmailWrap.style.display = 'block';
+        if(emailFilterRow) emailFilterRow.style.display = 'flex';
+        if(title) title.textContent = 'Email';
+        if(role)  role.textContent  = 'contact@llfg.us';
+        initGmailConnection();
       }
+    };
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ── GMAIL INTEGRATION — Google Identity Services OAuth 2.0 ──────
+    // ═══════════════════════════════════════════════════════════════════
+
+    // ── Configuration ──
+    // To enable Gmail in the portal:
+    // 1. Go to https://console.cloud.google.com
+    // 2. Create or select a project
+    // 3. Enable the Gmail API (APIs & Services → Library → Gmail API)
+    // 4. Create OAuth 2.0 credentials (APIs & Services → Credentials → Create → OAuth client ID → Web application)
+    // 5. Add your domain to Authorized JavaScript origins: https://llfg.us (and https://www.llfg.us)
+    // 6. Also add http://localhost for testing
+    // 7. Copy the Client ID and paste it below
+    const GMAIL_CLIENT_ID = '389662006358-fv4karhk1rp636qp5lmvlr719h1otn7h.apps.googleusercontent.com';
+    const GMAIL_SCOPES = 'https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send';
+
+    let gmailAccessToken = null;
+    let gmailTokenClient = null;
+    let gmailEmails = [];
+    let gmailCurrentFolder = 'inbox';
+
+    function initGmailConnection() {
+      const emailReadPanel = document.getElementById('msgEmailReadPanel');
+      const emailList = document.getElementById('msgEmailList');
+
+      if (gmailAccessToken) {
+        // Already authenticated — fetch emails
+        fetchGmailEmails();
+        return;
+      }
+
+      if (!GMAIL_CLIENT_ID) {
+        // No Client ID configured — show setup instructions
+        if (emailReadPanel) emailReadPanel.innerHTML = `
+          <div class="email-connect-prompt">
+            <div style="font-size:2rem;">📧</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--cream);">Connect Gmail</div>
+            <div style="font-size:0.72rem;color:var(--gray);line-height:1.7;max-width:400px;">
+              To connect your <strong style="color:var(--gold);">contact@llfg.us</strong> inbox, a Google Cloud OAuth Client ID is required.
+            </div>
+            <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:1rem;font-size:0.65rem;color:var(--gray);line-height:1.8;text-align:left;max-width:440px;">
+              <strong style="color:var(--cream);">Setup Steps:</strong><br/>
+              1. Go to <span style="color:var(--gold);">console.cloud.google.com</span><br/>
+              2. Create a project &amp; enable the Gmail API<br/>
+              3. Create OAuth 2.0 Web Client credentials<br/>
+              4. Add <span style="color:var(--gold);">https://llfg.us</span> to Authorized JS Origins<br/>
+              5. Paste the Client ID in the portal config
+            </div>
+          </div>`;
+        if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Gmail not connected yet.</div>';
+        return;
+      }
+
+      // Show connect button
+      if (emailReadPanel) emailReadPanel.innerHTML = `
+        <div class="email-connect-prompt">
+          <div style="font-size:2.5rem;">📧</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--cream);">Corporate Email</div>
+          <div style="font-size:0.75rem;color:var(--gray);margin-bottom:0.5rem;">Sign in with your <strong style="color:var(--gold);">@llfg.us</strong> Google Workspace account</div>
+          <button class="email-connect-btn" onclick="connectGmail()">Connect Gmail</button>
+          <div style="font-size:0.58rem;color:var(--gray);margin-top:0.5rem;">Read-only access — your credentials stay with Google</div>
+        </div>`;
+      if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Click <strong style="color:var(--gold);">Connect Gmail</strong> to get started.</div>';
+    }
+
+    window.connectGmail = function() {
+      if (!window.google || !window.google.accounts) {
+        alert('Google Identity Services failed to load. Check your internet connection and try again.');
+        return;
+      }
+      if (!gmailTokenClient) {
+        gmailTokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: GMAIL_CLIENT_ID,
+          scope: GMAIL_SCOPES,
+          callback: function(tokenResponse) {
+            if (tokenResponse && tokenResponse.access_token) {
+              gmailAccessToken = tokenResponse.access_token;
+              sessionStorage.setItem('gmail_token', gmailAccessToken);
+              fetchGmailEmails();
+            }
+          },
+        });
+      }
+      gmailTokenClient.requestAccessToken();
+    };
+
+    // Try to restore token from session
+    (function() {
+      var saved = sessionStorage.getItem('gmail_token');
+      if (saved) gmailAccessToken = saved;
+    })();
+
+    function fetchGmailEmails() {
+      var q = gmailCurrentFolder === 'sent' ? 'in:sent' : gmailCurrentFolder === 'starred' ? 'is:starred' : 'in:inbox';
+      var emailList = document.getElementById('msgEmailList');
+      var emailReadPanel = document.getElementById('msgEmailReadPanel');
+
+      if (emailList) emailList.innerHTML = '<div style="padding:2rem;text-align:center;font-size:0.7rem;color:var(--gray);">Loading emails...</div>';
+
+      fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=25&q=' + encodeURIComponent(q), {
+        headers: { 'Authorization': 'Bearer ' + gmailAccessToken }
+      })
+      .then(function(r) {
+        if (r.status === 401) {
+          gmailAccessToken = null;
+          sessionStorage.removeItem('gmail_token');
+          initGmailConnection();
+          throw new Error('Token expired');
+        }
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data.messages || !data.messages.length) {
+          if (emailList) emailList.innerHTML = '<div style="padding:2rem;text-align:center;font-size:0.7rem;color:var(--gray);">No emails found.</div>';
+          return;
+        }
+        // Fetch headers for each message (batch first 25)
+        var fetches = data.messages.slice(0, 25).map(function(m) {
+          return fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/' + m.id + '?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date', {
+            headers: { 'Authorization': 'Bearer ' + gmailAccessToken }
+          }).then(function(r) { return r.json(); });
+        });
+        return Promise.all(fetches);
+      })
+      .then(function(emails) {
+        if (!emails) return;
+        gmailEmails = emails;
+        renderGmailList(emails);
+        // Show welcome in read panel
+        if (emailReadPanel) emailReadPanel.innerHTML = `
+          <div class="email-connect-prompt">
+            <div style="font-size:2rem;">✉️</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);">contact@llfg.us</div>
+            <div style="font-size:0.72rem;color:var(--gray);">${emails.length} emails loaded — select one to read</div>
+          </div>`;
+      })
+      .catch(function(err) {
+        console.error('Gmail fetch error:', err);
+      });
+    }
+
+    function renderGmailList(emails) {
+      var emailList = document.getElementById('msgEmailList');
+      if (!emailList) return;
+
+      emailList.innerHTML = emails.map(function(email) {
+        var headers = {};
+        (email.payload && email.payload.headers || []).forEach(function(h) { headers[h.name] = h.value; });
+        var from = headers.From || 'Unknown';
+        var subject = headers.Subject || '(no subject)';
+        var date = headers.Date || '';
+        var snippet = email.snippet || '';
+        var isUnread = (email.labelIds || []).indexOf('UNREAD') !== -1;
+        var isStarred = (email.labelIds || []).indexOf('STARRED') !== -1;
+
+        // Parse sender name
+        var fromName = from.replace(/<.*>/, '').trim().replace(/"/g, '') || from;
+        var fromInitials = fromName.split(/[\s@]/).filter(Boolean).slice(0, 2).map(function(w) { return w[0]; }).join('').toUpperCase();
+
+        // Format date
+        var dateStr = '';
+        try {
+          var d = new Date(date);
+          var now = new Date();
+          if (d.toDateString() === now.toDateString()) {
+            dateStr = d.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+          } else {
+            dateStr = d.toLocaleDateString([], {month:'short',day:'numeric'});
+          }
+        } catch(e) { dateStr = ''; }
+
+        return '<div class="email-item' + (isUnread ? ' unread' : '') + '" onclick="readGmailMessage(\'' + email.id + '\')">'
+          + '<div class="email-avatar">' + fromInitials + '</div>'
+          + '<div class="email-meta">'
+          + '<div class="email-from">' + (isStarred ? '⭐ ' : '') + fromName.replace(/</g,'&lt;') + '</div>'
+          + '<div class="email-subject">' + subject.replace(/</g,'&lt;') + '</div>'
+          + '<div class="email-snippet">' + snippet.replace(/</g,'&lt;').substring(0, 80) + '</div>'
+          + '</div>'
+          + '<div class="email-date">' + dateStr + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    window.readGmailMessage = function(messageId) {
+      var emailReadPanel = document.getElementById('msgEmailReadPanel');
+      var title = document.getElementById('msgThreadTitle');
+
+      // Highlight active item
+      document.querySelectorAll('.email-item').forEach(function(el) { el.classList.remove('active'); });
+      var clicked = document.querySelector('.email-item[onclick*="' + messageId + '"]');
+      if (clicked) clicked.classList.add('active');
+
+      // Show on mobile
+      var hub = document.getElementById('msgHub');
+      if (hub && window.innerWidth <= 768) hub.classList.add('msg-show-thread');
+
+      if (emailReadPanel) emailReadPanel.innerHTML = '<div style="padding:2rem;text-align:center;font-size:0.7rem;color:var(--gray);">Loading message...</div>';
+      emailReadPanel.style.display = 'block';
+
+      fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/' + messageId + '?format=full', {
+        headers: { 'Authorization': 'Bearer ' + gmailAccessToken }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(msg) {
+        var headers = {};
+        (msg.payload && msg.payload.headers || []).forEach(function(h) { headers[h.name] = h.value; });
+
+        var from = headers.From || 'Unknown';
+        var to = headers.To || '';
+        var subject = headers.Subject || '(no subject)';
+        var date = headers.Date || '';
+        var fromName = from.replace(/<.*>/, '').trim().replace(/"/g, '');
+
+        // Extract body
+        var body = '';
+        function extractBody(part) {
+          if (!part) return;
+          if (part.mimeType === 'text/html' && part.body && part.body.data) {
+            body = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+          } else if (!body && part.mimeType === 'text/plain' && part.body && part.body.data) {
+            var text = atob(part.body.data.replace(/-/g, '+').replace(/_/g, '/'));
+            body = '<pre style="white-space:pre-wrap;font-family:inherit;">' + text.replace(/</g, '&lt;') + '</pre>';
+          }
+          if (part.parts) part.parts.forEach(extractBody);
+        }
+        extractBody(msg.payload);
+
+        if (title) title.textContent = subject;
+        document.getElementById('msgThreadRole').textContent = fromName;
+
+        var dateFormatted = '';
+        try { dateFormatted = new Date(date).toLocaleString(); } catch(e) {}
+
+        emailReadPanel.innerHTML = '<div class="email-read-view">'
+          + '<div class="email-read-header">'
+          + '<div class="email-read-subject">' + subject.replace(/</g,'&lt;') + '</div>'
+          + '<div class="email-read-from">From: ' + from.replace(/</g,'&lt;') + '</div>'
+          + '<div class="email-read-to">To: ' + to.replace(/</g,'&lt;') + '</div>'
+          + '<div class="email-read-date">' + dateFormatted + '</div>'
+          + '</div>'
+          + '<div class="email-read-body">' + body + '</div>'
+          + '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,0.1);display:flex;gap:0.5rem;">'
+          + '<button onclick="composeReplyEmail(\'' + messageId + '\')" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.5rem 1.2rem;font-family:Raleway,sans-serif;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background=\'var(--gold)\';this.style.color=\'var(--black)\'" onmouseout="this.style.background=\'rgba(201,168,76,0.08)\';this.style.color=\'var(--gold)\'">Reply</button>'
+          + '<button onclick="composeForwardEmail(\'' + messageId + '\')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.5rem 1.2rem;font-family:Raleway,sans-serif;font-size:0.68rem;letter-spacing:0.08em;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color=\'var(--cream)\'" onmouseout="this.style.color=\'var(--gray)\'">Forward</button>'
+          + '</div>'
+          + '</div>';
+      })
+      .catch(function(err) {
+        console.error('Gmail read error:', err);
+        if (emailReadPanel) emailReadPanel.innerHTML = '<div style="padding:2rem;text-align:center;font-size:0.72rem;color:#ff6b6b;">Failed to load email. Try reconnecting.</div>';
+      });
+    };
+
+    window.composeNewEmail = function() {
+      showComposeModal({ to:'', subject:'', body:'' });
+    };
+
+    window.composeReplyEmail = function(messageId) {
+      var email = gmailEmails.find(function(e) { return e.id === messageId; });
+      var headers = {};
+      if (email && email.payload) (email.payload.headers || []).forEach(function(h) { headers[h.name] = h.value; });
+      var from = headers.From || '';
+      var subject = headers.Subject || '';
+      if (!subject.toLowerCase().startsWith('re:')) subject = 'Re: ' + subject;
+      var replyTo = from.match(/<(.+)>/) ? from.match(/<(.+)>/)[1] : from;
+      showComposeModal({ to: replyTo, subject: subject, body: '\n\n--- Original Message ---\nFrom: ' + from + '\n' });
+    };
+
+    window.composeForwardEmail = function(messageId) {
+      var email = gmailEmails.find(function(e) { return e.id === messageId; });
+      var headers = {};
+      if (email && email.payload) (email.payload.headers || []).forEach(function(h) { headers[h.name] = h.value; });
+      var subject = headers.Subject || '';
+      if (!subject.toLowerCase().startsWith('fwd:')) subject = 'Fwd: ' + subject;
+      showComposeModal({ to: '', subject: subject, body: '\n\n--- Forwarded Message ---\nFrom: ' + (headers.From||'') + '\nSubject: ' + (headers.Subject||'') + '\n' });
+    };
+
+    function showComposeModal(opts) {
+      var existing = document.getElementById('emailComposeOverlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'emailComposeOverlay';
+      overlay.className = 'email-compose-overlay';
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+      overlay.innerHTML = '<div class="email-compose-box">'
+        + '<div class="email-compose-header">'
+        + '<div style="font-family:Cormorant Garamond,serif;font-size:1.1rem;color:var(--cream);">New Email</div>'
+        + '<button onclick="document.getElementById(\'emailComposeOverlay\').remove()" style="background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer;padding:0.2rem 0.5rem;">&times;</button>'
+        + '</div>'
+        + '<div class="email-compose-fields">'
+        + '<input type="text" id="compTo" placeholder="To (email address)" value="' + (opts.to || '') + '"/>'
+        + '<input type="text" id="compSubject" placeholder="Subject" value="' + (opts.subject || '').replace(/"/g, '&quot;') + '"/>'
+        + '</div>'
+        + '<textarea class="email-compose-body" id="compBody" placeholder="Write your email...">' + (opts.body || '') + '</textarea>'
+        + '<div class="email-compose-footer">'
+        + '<button onclick="document.getElementById(\'emailComposeOverlay\').remove()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.5rem 1rem;font-family:Raleway,sans-serif;font-size:0.68rem;cursor:pointer;">Cancel</button>'
+        + '<button onclick="sendComposedEmail()" style="background:var(--gold);border:none;color:var(--black);padding:0.5rem 1.5rem;font-family:Raleway,sans-serif;font-size:0.68rem;font-weight:600;letter-spacing:0.08em;cursor:pointer;">Send</button>'
+        + '</div>'
+        + '</div>';
+      document.body.appendChild(overlay);
+    }
+
+    window.sendComposedEmail = function() {
+      var to = document.getElementById('compTo').value.trim();
+      var subject = document.getElementById('compSubject').value.trim();
+      var body = document.getElementById('compBody').value;
+
+      if (!to || !subject) { alert('Please fill in To and Subject fields.'); return; }
+
+      // Build RFC 2822 email
+      var email = 'To: ' + to + '\r\n'
+        + 'Subject: ' + subject + '\r\n'
+        + 'Content-Type: text/plain; charset=utf-8\r\n\r\n'
+        + body;
+      var encoded = btoa(unescape(encodeURIComponent(email))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+      var sendBtn = document.querySelector('.email-compose-footer button:last-child');
+      if (sendBtn) { sendBtn.textContent = 'Sending...'; sendBtn.disabled = true; }
+
+      fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + gmailAccessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ raw: encoded })
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('Send failed: ' + r.status);
+        return r.json();
+      })
+      .then(function() {
+        var overlay = document.getElementById('emailComposeOverlay');
+        if (overlay) overlay.remove();
+        // Refresh inbox
+        fetchGmailEmails();
+      })
+      .catch(function(err) {
+        console.error('Gmail send error:', err);
+        alert('Failed to send email. Make sure you have send permissions.');
+        if (sendBtn) { sendBtn.textContent = 'Send'; sendBtn.disabled = false; }
+      });
+    };
+
+    window.switchGmailFolder = function(folder) {
+      gmailCurrentFolder = folder;
+      document.querySelectorAll('#emailFilterRow option').forEach(function(opt) { opt.selected = opt.value === folder; });
+      fetchGmailEmails();
+    };
+
+    window.filterGmailList = function(query) {
+      var q = query.toLowerCase();
+      document.querySelectorAll('.email-item').forEach(function(el) {
+        var text = el.textContent.toLowerCase();
+        el.style.display = text.indexOf(q) !== -1 ? 'flex' : 'none';
+      });
     };
 
     // ── Data Forms sidebar list ──
@@ -10269,73 +10986,101 @@ contact\u0040llfg.us`
       const thread = document.getElementById('msgThread');
       if (!thread) return;
       const msgs = msgThreads[activeContact] || [];
-      thread.innerHTML = msgs.length === 0
-        ? `<p style="color:var(--gray);font-size:0.78rem;text-align:center;margin-top:2rem;">No messages yet. Say hello! 👋</p>`
-        : msgs.map((m, idx) => {
-          let content = '';
-          if (m.type === 'image') {
-            content = `<img src="${m.src}" style="max-width:220px;max-height:180px;border-radius:8px;display:block;" alt="image"/>`;
-          } else if (m.type === 'gif') {
-            content = `<img src="${m.src}" style="max-width:220px;border-radius:8px;display:block;" alt="gif"/>`;
-          } else if (m.type === 'sale_bot') {
-            // Discord-style sales bot announcement
-            return `<div style="display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0.9rem;background:rgba(110,207,110,0.04);border-left:3px solid #6ecf6e;margin:0.4rem 0;border-radius:0 12px 12px 0;">
-              <div style="width:32px;height:32px;background:linear-gradient(135deg,#6ecf6e,#2a8a2a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">🤖</div>
+      if (msgs.length === 0) {
+        thread.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:0.5rem;opacity:0.4;padding-top:3rem;"><div style="font-size:2.5rem;">💬</div><div style="color:var(--gray);font-size:0.82rem;font-weight:500;">No messages yet</div><div style="color:rgba(255,255,255,0.2);font-size:0.65rem;">Send a message to start the conversation</div></div>';
+        return;
+      }
+      thread.innerHTML = msgs.map((m, idx) => {
+        // ── Gamified Sales Bot — Deal Leaderboard Card ──
+        if (m.type === 'sale_bot') {
+          const apTier = m.ap >= 5000 ? 'LEGENDARY' : m.ap >= 3000 ? 'EPIC' : m.ap >= 1500 ? 'GREAT' : 'NICE';
+          const tierColor = m.ap >= 5000 ? '#ffd700' : m.ap >= 3000 ? '#c084fc' : m.ap >= 1500 ? '#6ecf6e' : '#6ea8fe';
+          const tierEmoji = m.ap >= 5000 ? '👑' : m.ap >= 3000 ? '💎' : m.ap >= 1500 ? '🔥' : '✨';
+          const xp = Math.round(m.ap / 100);
+          const pwr = Math.min(100, Math.ceil(m.ap / 60));
+          return `<div style="margin:0.5rem 0;border-radius:16px;overflow:hidden;border:1px solid ${tierColor}33;">
+            <div style="background:linear-gradient(135deg,${tierColor}12,${tierColor}04);padding:0.65rem 0.9rem;display:flex;align-items:center;gap:0.6rem;">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,${tierColor},${tierColor}88);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${tierEmoji}</div>
               <div style="flex:1;">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
-                  <span style="font-size:0.75rem;font-weight:700;color:#6ecf6e;">SalesBot</span>
-                  <span style="font-size:0.56rem;background:#6ecf6e22;color:#6ecf6e;padding:0.1rem 0.35rem;border-radius:2px;letter-spacing:0.08em;text-transform:uppercase;">BOT</span>
-                  <span style="font-size:0.6rem;color:var(--gray);">${m.time}</span>
+                <div style="display:flex;align-items:center;gap:0.4rem;">
+                  <span style="font-size:0.8rem;font-weight:700;color:${tierColor};">DEAL CLOSED!</span>
+                  <span style="font-size:0.48rem;background:${tierColor};color:#000;padding:0.08rem 0.35rem;border-radius:4px;font-weight:700;letter-spacing:0.08em;">${apTier}</span>
                 </div>
-                <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(110,207,110,0.2);padding:0.8rem 1rem;border-radius:4px;">
-                  <div style="font-size:0.72rem;color:var(--cream);font-weight:600;margin-bottom:0.5rem;">🎉 New Sale Alert!</div>
-                  <div style="display:grid;grid-template-columns:auto 1fr;gap:0.25rem 0.8rem;font-size:0.68rem;">
-                    <span style="color:var(--gray);">Agent</span><span style="color:var(--cream);">${m.agentName}</span>
-                    <span style="color:var(--gray);">Team</span><span style="color:var(--gold);">${m.teamName}</span>
-                    <span style="color:var(--gray);">Policy</span><span style="color:var(--cream);">${m.deal}</span>
-                    <span style="color:var(--gray);">AP</span><span style="color:#6ecf6e;font-weight:700;font-size:0.82rem;">$${m.ap.toLocaleString()}</span>
-                  </div>
-                </div>
-                <div style="display:flex;gap:0.3rem;margin-top:0.4rem;flex-wrap:wrap;" id="reactions-${idx}">
-                  ${(m.reactions||[]).map(r=>`<span style="background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.2);padding:0.15rem 0.5rem;border-radius:12px;font-size:0.78rem;cursor:pointer;" onclick="addReactionToMsg(${idx},'${r.emoji}')">${r.emoji} ${r.count}</span>`).join('')}
-                  <span onclick="showReactionPicker(${idx})" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);padding:0.15rem 0.5rem;border-radius:12px;font-size:0.78rem;cursor:pointer;color:var(--gray);">+ React</span>
-                </div>
+                <div style="font-size:0.52rem;color:rgba(255,255,255,0.25);">${m.time}</div>
               </div>
-            </div>`;
-          } else if (m.type === 'bot_daily') {
-            return `<div style="display:flex;align-items:flex-start;gap:0.7rem;padding:0.7rem 0.9rem;background:rgba(201,168,76,0.04);border-left:3px solid rgba(201,168,76,0.4);margin:0.4rem 0;border-radius:0 12px 12px 0;">
-              <div style="width:32px;height:32px;background:linear-gradient(135deg,#c9a84c,#8b6914);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">☀️</div>
-              <div style="flex:1;">
-                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
-                  <span style="font-size:0.75rem;font-weight:700;color:var(--gold);">Daily Motivator</span>
-                  <span style="font-size:0.56rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:0.1rem 0.35rem;border-radius:2px;letter-spacing:0.08em;text-transform:uppercase;">BOT</span>
-                  <span style="font-size:0.6rem;color:var(--gray);">${m.time}</span>
-                </div>
-                <div style="font-size:0.78rem;color:var(--cream);line-height:1.6;">${m.text}</div>
-              </div>
-            </div>`;
-          } else {
-          const isMe = m.me;
-          const reactions = (m.reactions||[]).length ? `<div style="display:flex;gap:0.25rem;margin-top:0.25rem;flex-wrap:wrap;">${(m.reactions||[]).map(r=>`<span style="background:rgba(255,255,255,0.06);padding:0.1rem 0.4rem;border-radius:10px;font-size:0.72rem;cursor:pointer;" onclick="addReactionToMsg(${idx},'${r.emoji}')">${r.emoji} ${r.count}</span>`).join('')}</div>` : '';
-          return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};margin:0.15rem 0;">
-            <div style="display:flex;align-items:flex-end;gap:0.4rem;flex-direction:${isMe?'row-reverse':'row'};">
-              ${!isMe?`<div style="width:26px;height:26px;background:linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:600;color:var(--gold);flex-shrink:0;">${(m.from||'T').charAt(0)}</div>`:''}
-              <div style="max-width:72%;">
-                ${!isMe?`<div style="font-size:0.58rem;color:var(--gray);margin-bottom:0.15rem;margin-left:0.3rem;">${m.from||''}</div>`:''}
-                <div style="background:${isMe?'var(--gold)':'rgba(255,255,255,0.08)'};color:${isMe?'#000':'var(--cream)'};padding:0.5rem 0.85rem;border-radius:${isMe?'18px 18px 4px 18px':'18px 18px 18px 4px'};word-break:break-word;font-size:0.82rem;line-height:1.5;">
-                  ${m.text||''}
-                </div>
-                <div style="font-size:0.5rem;color:rgba(255,255,255,0.25);margin-top:0.15rem;text-align:${isMe?'right':'left'};padding:0 0.3rem;">${m.time}</div>
+              <div style="text-align:right;">
+                <div style="font-size:1.1rem;font-weight:800;color:${tierColor};font-family:'Cormorant Garamond',serif;">$${m.ap.toLocaleString()}</div>
+                <div style="font-size:0.48rem;color:rgba(255,255,255,0.3);letter-spacing:0.08em;">ANNUAL PREMIUM</div>
               </div>
             </div>
-            ${reactions}
+            <div style="padding:0.5rem 0.9rem;background:rgba(0,0,0,0.2);">
+              <div style="display:flex;gap:1rem;font-size:0.68rem;margin-bottom:0.4rem;">
+                <div><span style="color:rgba(255,255,255,0.3);">Agent </span><span style="color:var(--cream);font-weight:600;">${m.agentName}</span></div>
+                <div><span style="color:rgba(255,255,255,0.3);">Team </span><span style="color:var(--gold);">${m.teamName}</span></div>
+                <div><span style="color:rgba(255,255,255,0.3);">Policy </span><span style="color:var(--cream);">${m.deal}</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <div style="font-size:0.48rem;color:rgba(255,255,255,0.3);letter-spacing:0.06em;width:32px;">POWER</div>
+                <div style="flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;">
+                  <div style="width:${pwr}%;height:100%;background:linear-gradient(90deg,${tierColor},${tierColor}88);border-radius:3px;"></div>
+                </div>
+                <div style="font-size:0.52rem;color:${tierColor};font-weight:700;">+${xp} XP</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.2rem;padding:0.35rem 0.9rem;background:rgba(0,0,0,0.12);flex-wrap:wrap;">
+              ${(m.reactions||[]).map(r=>`<span style="background:rgba(255,255,255,0.05);padding:0.1rem 0.4rem;border-radius:10px;font-size:0.68rem;cursor:pointer;" onclick="addReactionToMsg(${idx},'${r.emoji}')">${r.emoji} ${r.count}</span>`).join('')}
+              <span onclick="showReactionPicker(${idx})" style="background:rgba(255,255,255,0.03);padding:0.1rem 0.4rem;border-radius:10px;font-size:0.6rem;cursor:pointer;color:rgba(255,255,255,0.25);">+</span>
+            </div>
           </div>`;
-          }
-        }).join('');
+        }
+        // ── Daily Bot ──
+        if (m.type === 'bot_daily') {
+          return `<div style="display:flex;align-items:flex-start;gap:0.55rem;padding:0.65rem 0.8rem;background:rgba(201,168,76,0.03);border-radius:14px;margin:0.3rem 0;border:1px solid rgba(201,168,76,0.06);">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#c9a84c,#8b6914);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;">☀️</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.35rem;margin-bottom:0.15rem;">
+                <span style="font-size:0.68rem;font-weight:700;color:var(--gold);">Daily Motivator</span>
+                <span style="font-size:0.46rem;background:rgba(201,168,76,0.12);color:var(--gold);padding:0.06rem 0.25rem;border-radius:3px;letter-spacing:0.05em;">BOT</span>
+                <span style="font-size:0.48rem;color:rgba(255,255,255,0.2);margin-left:auto;">${m.time}</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--cream);line-height:1.6;">${m.text}</div>
+            </div>
+          </div>`;
+        }
+        // ── Image / GIF ──
+        if (m.type === 'image' || m.type === 'gif') {
+          return `<div style="display:flex;flex-direction:column;align-items:${m.me?'flex-end':'flex-start'};margin:0.2rem 0;">
+            <img src="${m.src}" style="max-width:240px;border-radius:16px;display:block;" alt="${m.type}"/>
+            <div style="font-size:0.48rem;color:rgba(255,255,255,0.18);margin-top:0.08rem;padding:0 0.2rem;">${m.time}</div>
+          </div>`;
+        }
+        // ── Regular iMessage bubble ──
+        const isMe = m.me;
+        const reactions = (m.reactions||[]).length ? `<div style="display:flex;gap:0.15rem;margin-top:0.15rem;">${(m.reactions||[]).map(r=>`<span style="background:rgba(255,255,255,0.06);padding:0.06rem 0.3rem;border-radius:10px;font-size:0.65rem;cursor:pointer;" onclick="addReactionToMsg(${idx},'${r.emoji}')">${r.emoji}${r.count>1?' '+r.count:''}</span>`).join('')}</div>` : '';
+        return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};margin:0.08rem 0;">
+          <div style="display:flex;align-items:flex-end;gap:0.3rem;flex-direction:${isMe?'row-reverse':'row'};max-width:78%;">
+            ${!isMe?`<div style="width:22px;height:22px;background:linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.06));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.48rem;font-weight:700;color:var(--gold);flex-shrink:0;margin-bottom:0.12rem;">${(m.from||'?').charAt(0)}</div>`:''}
+            <div>
+              ${!isMe?`<div style="font-size:0.48rem;color:rgba(255,255,255,0.25);margin-bottom:0.08rem;margin-left:0.15rem;">${m.from||''}</div>`:''}
+              <div style="background:${isMe?'linear-gradient(135deg,#c9a84c,#b8943f)':'rgba(255,255,255,0.07)'};color:${isMe?'#000':'var(--cream)'};padding:0.5rem 0.85rem;border-radius:${isMe?'20px 20px 4px 20px':'20px 20px 20px 4px'};word-break:break-word;font-size:0.82rem;line-height:1.5;${isMe?'font-weight:500;':''}">
+                ${m.text||''}
+              </div>
+              <div style="font-size:0.44rem;color:rgba(255,255,255,0.15);margin-top:0.08rem;text-align:${isMe?'right':'left'};padding:0 0.2rem;">${m.time}</div>
+            </div>
+          </div>
+          ${reactions}
+        </div>`;
+      }).join('');
       thread.scrollTop = thread.scrollHeight;
     }
 
-    const REACTION_EMOJIS = ['🔥','💪','🎉','💰','👏','⭐','🚀','💯','🙌','❤️','😂','👍'];
+    const REACTION_EMOJIS = [
+      '👍','❤️','😂','😮','🤔','💀','🫡','👎',
+      '🔥','💪','🎉','💰','👏','💯','🙌','⭐',
+      '🤑','💵','💸','💳','🏦','📈','💲','🪙',
+      '😎','🥶','😤','🥱','😈','🤩','😭','🫶',
+      '🚀','👑','💎','🎯','⚡','🦁','🏆','🥂'
+    ];
 
     window.__R_showReactionPicker = window.showReactionPicker = function(idx) {
       const existing = document.getElementById('reactionPicker');
@@ -10343,9 +11088,19 @@ contact\u0040llfg.us`
       const picker = document.createElement('div');
       picker.id = 'reactionPicker';
       picker.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,30,30,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);padding:0.5rem 0.6rem;display:flex;flex-wrap:wrap;gap:0.2rem;max-width:260px;z-index:999;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.7);';
-      picker.innerHTML = REACTION_EMOJIS.map(e => `<span onclick="addReactionToMsg(${idx},'${e}');document.getElementById('reactionPicker').remove();" style="font-size:1.3rem;cursor:pointer;padding:0.2rem 0.3rem;border-radius:4px;" onmouseover="this.style.background='rgba(201,168,76,0.1)'" onmouseout="this.style.background=''">${e}</span>`).join('');
+      const rows = [
+        {label:'Reactions', emojis:['👍','❤️','😂','😮','🤔','💀','🫡','👎']},
+        {label:'Hype',      emojis:['🔥','💪','🎉','💰','👏','💯','🙌','⭐']},
+        {label:'Money',     emojis:['🤑','💵','💸','💳','🏦','📈','💲','🪙']},
+        {label:'Mood',      emojis:['😎','🥶','😤','🥱','😈','🤩','😭','🫶']},
+        {label:'Status',    emojis:['🚀','👑','💎','🎯','⚡','🦁','🏆','🥂']},
+      ];
+      picker.innerHTML = rows.map(function(r){
+        return '<div style="margin-bottom:0.3rem;"><div style="font-size:0.45rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.2);padding:0 0.15rem 0.15rem;">'+r.label+'</div><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:1px;">'+r.emojis.map(function(e){return '<span onclick="addReactionToMsg('+idx+',\''+e+'\');document.getElementById(\'reactionPicker\').remove();" style="font-size:1.25rem;cursor:pointer;padding:0.2rem;border-radius:8px;text-align:center;transition:all 0.1s;" onmouseover="this.style.background=\'rgba(201,168,76,0.12)\';this.style.transform=\'scale(1.15)\'" onmouseout="this.style.background=\'\';this.style.transform=\'\'">'+e+'</span>';}).join('')+'</div></div>';
+      }).join('');
       document.body.appendChild(picker);
-      setTimeout(() => { if(document.getElementById('reactionPicker')) document.getElementById('reactionPicker').remove(); }, 5000);
+      setTimeout(function(){ document.addEventListener('click', function h(e){ if(!picker.contains(e.target)){picker.remove();document.removeEventListener('click',h);} }); }, 50);
+      setTimeout(function(){ if(document.getElementById('reactionPicker')) document.getElementById('reactionPicker').remove(); }, 8000);
     };
 
     window.__R_addReactionToMsg = window.addReactionToMsg = function(idx, emoji) {
@@ -10635,50 +11390,157 @@ contact\u0040llfg.us`
 
     // ─── GIF Picker ───
     const GIF_CATEGORIES = {
-      'Celebration': [
+      'Celebration 🎉': [
         'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
         'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif',
         'https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif',
+        'https://media.giphy.com/media/g9582DNuQppxC/giphy.gif',
       ],
-      'Motivation': [
-        'https://media.giphy.com/media/3o7TKsQ8UQ5ELhBFzq/giphy.gif',
-        'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
-        'https://media.giphy.com/media/xT9IgG50Lg7russbDa/giphy.gif',
-      ],
-      'Money': [
+      'Money 💰': [
         'https://media.giphy.com/media/26uf2YTgF5upXUTm0/giphy.gif',
         'https://media.giphy.com/media/3oz8xRF0v9WMAUVLNK/giphy.gif',
         'https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif',
+        'https://media.giphy.com/media/l0HFkA6omUyjVYqw8/giphy.gif',
+      ],
+      'Motivation 💪': [
+        'https://media.giphy.com/media/3o7TKsQ8UQ5ELhBFzq/giphy.gif',
+        'https://media.giphy.com/media/xT9IgG50Lg7russbDa/giphy.gif',
+        'https://media.giphy.com/media/l4FATJpd4LWgeruTK/giphy.gif',
+        'https://media.giphy.com/media/JltOMwYmi0VRK/giphy.gif',
       ],
       'Fire 🔥': [
         'https://media.giphy.com/media/kVVEP6SmfEXvy/giphy.gif',
         'https://media.giphy.com/media/5VKbvrjxpVJCM/giphy.gif',
         'https://media.giphy.com/media/l1ughbsd9qXz2s9SE/giphy.gif',
       ],
+      'High Five 🤝': [
+        'https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif',
+        'https://media.giphy.com/media/l0HlTU9KRkRkIjMje/giphy.gif',
+        'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif',
+      ],
+      'Thank You 🙏': [
+        'https://media.giphy.com/media/osjgQPWRx3cac/giphy.gif',
+        'https://media.giphy.com/media/3oz8xIsloV320wMnUk/giphy.gif',
+        'https://media.giphy.com/media/ZfK4cXKJTTay1Ava29/giphy.gif',
+      ],
+      'Good Morning ☀️': [
+        'https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif',
+        'https://media.giphy.com/media/xUPGcEliCc7bETyfO8/giphy.gif',
+        'https://media.giphy.com/media/l3q2Hy66w1hpDSWUE/giphy.gif',
+      ],
+      'Funny 😂': [
+        'https://media.giphy.com/media/10JhviFuU2gWD6/giphy.gif',
+        'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+        'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif',
+        'https://media.giphy.com/media/26n6Gx9moCgs1pUuk/giphy.gif',
+      ],
+      'Mind Blown 🤯': [
+        'https://media.giphy.com/media/xT0xeJpnrWC3xWgIXm/giphy.gif',
+        'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif',
+        'https://media.giphy.com/media/3o7btZ1Gm7ZL25pLMs/giphy.gif',
+      ],
+      'Lets Go 🚀': [
+        'https://media.giphy.com/media/3oKIPjzfv0sI2p7fDW/giphy.gif',
+        'https://media.giphy.com/media/l4FATJpd4LWgeruTK/giphy.gif',
+        'https://media.giphy.com/media/l0MYEqEzwMWFCg8rm/giphy.gif',
+      ],
+      'Get Paid 🤑': [
+        'https://media.giphy.com/media/l0HFkA6omUyjVYqw8/giphy.gif',
+        'https://media.giphy.com/media/3o6gDWzmAzrpi5DQU8/giphy.gif',
+        'https://media.giphy.com/media/xTiTnqUxyWbsAXq7Ju/giphy.gif',
+        'https://media.giphy.com/media/GjB41rKHBnOkE/giphy.gif',
+        'https://media.giphy.com/media/l3V0lsGtTMSB5YNgc/giphy.gif',
+      ],
+      'Bag Season 💵': [
+        'https://media.giphy.com/media/eHOxorEP0jIT6/giphy.gif',
+        'https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif',
+        'https://media.giphy.com/media/Y2ZUWLrTy63j9T6qrK/giphy.gif',
+        'https://media.giphy.com/media/67ThRZlYBvibtdF9JH/giphy.gif',
+      ],
+      'Winning 🏆': [
+        'https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif',
+        'https://media.giphy.com/media/l0MYJnJQ4EiYLxvQ4/giphy.gif',
+        'https://media.giphy.com/media/3oz8xRF0v9WMAUVLNK/giphy.gif',
+        'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+      ],
+      'Happy 😊': [
+        'https://media.giphy.com/media/l0HlTU9KRkRkIjMje/giphy.gif',
+        'https://media.giphy.com/media/3NtY188QaxDdC/giphy.gif',
+        'https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif',
+        'https://media.giphy.com/media/xUPGcEliCc7bETyfO8/giphy.gif',
+      ],
+      'Stressed 😩': [
+        'https://media.giphy.com/media/l1J9u3TZfpmeDLkD6/giphy.gif',
+        'https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy.gif',
+        'https://media.giphy.com/media/26n6Gx9moCgs1pUuk/giphy.gif',
+        'https://media.giphy.com/media/xT0xeJpnrWC3xWgIXm/giphy.gif',
+      ],
+      'Focused 🎯': [
+        'https://media.giphy.com/media/JltOMwYmi0VRK/giphy.gif',
+        'https://media.giphy.com/media/3o7TKsQ8UQ5ELhBFzq/giphy.gif',
+        'https://media.giphy.com/media/xT9IgG50Lg7russbDa/giphy.gif',
+      ],
+      'Vibing 😎': [
+        'https://media.giphy.com/media/3oriO6qJiXajN0TyDu/giphy.gif',
+        'https://media.giphy.com/media/l3q2Hy66w1hpDSWUE/giphy.gif',
+        'https://media.giphy.com/media/g9582DNuQppxC/giphy.gif',
+        'https://media.giphy.com/media/kVVEP6SmfEXvy/giphy.gif',
+      ],
     };
 
+    window._gifActiveCat = null;
     window.__R_sendMsgGif = window.sendMsgGif = function() {
       const existing = document.getElementById('gifPickerPanel');
       if (existing) { existing.remove(); return; }
 
       const panel = document.createElement('div');
       panel.id = 'gifPickerPanel';
-      panel.style.cssText = 'position:absolute;bottom:calc(100% + 4px);left:0;background:#111;border:1px solid rgba(201,168,76,0.25);z-index:200;width:280px;max-height:240px;overflow-y:auto;';
+      panel.style.cssText = 'position:absolute;bottom:calc(100% + 4px);left:0;background:rgba(20,20,20,0.97);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(201,168,76,0.15);z-index:200;width:340px;max-height:320px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.6);';
 
-      let html = '<div style="padding:0.5rem 0.7rem;border-bottom:1px solid rgba(201,168,76,0.1);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);">Select a GIF</div>';
-      for (const [cat, gifs] of Object.entries(GIF_CATEGORIES)) {
-        html += `<div style="padding:0.3rem 0.7rem;font-size:0.62rem;color:var(--gold);letter-spacing:0.1em;">${cat}</div>`;
-        html += '<div style="display:flex;gap:4px;flex-wrap:wrap;padding:0 0.7rem 0.4rem;">';
-        gifs.forEach(gif => {
-          html += `<img src="${gif}" style="width:78px;height:60px;object-fit:cover;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s;" onclick="selectGif('${gif}')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='transparent'"/>`;
-        });
-        html += '</div>';
-      }
-      panel.innerHTML = html;
+      const cats = Object.keys(GIF_CATEGORIES);
+      const firstCat = cats[0];
+      window._gifActiveCat = firstCat;
+
+      // Category tabs (scrollable horizontal)
+      let tabsHtml = '<div style="display:flex;gap:0;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:0 0.3rem;" id="gifCatTabs">';
+      cats.forEach((cat, i) => {
+        const label = cat.replace(/[^\w\s]/g,'').trim().split(' ')[0];
+        const emoji = cat.match(/[\p{Emoji}]/u)?.[0] || '';
+        tabsHtml += `<button onclick="switchGifCat('${cat.replace(/'/g,"\\'")}')" data-cat="${cat}" style="background:none;border:none;border-bottom:2px solid ${i===0?'var(--gold)':'transparent'};padding:0.4rem 0.5rem;font-size:0.55rem;color:${i===0?'var(--gold)':'var(--gray)'};cursor:pointer;white-space:nowrap;font-family:'Raleway',sans-serif;transition:all 0.15s;">${emoji} ${label}</button>`;
+      });
+      tabsHtml += '</div>';
+
+      // GIF grid area
+      let gridHtml = '<div id="gifGridArea" style="flex:1;overflow-y:auto;padding:0.4rem;"></div>';
+
+      panel.innerHTML = tabsHtml + gridHtml;
       const toolbar = document.getElementById('msgToolbarWrap');
       if (toolbar) { toolbar.style.position='relative'; toolbar.appendChild(panel); }
+
+      // Render first category
+      renderGifGrid(firstCat);
+
       setTimeout(() => document.addEventListener('click', function h(e){ if(!panel.contains(e.target)&&e.target.id!=='gifBtn'){panel.remove();document.removeEventListener('click',h);} }), 50);
     };
+
+    window.__R_switchGifCat = window.switchGifCat = function(cat) {
+      window._gifActiveCat = cat;
+      document.querySelectorAll('#gifCatTabs button').forEach(b => {
+        const active = b.dataset.cat === cat;
+        b.style.borderBottomColor = active ? 'var(--gold)' : 'transparent';
+        b.style.color = active ? 'var(--gold)' : 'var(--gray)';
+      });
+      renderGifGrid(cat);
+    };
+
+    function renderGifGrid(cat) {
+      const area = document.getElementById('gifGridArea');
+      if (!area) return;
+      const gifs = GIF_CATEGORIES[cat] || [];
+      area.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">' +
+        gifs.map(gif => `<img src="${gif}" style="width:100%;height:72px;object-fit:cover;cursor:pointer;border-radius:8px;border:2px solid transparent;transition:all 0.15s;" onclick="selectGif('${gif}')" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='scale(1.03)'" onmouseout="this.style.borderColor='transparent';this.style.transform=''">`).join('') +
+      '</div>';
+    }
 
     window.__R_selectGif = window.selectGif = function(gifUrl) {
       document.getElementById('gifPickerPanel')?.remove();
@@ -14549,19 +15411,34 @@ This request requires Managing Partner approval.`
       }, 1200);
     };
 
-    // ─── HERO PARALLAX ───────────────────────────────────────────────
-    (function initHeroParallax() {
-      var skyline = document.querySelector('.hero-skyline');
-      var lion = document.querySelector('.hero-lion');
-      var heroBg = document.querySelector('.hero-bg');
-      if (!skyline && !lion) return;
+    // ─── CINEMATIC HERO SCROLL CAMERA ──────────────────────────────
+    (function initHeroCinematic() {
+      var heroImg = document.querySelector('.hero-bg-img');
+      var heroContent = document.querySelector('.hero-content');
+      var heroGlow = document.querySelector('.hero-glow');
+      if (!heroImg) return;
+
       window.addEventListener('scroll', function() {
         var scrollY = window.scrollY || window.pageYOffset;
-        if (scrollY > window.innerHeight) return;
-        var pct = scrollY / window.innerHeight;
-        if (skyline) skyline.style.transform = 'translateY(' + (pct * 40) + 'px)';
-        if (lion) lion.style.transform = 'translateY(calc(-55% + ' + (pct * 30) + 'px))';
-        if (heroBg) heroBg.style.opacity = 1 - (pct * 0.4);
+        var vh = window.innerHeight;
+        if (scrollY > vh * 1.3) return;
+        var pct = Math.min(scrollY / vh, 1);
+
+        // Image: zooms out from 1.12 to 1.0, slight rotation — camera pulling back
+        var scale = 1.12 - (pct * 0.12);
+        var rotate = pct * 1.2;
+        heroImg.style.transform = 'scale(' + scale + ') rotate(' + rotate + 'deg)';
+
+        // Content: parallax up and fade
+        if (heroContent) {
+          heroContent.style.transform = 'translateY(' + (-pct * 100) + 'px)';
+          heroContent.style.opacity = Math.max(0, 1 - (pct * 1.6));
+        }
+
+        // Glow pulse fades
+        if (heroGlow) {
+          heroGlow.style.opacity = Math.max(0, 1 - (pct * 2));
+        }
       }, { passive: true });
     })();
 
@@ -14602,6 +15479,272 @@ This request requires Managing Partner approval.`
         }
       });
     }
+
+    // ╔═══════════════════════════════════════════════════════════╗
+    // ║  LLFG FEATURES — Graphs·Hierarchy·Calendar·Email·Acct   ║
+    // ╚═══════════════════════════════════════════════════════════╝
+    window._llfgCharts={};
+    var LFC={gold:'#c9a84c',blue:'#6ea8fe',purple:'#c084fc',orange:'#ff9f43',green:'#6ecf6e',red:'#e05555',grid:'rgba(255,255,255,0.04)'};
+    if(typeof Chart!=='undefined'){Chart.defaults.font.family="'Raleway',sans-serif";Chart.defaults.font.size=11;Chart.defaults.color='#888';Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.tooltip.backgroundColor='#111';Chart.defaults.plugins.tooltip.borderColor='rgba(201,168,76,0.25)';Chart.defaults.plugins.tooltip.borderWidth=1;Chart.defaults.plugins.tooltip.cornerRadius=0;Chart.defaults.plugins.tooltip.padding=10;}
+    function _dc(id){if(window._llfgCharts[id]){window._llfgCharts[id].destroy();delete window._llfgCharts[id];}}
+    function _fc(n){return '$'+Math.round(n).toLocaleString();}
+    function _toast(m,c){c=c||'#6ecf6e';var t=document.createElement('div');t.className='llfg-toast';t.style.borderColor=c==='#6ecf6e'?'rgba(110,207,110,0.3)':c==='#e05555'?'rgba(224,85,85,0.3)':'rgba(110,168,254,0.3)';t.style.color=c;t.innerHTML=m;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(10px)';setTimeout(function(){t.remove();},300);},3500);}
+
+    /* ── 1. GRAPHS ────────────────────────────────────────────── */
+    function renderOverviewCharts(){if(typeof Chart==='undefined'||typeof TEAM_DATA==='undefined')return;var c=document.getElementById('portalOverviewSections');if(!c||document.getElementById('llfgOC'))return;var w=document.createElement('div');w.id='llfgOC';w.className='llfg-stagger';w.innerHTML='<div class="dash-section" style="margin-top:1rem;"><div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>Performance Analytics</span><span style="font-size:0.55rem;color:var(--gray);font-weight:400;">Live data</span></div><div class="llfg-chart-row"><div class="llfg-chart-card"><h4>Team AP Comparison</h4><div class="llfg-chart-wrap"><canvas id="cTeamAP"></canvas></div></div><div class="llfg-chart-card"><h4>Team Health</h4><div class="llfg-chart-wrap"><canvas id="cHealth"></canvas></div></div></div><div class="llfg-chart-row"><div class="llfg-chart-card"><h4>Commission Distribution</h4><div class="llfg-chart-wrap"><canvas id="cCommD"></canvas></div></div><div class="llfg-chart-card"><h4>Risk Overview</h4><div class="llfg-chart-wrap"><canvas id="cRisk"></canvas></div></div></div></div>';c.appendChild(w);setTimeout(function(){_dc('tAP');var x=document.getElementById('cTeamAP');if(x)window._llfgCharts.tAP=new Chart(x,{type:'bar',data:{labels:TEAM_DATA.map(function(t){return t.name}),datasets:[{label:'Total AP',data:TEAM_DATA.map(function(t){return t.totalAP}),backgroundColor:'rgba(201,168,76,0.6)',borderColor:'#c9a84c',borderWidth:1,borderRadius:2},{label:'Adv Pay',data:TEAM_DATA.map(function(t){return Math.round(t.totalAP*(t.leaderComm/100)*0.75)}),backgroundColor:'rgba(110,168,254,0.5)',borderColor:'#6ea8fe',borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:800,easing:'easeOutQuart'},scales:{x:{grid:{color:LFC.grid}},y:{grid:{color:LFC.grid},ticks:{callback:function(v){return'$'+v/1000+'K'}}}},plugins:{tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+_fc(c.raw)}}}}}});_dc('hlth');var x2=document.getElementById('cHealth');if(x2){var tc=['#c9a84c','#6ea8fe','#c084fc','#ff9f43'];window._llfgCharts.hlth=new Chart(x2,{type:'radar',data:{labels:['Persistency','Retention','Low CB'],datasets:TEAM_DATA.map(function(t,i){return{label:t.name,data:[t.persistency,t.retention,Math.max(0,100-t.chargeback*10)],borderColor:tc[i%4],backgroundColor:tc[i%4]+'14',pointBackgroundColor:tc[i%4],borderWidth:2,pointRadius:3}})},options:{responsive:true,maintainAspectRatio:false,animation:{duration:1000},scales:{r:{min:50,max:100,grid:{color:LFC.grid},angleLines:{color:LFC.grid},pointLabels:{font:{size:10}},ticks:{display:false}}},plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:12}}}}})}_dc('cDist');var x3=document.getElementById('cCommD');if(x3){var aa=[];TEAM_DATA.forEach(function(t){t.agents.forEach(function(a){aa.push(a)})});var ti={};aa.forEach(function(a){var k=a.comm+'%';ti[k]=(ti[k]||0)+1});var sk=Object.keys(ti).sort(function(a,b){return parseInt(a)-parseInt(b)});var pl=['#c9a84c','#6ea8fe','#c084fc','#ff9f43','#6ecf6e','#e05555'];window._llfgCharts.cDist=new Chart(x3,{type:'doughnut',data:{labels:sk,datasets:[{data:sk.map(function(k){return ti[k]}),backgroundColor:sk.map(function(k,i){return pl[i%pl.length]}),borderColor:'#161616',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{animateRotate:true,duration:900},cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:10}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.raw+' agent'+(c.raw>1?'s':'')}}}}}})}  _dc('rsk');var x4=document.getElementById('cRisk');if(x4)window._llfgCharts.rsk=new Chart(x4,{type:'bar',data:{labels:TEAM_DATA.map(function(t){return t.name}),datasets:[{label:'CB %',data:TEAM_DATA.map(function(t){return t.chargeback}),backgroundColor:'rgba(224,85,85,0.6)',borderColor:'#e05555',borderWidth:1,borderRadius:2},{label:'Debt Risk',data:TEAM_DATA.map(function(t){return t.debtRisk==='Low'?20:t.debtRisk==='Medium'?60:90}),backgroundColor:'rgba(255,159,67,0.5)',borderColor:'#ff9f43',borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:800},scales:{x:{grid:{color:LFC.grid}},y:{grid:{color:LFC.grid},ticks:{font:{size:10}}}},plugins:{legend:{position:'bottom',labels:{font:{size:10},padding:12}}}}})},200)}
+
+    function renderCommissionCharts(){if(typeof Chart==='undefined'||typeof TEAM_DATA==='undefined')return;var s=document.getElementById('commTabSections');if(!s||document.getElementById('llfgCC'))return;var w=document.createElement('div');w.id='llfgCC';w.className='dash-section llfg-anim-up';w.innerHTML='<div class="dash-section-title">Earnings Analytics</div><div class="llfg-chart-row"><div class="llfg-chart-card"><h4>Earnings by Team</h4><div class="llfg-chart-wrap"><canvas id="cEarn"></canvas></div></div><div class="llfg-chart-card"><h4>Promotion Threshold</h4><div class="llfg-chart-wrap"><canvas id="cTier"></canvas></div></div></div>';s.appendChild(w);setTimeout(function(){_dc('earn');var c1=document.getElementById('cEarn');if(c1)window._llfgCharts.earn=new Chart(c1,{type:'bar',data:{labels:TEAM_DATA.map(function(t){return t.name}),datasets:[{label:'Earned',data:TEAM_DATA.map(function(t){return Math.round(t.totalAP*(t.leaderComm/100))}),backgroundColor:'rgba(110,207,110,0.55)',borderColor:'#6ecf6e',borderWidth:1,borderRadius:2},{label:'Advanced',data:TEAM_DATA.map(function(t){return Math.round(t.totalAP*(t.leaderComm/100)*0.75)}),backgroundColor:'rgba(201,168,76,0.55)',borderColor:'#c9a84c',borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:800},scales:{x:{grid:{color:LFC.grid}},y:{grid:{color:LFC.grid},ticks:{callback:function(v){return'$'+v/1000+'K'}}}},plugins:{tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+_fc(c.raw)}}}}}});_dc('tier');var c2=document.getElementById('cTier');if(c2){var oAP=TEAM_DATA.reduce(function(s,t){return s+t.totalAP},0);var tr=[{l:'FA',m:150000,c:'#c9a84c'},{l:'Mgr',m:500000,c:'#6ea8fe'},{l:'Exec',m:1500000,c:'#c084fc'},{l:'Dir',m:6000000,c:'#ff9f43'}];window._llfgCharts.tier=new Chart(c2,{type:'bar',data:{labels:tr.map(function(t){return t.l}),datasets:[{label:'Threshold',data:tr.map(function(t){return t.m}),backgroundColor:tr.map(function(t){return t.c+'33'}),borderColor:tr.map(function(t){return t.c}),borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},scales:{x:{grid:{color:LFC.grid}},y:{grid:{color:LFC.grid},type:'logarithmic',ticks:{callback:function(v){return v>=1e6?'$'+(v/1e6)+'M':v>=1e3?'$'+(v/1e3)+'K':'$'+v}}}},plugins:{legend:{position:'bottom'}}}})}},250)}
+
+    /* ── 2. HIERARCHY ─────────────────────────────────────────── */
+    function renderEnhancedHierarchy(){var el=document.getElementById('hierarchyChartWrap');if(!el||typeof TEAM_DATA==='undefined')return;var u=currentUser||window._llfgCurrentUser;var role=(u&&u.role)||'financial_advisor';var isOwner=(u&&u.isOwner)||(u&&u.email==='lorenzoparenza@llfg.us');var vt=[];if(isOwner||role==='admin'||role==='managing_partner'||role==='director'||role==='executive')vt=TEAM_DATA;else if(role==='manager'){vt=TEAM_DATA.filter(function(t){return t.leader===(u&&u.name)});if(!vt.length)vt=[TEAM_DATA[3]]}else{el.innerHTML='<p style="color:var(--gray);font-size:0.78rem;">Build your team to unlock this view.</p>';return}var h='<div class="llfg-org-tree llfg-anim-fade">';if(vt.length>1){h+='<div class="llfg-org-node" style="margin-bottom:0.3rem;"><div class="llfg-org-avatar" style="width:58px;height:58px;border-color:var(--gold);font-size:0.8rem;" onclick="if(typeof openCompModal===\'function\')openCompModal(\'Lorenzo Parenza\',140,\'beta\')">LP</div><div class="llfg-org-tooltip"><div style="font-size:0.72rem;color:var(--cream);font-weight:600;">Lorenzo Parenza</div><div style="font-size:0.58rem;color:var(--gold);margin:0.2rem 0;">Owner / Managing Partner</div><div style="font-size:0.6rem;color:var(--gray);">Comm: 140% &middot; Org AP: '+_fc(TEAM_DATA.reduce(function(s,t){return s+t.totalAP},0))+'</div></div><div class="llfg-org-name">Lorenzo</div><div class="llfg-org-comm">140%</div><div class="llfg-org-role">Owner / MP</div></div><div class="llfg-org-connector"></div>'}h+='<div class="llfg-org-branch">';vt.forEach(function(team,ti){var rc=team.leaderRole.indexOf('Executive')>=0?LFC.purple:team.leaderRole.indexOf('Manager')>=0&&team.leaderRole.indexOf('Managing')<0?LFC.blue:LFC.gold;h+='<div class="llfg-org-node" style="animation-delay:'+((ti+1)*0.1)+'s;"><div class="llfg-org-connector"></div><div class="llfg-org-avatar" style="border-color:'+rc+';" onclick="if(typeof openCompModal===\'function\')openCompModal(\''+team.leader+'\','+team.leaderComm+',\''+team.id+'\')">'+team.leaderInit+'</div><div class="llfg-org-tooltip"><div style="font-size:0.72rem;color:var(--cream);font-weight:600;">'+team.leader+'</div><div style="font-size:0.58rem;color:'+rc+';margin:0.2rem 0;">'+team.leaderRole+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-top:0.4rem;"><div><div class="llfg-fin-label">Team AP</div><div style="font-size:0.72rem;color:var(--cream);">'+_fc(team.totalAP)+'</div></div><div><div class="llfg-fin-label">Comm</div><div style="font-size:0.72rem;color:var(--gold);">'+team.leaderComm+'%</div></div><div><div class="llfg-fin-label">Persist</div><div style="font-size:0.72rem;color:'+persistColor(team.persistency)+';">'+team.persistency+'%</div></div><div><div class="llfg-fin-label">CB</div><div style="font-size:0.72rem;color:'+cbColor(team.chargeback)+';">'+team.chargeback+'%</div></div></div></div><div class="llfg-org-name" style="color:'+rc+';">'+team.leader.split(' ')[0]+'</div><div class="llfg-org-comm">'+team.leaderComm+'%</div><div class="llfg-org-role">'+team.leaderRole.split('/')[0].trim()+'</div>';var nl=team.agents.filter(function(a){return a.name!==team.leader});if(nl.length>0){h+='<div class="llfg-org-connector" style="height:14px;"></div><div style="display:flex;gap:0.3rem;">';nl.forEach(function(a,ai){h+='<div class="llfg-org-node" style="animation-delay:'+(0.15*(ti+1)+0.08*(ai+1))+'s;"><div class="llfg-org-connector" style="height:10px;"></div><div class="llfg-org-avatar" style="width:40px;height:40px;font-size:0.58rem;border-color:rgba(201,168,76,0.2);" onclick="if(typeof openCompModal===\'function\')openCompModal(\''+a.name+'\','+a.comm+',\''+team.id+'\')">'+a.init+'</div><div class="llfg-org-tooltip"><div style="font-size:0.72rem;color:var(--cream);font-weight:600;">'+a.name+'</div><div style="font-size:0.58rem;color:var(--gold);margin:0.2rem 0;">'+a.role+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-top:0.4rem;"><div><div class="llfg-fin-label">AP</div><div style="font-size:0.72rem;color:var(--cream);">'+_fc(a.ap)+'</div></div><div><div class="llfg-fin-label">Comm</div><div style="font-size:0.72rem;color:var(--gold);">'+a.comm+'%</div></div><div><div class="llfg-fin-label">Persist</div><div style="font-size:0.72rem;color:'+persistColor(a.persist)+';">'+a.persist+'%</div></div><div><div class="llfg-fin-label">Debt</div><div style="font-size:0.72rem;color:'+debtColor(a.debt)+';">'+a.debt+'</div></div></div></div><div class="llfg-org-name" style="max-width:60px;font-size:0.58rem;">'+a.name.split(' ')[0]+'</div><div class="llfg-org-comm" style="font-size:0.5rem;">'+a.comm+'%</div></div>'});h+='</div>'}h+='</div>'});h+='</div></div>';el.innerHTML=h}
+
+    /* ── 3. CALENDAR — ICS & Persistence ──────────────────────── */
+    function _saveCal(){try{localStorage.setItem('llfg_pcal',JSON.stringify(portalCalEvents))}catch(e){}}
+    (function(){try{var s=localStorage.getItem('llfg_pcal');if(s&&typeof portalCalEvents!=='undefined')portalCalEvents=JSON.parse(s)}catch(e){}})();
+    function _genICS(ev){var s=new Date(ev.date+'T'+(ev.time||'09:00')),e=new Date(s.getTime()+(ev.duration||60)*6e4);function f(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')}var ag=currentUser||window._llfgCurrentUser||{};return'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//LLFG//EN\r\nMETHOD:REQUEST\r\nBEGIN:VEVENT\r\nDTSTART:'+f(s)+'\r\nDTEND:'+f(e)+'\r\nSUMMARY:'+(ev.label||'Event')+(ev.guestName?' - '+ev.guestName:'')+'\r\nDESCRIPTION:'+(ev.notes||'Via LLFG Portal').replace(/\n/g,'\\n')+'\r\n'+(ev.location?'LOCATION:'+ev.location+'\r\n':'')+(ag.email?'ORGANIZER;CN='+(ag.name||'Agent')+':mailto:'+ag.email+'\r\n':'')+(ev.guestEmail?'ATTENDEE;RSVP=TRUE;CN='+(ev.guestName||ev.guestEmail)+':mailto:'+ev.guestEmail+'\r\n':'')+'UID:'+ev.id+'@llfg.us\r\nSTATUS:CONFIRMED\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'}
+    window.__R_downloadICS=window.downloadICS=function(id){var ev=portalCalEvents.find(function(e){return e.id==id});if(!ev)return;var b=new Blob([_genICS(ev)],{type:'text/calendar'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=(ev.label||'event').replace(/[^a-zA-Z0-9]/g,'_')+'.ics';a.click();URL.revokeObjectURL(u);_toast('Downloaded .ics file')};
+    window.__R_deleteCalEvent=window.deleteCalEvent=function(id){portalCalEvents=portalCalEvents.filter(function(e){return e.id!==id});_saveCal();renderPortalCal();_toast('Event removed','#e05555')};
+    var _oUpcoming=renderPortalCalUpcoming;renderPortalCalUpcoming=function(){var el=document.getElementById('portalCalUpcoming');if(!el)return;var now=new Date().toISOString().slice(0,10);var up=portalCalEvents.filter(function(e){return e.date>=now}).sort(function(a,b){return a.date<b.date?-1:1}).slice(0,6);if(!up.length){el.innerHTML='<p style="color:var(--gray);font-size:0.75rem;">No upcoming events.</p>';return}el.innerHTML='<div class="llfg-stagger">'+up.map(function(e){var c=PC_COLORS[e.type]||PC_COLORS.client_call;var d=new Date(e.date+'T00:00:00');var ds=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});return'<div class="llfg-cal-event-pill" style="background:'+c.bg+';border-color:'+c.border+';color:'+c.text+';display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.7rem;margin-bottom:0.4rem;"><div style="display:flex;align-items:center;gap:0.5rem;overflow:hidden;"><div style="font-size:0.6rem;font-weight:600;white-space:nowrap;">'+ds+'</div><div style="font-size:0.6rem;opacity:0.8;white-space:nowrap;">'+(e.time||'')+'</div><div style="font-size:0.65rem;font-weight:500;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(e.label||'Event')+(e.guestName?' \u2014 '+e.guestName:'')+'</div></div><div style="display:flex;gap:0.3rem;flex-shrink:0;"><button onclick="downloadICS('+e.id+')" style="background:none;border:1px solid '+c.border+'44;color:'+c.text+';padding:0.15rem 0.4rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;">ICS</button><button onclick="deleteCalEvent('+e.id+')" style="background:none;border:1px solid rgba(224,85,85,0.2);color:#e05555;padding:0.15rem 0.4rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;">DEL</button></div></div>'}).join('')+'</div>'};
+    var _oAddCal=window.addPortalCalEvent;window.addPortalCalEvent=function(){_oAddCal();_saveCal()};
+
+    /* ── 4. EMAIL — Logging, Scheduling ───────────────────────── */
+    var _eLog=[],_eSched=[];try{_eLog=JSON.parse(localStorage.getItem('llfg_elog')||'[]')}catch(e){}try{_eSched=JSON.parse(localStorage.getItem('llfg_esched')||'[]')}catch(e){}
+    function _logEmail(to,subj,tpl,st){_eLog.push({id:Date.now(),to:to,subject:subj,template:tpl,status:st||'sent',sentAt:new Date().toISOString(),sentBy:((currentUser||window._llfgCurrentUser||{}).name||'Agent')});try{localStorage.setItem('llfg_elog',JSON.stringify(_eLog))}catch(e){}}
+    var _oSendTpl=window.sendEmailTemplate;window.__R_sendEmailTemplate=window.sendEmailTemplate=function(id){var all=(typeof EMAIL_TEMPLATES!=='undefined'?EMAIL_TEMPLATES:[]).concat(typeof customTemplates!=='undefined'?customTemplates:[]);var tpl=all.find(function(t){return t.id===id});if(!tpl)return;var subj=(document.getElementById('tplSubjectPreview')||{}).textContent||tpl.subject;var body=(document.getElementById('tplBodyPreview')||{}).textContent||tpl.body;var to=(document.getElementById('tplEmail')||{}).value||'';var a=document.createElement('a');a.href='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);a.click();_logEmail(to,subj,tpl.name,'sent');_toast('<strong>Email opened</strong> in mail client')};
+    window.__R_llfgScheduleEmail=window.llfgScheduleEmail=function(){var to=(document.getElementById('schedEmailTo')||{}).value||'';var subj=(document.getElementById('schedEmailSubj')||{}).value||'';var body=(document.getElementById('schedEmailBody')||{}).value||'';var sendAt=(document.getElementById('schedEmailDate')||{}).value||'';if(!to||!subj||!sendAt){alert('Recipient, subject, and send date required.');return}_eSched.push({id:Date.now(),to:to,subject:subj,body:body,scheduledFor:sendAt,status:'scheduled',createdBy:((currentUser||window._llfgCurrentUser||{}).name||'Agent'),createdAt:new Date().toISOString()});try{localStorage.setItem('llfg_esched',JSON.stringify(_eSched))}catch(e){}_toast('<strong>Email scheduled</strong>',LFC.blue);_renderEmailDash()};
+    window.__R_cancelScheduledEmail=window.cancelScheduledEmail=function(id){_eSched=_eSched.filter(function(e){return e.id!==id});try{localStorage.setItem('llfg_esched',JSON.stringify(_eSched))}catch(e){}_toast('Cancelled','#e05555');_renderEmailDash()};
+    function _renderEmailDash(){var ct=document.getElementById('ptab-emailtemplates');if(!ct)return;var bd=ct.querySelector('.dash-body');if(!bd)return;var d=document.getElementById('llfgED');if(!d){d=document.createElement('div');d.id='llfgED';d.className='llfg-anim-up';bd.appendChild(d)}var sc=_eLog.length,schc=_eSched.filter(function(e){return e.status==='scheduled'}).length;var rec=_eLog.slice(-8).reverse();d.innerHTML='<div class="dash-section" style="margin-top:1.5rem;"><div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>Email Activity</span><div style="display:flex;gap:0.6rem;"><span class="llfg-email-status sent">'+sc+' sent</span><span class="llfg-email-status scheduled">'+schc+' scheduled</span></div></div><div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.08);padding:1rem;margin-bottom:1rem;"><div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.6rem;">Schedule Email</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:0.6rem;align-items:end;"><div class="cal-field"><label>To</label><input type="email" id="schedEmailTo" placeholder="recipient@email.com"/></div><div class="cal-field"><label>Subject</label><input type="text" id="schedEmailSubj" placeholder="Subject"/></div><div class="cal-field"><label>Send Date</label><input type="datetime-local" id="schedEmailDate" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.75rem;font-family:Raleway,sans-serif;font-size:0.82rem;outline:none;"/></div><button onclick="llfgScheduleEmail()" class="modal-btn" style="padding:0.75rem 1.2rem;font-size:0.62rem;white-space:nowrap;">Schedule</button></div><div class="cal-field" style="margin-top:0.6rem;"><label>Body</label><textarea id="schedEmailBody" placeholder="Email body..." style="width:100%;height:60px;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.78rem;outline:none;resize:vertical;"></textarea></div></div>'+(_eSched.length?'<div style="margin-bottom:1rem;"><div style="font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Scheduled Queue</div>'+_eSched.map(function(e){return'<div class="llfg-email-log-row"><span class="llfg-email-status scheduled" style="font-size:0.5rem;">queued</span><div><div style="font-size:0.72rem;color:var(--cream);">'+e.subject+'</div><div style="font-size:0.6rem;color:var(--gray);">To: '+e.to+'</div></div><div style="font-size:0.6rem;color:var(--gray);">'+new Date(e.scheduledFor).toLocaleDateString()+'</div><button onclick="cancelScheduledEmail('+e.id+')" style="background:none;border:1px solid rgba(224,85,85,0.2);color:#e05555;padding:0.2rem 0.5rem;font-size:0.52rem;cursor:pointer;font-family:Raleway,sans-serif;">Cancel</button></div>'}).join('')+'</div>':'')+(rec.length?'<div style="font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Recent Activity</div>'+rec.map(function(e){return'<div class="llfg-email-log-row"><span class="llfg-email-status sent" style="font-size:0.5rem;">sent</span><div><div style="font-size:0.72rem;color:var(--cream);">'+e.subject+'</div><div style="font-size:0.6rem;color:var(--gray);">To: '+e.to+'</div></div><div style="font-size:0.6rem;color:var(--gray);">'+new Date(e.sentAt).toLocaleDateString()+'</div><div style="font-size:0.58rem;color:var(--gray);">'+e.sentBy+'</div></div>'}).join(''):'<p style="font-size:0.72rem;color:var(--gray);">No emails sent yet.</p>')+'</div>'}
+
+    /* ── 5. ACCOUNTING — Ledger, P&L, Export ───────────────────── */
+    var _ledger=[];try{_ledger=JSON.parse(localStorage.getItem('llfg_ledger')||'[]')}catch(e){}function _saveLedger(){try{localStorage.setItem('llfg_ledger',JSON.stringify(_ledger))}catch(e){}}
+    function _initLedger(){if(_ledger.length>0||typeof TEAM_DATA==='undefined')return;var now=new Date().toISOString().slice(0,10);TEAM_DATA.forEach(function(team){team.agents.forEach(function(a){var earned=Math.round(a.ap*(a.comm/100)),adv=Math.round(earned*0.75);_ledger.push({id:Date.now()+Math.random(),date:now,type:'credit',category:'premium',agent:a.name,team:team.name,amount:a.ap,description:'Premium - '+team.name});_ledger.push({id:Date.now()+Math.random(),date:now,type:'debit',category:'commission',agent:a.name,team:team.name,amount:earned,description:'Commission @ '+a.comm+'%'});_ledger.push({id:Date.now()+Math.random(),date:now,type:'debit',category:'advance_pay',agent:a.name,team:team.name,amount:adv,description:'Advance pay (75%)'});if(a.cb>5)_ledger.push({id:Date.now()+Math.random(),date:now,type:'debit',category:'chargeback',agent:a.name,team:team.name,amount:Math.round(a.ap*(a.cb/100)),description:'CB risk ('+a.cb+'%)'})})});_saveLedger()}
+    function _calcPnL(){var r=0,c=0,a=0,cb=0;if(typeof TEAM_DATA!=='undefined')TEAM_DATA.forEach(function(t){r+=t.totalAP;t.agents.forEach(function(ag){c+=Math.round(ag.ap*(ag.comm/100));a+=Math.round(ag.ap*(ag.comm/100)*0.75);cb+=Math.round(ag.ap*(ag.cb/100))})});return{revenue:r,comm:c,adv:a,cb:cb,net:r-c,margin:r>0?Math.round(((r-c)/r)*100):0}}
+
+    function renderFinancialDashboard(){var ct=document.getElementById('ptab-reports');if(!ct)return;if(document.getElementById('llfgFD'))document.getElementById('llfgFD').remove();_initLedger();var p=_calcPnL();var d=document.createElement('div');d.id='llfgFD';d.className='llfg-anim-up';d.innerHTML='<div class="dash-section" style="margin-top:1rem;"><div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;"><span>Financial Overview</span><div style="display:flex;gap:0.5rem;"><button onclick="exportCSV(\'pnl\')" class="llfg-tab-btn active" style="border:1px solid rgba(201,168,76,0.15);font-size:0.52rem;padding:0.3rem 0.7rem;">P&amp;L CSV</button><button onclick="exportCSV(\'ledger\')" class="llfg-tab-btn" style="border:1px solid rgba(201,168,76,0.15);font-size:0.52rem;padding:0.3rem 0.7rem;">Ledger CSV</button><button onclick="exportCSV(\'agents\')" class="llfg-tab-btn" style="border:1px solid rgba(201,168,76,0.15);font-size:0.52rem;padding:0.3rem 0.7rem;">Agents CSV</button></div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:1.2rem;" class="llfg-stagger"><div class="llfg-fin-card"><div class="llfg-fin-label">Total Revenue</div><div class="llfg-fin-value llfg-fin-pos">'+_fc(p.revenue)+'</div><div class="llfg-fin-sub">All teams</div></div><div class="llfg-fin-card"><div class="llfg-fin-label">Commission Expense</div><div class="llfg-fin-value llfg-fin-neg">'+_fc(p.comm)+'</div><div class="llfg-fin-sub">Agent payouts</div></div><div class="llfg-fin-card"><div class="llfg-fin-label">Net Income</div><div class="llfg-fin-value '+(p.net>=0?'llfg-fin-pos':'llfg-fin-neg')+'">'+_fc(p.net)+'</div><div class="llfg-fin-sub">Margin: '+p.margin+'%</div></div><div class="llfg-fin-card"><div class="llfg-fin-label">CB Exposure</div><div class="llfg-fin-value llfg-fin-neg">'+_fc(p.cb)+'</div><div class="llfg-fin-sub">At risk</div></div></div><div class="llfg-chart-row"><div class="llfg-chart-card"><h4>Revenue vs Expenses</h4><div class="llfg-chart-wrap"><canvas id="cPnL"></canvas></div></div><div class="llfg-chart-card"><h4>Agent Compensation</h4><div class="llfg-chart-wrap"><canvas id="cComp"></canvas></div></div></div><div style="margin-top:1rem;"><div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.6rem;">Team Financial Summary</div><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.72rem;"><thead><tr style="border-bottom:1px solid rgba(201,168,76,0.15);"><th style="text-align:left;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;">Team</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">AP</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">Comm</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">Adv Pay</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">CB</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">Net</th><th style="text-align:right;padding:0.5rem;color:var(--gold-dim);font-size:0.55rem;letter-spacing:0.12em;font-weight:500;">Margin</th></tr></thead><tbody>'+(typeof TEAM_DATA!=='undefined'?TEAM_DATA.map(function(t){var c=t.agents.reduce(function(s,a){return s+Math.round(a.ap*(a.comm/100))},0);var ad=Math.round(c*0.75);var cb2=t.agents.reduce(function(s,a){return s+Math.round(a.ap*(a.cb/100))},0);var n=t.totalAP-c;var m=t.totalAP>0?Math.round((n/t.totalAP)*100):0;return'<tr style="border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s;" onmouseover="this.style.background=\'rgba(201,168,76,0.03)\'" onmouseout="this.style.background=\'\'"><td style="padding:0.5rem;color:var(--cream);font-weight:500;">'+t.name+' <span style="color:var(--gray);font-weight:300;">\u2014 '+t.leader+'</span></td><td style="padding:0.5rem;text-align:right;color:var(--cream);">'+_fc(t.totalAP)+'</td><td style="padding:0.5rem;text-align:right;color:#e05555;">'+_fc(c)+'</td><td style="padding:0.5rem;text-align:right;color:var(--gold);">'+_fc(ad)+'</td><td style="padding:0.5rem;text-align:right;color:'+cbColor(t.chargeback)+';">'+_fc(cb2)+'</td><td style="padding:0.5rem;text-align:right;color:'+(n>=0?'#6ecf6e':'#e05555')+';">'+_fc(n)+'</td><td style="padding:0.5rem;text-align:right;color:'+(m>=0?'#6ecf6e':'#e05555')+';">'+m+'%</td></tr>'}).join(''):'')+'</tbody></table></div></div></div>';var bd=ct.querySelector('.dash-body');if(bd)bd.appendChild(d);setTimeout(function(){_dc('pnl');var c1=document.getElementById('cPnL');if(c1&&typeof Chart!=='undefined'&&typeof TEAM_DATA!=='undefined'){window._llfgCharts.pnl=new Chart(c1,{type:'bar',data:{labels:TEAM_DATA.map(function(t){return t.name}),datasets:[{label:'Revenue',data:TEAM_DATA.map(function(t){return t.totalAP}),backgroundColor:'rgba(110,207,110,0.5)',borderColor:'#6ecf6e',borderWidth:1,borderRadius:2},{label:'Expense',data:TEAM_DATA.map(function(t){return t.agents.reduce(function(s,a){return s+Math.round(a.ap*(a.comm/100))},0)}),backgroundColor:'rgba(224,85,85,0.5)',borderColor:'#e05555',borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:800,easing:'easeOutQuart'},scales:{x:{grid:{color:LFC.grid}},y:{grid:{color:LFC.grid},ticks:{callback:function(v){return'$'+v/1000+'K'}}}},plugins:{tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+_fc(c.raw)}}}}}})} _dc('comp');var c2=document.getElementById('cComp');if(c2&&typeof Chart!=='undefined'&&typeof TEAM_DATA!=='undefined'){var ags=[];TEAM_DATA.forEach(function(t){t.agents.forEach(function(a){ags.push(a)})});ags.sort(function(a,b){return(b.ap*(b.comm/100))-(a.ap*(a.comm/100))});var top=ags.slice(0,8);window._llfgCharts.comp=new Chart(c2,{type:'bar',data:{labels:top.map(function(a){return a.name.split(' ')[0]}),datasets:[{label:'Earned',data:top.map(function(a){return Math.round(a.ap*(a.comm/100))}),backgroundColor:'rgba(201,168,76,0.5)',borderColor:'#c9a84c',borderWidth:1,borderRadius:2},{label:'Advanced',data:top.map(function(a){return Math.round(a.ap*(a.comm/100)*0.75)}),backgroundColor:'rgba(110,168,254,0.4)',borderColor:'#6ea8fe',borderWidth:1,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animation:{duration:800},scales:{x:{grid:{color:LFC.grid},ticks:{callback:function(v){return'$'+v/1000+'K'}}},y:{grid:{color:LFC.grid}}},plugins:{tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+_fc(c.raw)}}},legend:{position:'bottom'}}}})}},300)}
+
+    window.__R_exportCSV=window.exportCSV=function(type){var csv='',fn='llfg_'+type+'_'+new Date().toISOString().slice(0,10)+'.csv';if(type==='pnl'){csv='Team,Leader,AP,Commission,AdvPay,CB,Net,Margin\n';if(typeof TEAM_DATA!=='undefined')TEAM_DATA.forEach(function(t){var c=t.agents.reduce(function(s,a){return s+Math.round(a.ap*(a.comm/100))},0);csv+='"'+t.name+'","'+t.leader+'",'+t.totalAP+','+c+','+Math.round(c*0.75)+','+t.agents.reduce(function(s,a){return s+Math.round(a.ap*(a.cb/100))},0)+','+(t.totalAP-c)+','+(t.totalAP>0?Math.round(((t.totalAP-c)/t.totalAP)*100):0)+'%\n'})}else if(type==='ledger'){csv='Date,Type,Category,Agent,Team,Amount,Description\n';_ledger.forEach(function(e){csv+=e.date+','+e.type+','+e.category+',"'+e.agent+'","'+e.team+'",'+e.amount+',"'+e.description+'"\n'})}else if(type==='agents'){csv='Name,Role,Comm%,Team,AP,MoPrem,Persist,CB%,Ret,Debt\n';if(typeof TEAM_DATA!=='undefined')TEAM_DATA.forEach(function(t){t.agents.forEach(function(a){csv+='"'+a.name+'","'+a.role+'",'+a.comm+',"'+t.name+'",'+a.ap+','+a.moP+','+a.persist+'%,'+a.cb+'%,'+a.ret+'%,'+a.debt+'\n'})})}var b=new Blob([csv],{type:'text/csv'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u);_toast('<strong>Downloaded</strong> '+fn)};
+
+    /* ── HOOKS — Wire features into tab router ────────────────── */
+    var _oShowTab=window.showPortalTab;window.__R_showPortalTab=window.showPortalTab=function(tab,el,isSubTab){_oShowTab(tab,el,isSubTab);setTimeout(function(){if(tab==='overview')renderOverviewCharts();if(tab==='commissions')renderCommissionCharts();if(tab==='reports')renderFinancialDashboard();if(tab==='emailtemplates')_renderEmailDash()},100)};
+    var _oBuildOv=(typeof buildPortalOverview==='function')?buildPortalOverview:null;if(_oBuildOv){window.buildPortalOverview=function(user){_oBuildOv(user);setTimeout(renderOverviewCharts,200)}}
+    var _oHier=(typeof renderHierarchyChart==='function')?renderHierarchyChart:null;renderHierarchyChart=function(){renderEnhancedHierarchy()};
+    setTimeout(function(){var o=document.getElementById('ptab-overview');if(o&&o.classList.contains('active'))renderOverviewCharts()},1000);
+
+    /* ═══════════════════════════════════════════════════════════
+       LLFG API LAYER — Connects frontend to Netlify Functions
+       Falls back to client-side behavior when backend unavailable
+       ═══════════════════════════════════════════════════════════ */
+
+    window.LLFG_API = {
+      _call: async function(fn, body) {
+        try {
+          var r = await fetch('/.netlify/functions/' + fn, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          return await r.json();
+        } catch (e) {
+          return { success: false, mode: 'client', error: e.message };
+        }
+      },
+
+      // ── Accounts ──
+      createAccount: async function(data) {
+        var result = await this._call('accounts', Object.assign({ action: 'create' }, data));
+        if (result.mode === 'client') return result; // fallback handled by caller
+        return result;
+      },
+
+      // ── Email ──
+      sendEmail: async function(to, subject, body, senderName) {
+        var result = await this._call('send-email', {
+          action: 'send-template', to: to, subject: subject,
+          templateBody: body, senderName: senderName
+        });
+        if (!result.success && result.mode === 'client') {
+          // Fallback to mailto
+          var a = document.createElement('a');
+          a.href = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+          a.click();
+          return { success: true, mode: 'mailto', message: 'Opened in mail client' };
+        }
+        return result;
+      },
+
+      sendCredentials: async function(data) {
+        var result = await this._call('send-email', Object.assign({ action: 'send-credentials' }, data));
+        if (!result.success && result.mode === 'client') {
+          var subj = 'Your LLFG Portal Credentials';
+          var body = 'Portal: llfg.org\nEmail: ' + data.llfgEmail + '\nPassword: ' + (data.password || 'welcome123') + '\nRole: ' + (data.role || 'Financial Advisor');
+          var a = document.createElement('a');
+          a.href = 'mailto:' + (data.to || data.llfgEmail) + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+          a.click();
+          return { success: true, mode: 'mailto' };
+        }
+        return result;
+      },
+
+      // ── Google Workspace ──
+      createWorkspaceUser: async function(firstName, lastName, username) {
+        var result = await this._call('google-workspace', {
+          action: 'create-user', firstName: firstName, lastName: lastName, username: username
+        });
+        if (result.mode === 'manual' && result.fallbackUrl) {
+          window.open(result.fallbackUrl, '_blank');
+          return { success: true, mode: 'manual', message: 'Opened Google Admin console' };
+        }
+        return result;
+      },
+
+      // ── Calendar ──
+      createCalendarEvent: async function(eventData) {
+        var result = await this._call('calendar-sync', Object.assign({ action: 'create-event' }, eventData));
+        if (result.mode === 'local') return result; // use local calendar
+        return result;
+      },
+
+      // ── Deals ──
+      saveDeal: async function(deal) {
+        var result = await this._call('deals', Object.assign({ action: 'save-deal' }, deal));
+        if (result.mode === 'client') return result;
+        return result;
+      },
+
+      listDeals: async function(agentEmail, all) {
+        return await this._call('deals', { action: 'list-deals', agentEmail: agentEmail, all: all });
+      }
+    };
+
+    // ── Patch addAccountDirectly to use API ──
+    var _origAddAccount = window.addAccountDirectly;
+    window.addAccountDirectly = async function() {
+      var nameEl = document.getElementById('addAccName');
+      var userEl = document.getElementById('addAccUsername');
+      var passEl = document.getElementById('addAccPass');
+      var roleEl = document.getElementById('addAccRole');
+      var commEl = document.getElementById('addAccComm');
+      var persEl = document.getElementById('addAccPersonalEmail');
+
+      var name = (nameEl && nameEl.value || '').trim();
+      var username = (userEl && userEl.value || '').trim().toLowerCase().replace(/[^a-z0-9._-]/g, '');
+      if (!name || !username) { alert('Full name and username are required.'); return; }
+
+      var llfgEmail = username + '@llfg.us';
+      var pass = (passEl && passEl.value) || 'welcome123';
+      var role = (roleEl && roleEl.value) || 'financial_advisor';
+      var comm = parseInt((commEl && commEl.value) || '75');
+      var persEmail = (persEl && persEl.value || '').trim();
+      var parts = name.split(' ');
+      var firstName = parts[0] || name;
+      var lastName = parts.slice(1).join(' ') || '';
+
+      // 1. Create portal account (API with fallback)
+      var accResult = await LLFG_API.createAccount({
+        email: llfgEmail, password: pass, name: name,
+        role: role, commission: comm, personalEmail: persEmail,
+        createdBy: ((currentUser || window._llfgCurrentUser || {}).name || 'Admin')
+      });
+
+      // Always create in-memory too (immediate use)
+      if (typeof USERS !== 'undefined') USERS[llfgEmail] = { password: pass, role: role, name: name, comm: comm };
+      if (typeof LLFG_USERS !== 'undefined') LLFG_USERS[llfgEmail] = { password: pass, role: role, name: name, comm: comm };
+      if (typeof runtimePermissions !== 'undefined') runtimePermissions[llfgEmail] = role;
+
+      // 2. Send credentials email (API with mailto fallback)
+      await LLFG_API.sendCredentials({
+        to: persEmail || llfgEmail, name: name,
+        llfgEmail: llfgEmail, password: pass, role: role
+      });
+
+      // 3. Create Google Workspace account (API with manual fallback)
+      await LLFG_API.createWorkspaceUser(firstName, lastName, username);
+
+      // 4. Track in approved accounts
+      if (typeof approvedAccounts !== 'undefined') {
+        approvedAccounts.push({
+          id: Date.now(), name: name, email: llfgEmail,
+          role: role, approvedBy: ((currentUser || window._llfgCurrentUser || {}).name || 'Admin'),
+          date: new Date().toLocaleDateString()
+        });
+      }
+
+      // 5. Success UI
+      _toast('<strong>' + name + '</strong> account created<br>' + llfgEmail);
+      var successEl = document.getElementById('addAccSuccessMsg');
+      if (successEl) {
+        successEl.innerHTML = '<span style="color:#6ecf6e;">✓</span> <strong>' + name + '</strong> added as ' + role
+          + '<br><span style="font-size:0.6rem;color:var(--gray);">Portal: ' + llfgEmail + ' · Credentials '
+          + (accResult.mode === 'client' ? 'emailed via mail client' : 'sent via server')
+          + ' · Google Workspace ' + (accResult.mode === 'client' ? 'opened in admin console' : 'account created') + '</span>';
+        successEl.style.display = 'block';
+        setTimeout(function() { successEl.style.display = 'none'; }, 10000);
+      }
+
+      // 6. Reset form
+      ['addAccName','addAccUsername','addAccPersonalEmail','addAccPhone'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      if (roleEl) roleEl.value = 'financial_advisor';
+      if (commEl) commEl.value = '75';
+      if (passEl) passEl.value = 'welcome123';
+      var strip = document.getElementById('accPreviewStrip');
+      if (strip) strip.style.display = 'none';
+
+      if (typeof renderAccountApprovals === 'function') renderAccountApprovals();
+    };
+
+    // ── Patch sendEmailTemplate to use API ──
+    var _origSendEmail2 = window.sendEmailTemplate;
+    window.__R_sendEmailTemplate = window.sendEmailTemplate = async function(id) {
+      var all = (typeof EMAIL_TEMPLATES !== 'undefined' ? EMAIL_TEMPLATES : []).concat(typeof customTemplates !== 'undefined' ? customTemplates : []);
+      var tpl = all.find(function(t) { return t.id === id; });
+      if (!tpl) return;
+      var subj = (document.getElementById('tplSubjectPreview') || {}).textContent || tpl.subject;
+      var body = (document.getElementById('tplBodyPreview') || {}).textContent || tpl.body;
+      var to = (document.getElementById('tplEmail') || {}).value || '';
+      var sender = ((currentUser || window._llfgCurrentUser || {}).name || 'LLFG Agent');
+
+      var result = await LLFG_API.sendEmail(to, subj, body, sender);
+      _logEmail(to, subj, tpl.name, 'sent');
+
+      if (result.mode === 'mailto') {
+        _toast('<strong>Email opened</strong> in mail client');
+      } else if (result.success) {
+        _toast('<strong>Email sent</strong> to ' + to);
+      } else {
+        _toast('Send failed: ' + (result.error || 'unknown'), '#e05555');
+      }
+    };
+
+    // ── Patch addPortalCalEvent to sync with Google Calendar ──
+    var _origAddCal2 = window.addPortalCalEvent;
+    window.addPortalCalEvent = async function() {
+      _origAddCal2 ? _origAddCal2() : null;
+      _saveCal();
+
+      // Try to sync to Google Calendar
+      var lastEv = portalCalEvents[portalCalEvents.length - 1];
+      if (lastEv) {
+        var start = new Date(lastEv.date + 'T' + (lastEv.time || '09:00'));
+        var end = new Date(start.getTime() + (lastEv.duration || 60) * 60000);
+        var result = await LLFG_API.createCalendarEvent({
+          title: lastEv.label + (lastEv.guestName ? ' — ' + lastEv.guestName : ''),
+          startDateTime: start.toISOString(),
+          endDateTime: end.toISOString(),
+          guestEmail: lastEv.guestEmail,
+          guestName: lastEv.guestName,
+          location: lastEv.location,
+          description: lastEv.notes,
+          userEmail: ((currentUser || window._llfgCurrentUser || {}).email || '')
+        });
+        if (result.success && result.eventId) {
+          lastEv.googleEventId = result.eventId;
+          _saveCal();
+        }
+      }
+    };
+
   </script>
 </body>
 </html>
