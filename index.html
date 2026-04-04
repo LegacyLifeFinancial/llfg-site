@@ -5113,6 +5113,9 @@
           </div>
         </div>
 
+        <!-- Revenue Ops, Pipeline & Reconciliation -->
+        <div id="revenueOpsSection" style="margin-top:1.5rem;"></div>
+
         <!-- Inline full report preview (toggleable) -->
         <div id="inlineReportView" style="display:none;">
           <div class="dash-section">
@@ -5750,6 +5753,33 @@
             <thead><tr><th>Email</th><th>Permission Level</th><th>Granted By</th><th>Date</th><th></th></tr></thead>
             <tbody id="permTableBody"></tbody>
           </table>
+        </div>
+
+        <!-- Data Backup & Export -->
+        <div class="dash-section" style="margin-top:1.5rem;">
+          <div class="dash-section-title">&#x1F4BE; Data Backup &amp; Export</div>
+          <p style="font-size:0.68rem;color:var(--gray);line-height:1.6;margin-bottom:1rem;">Export all portal data (gamification progress, training, agents, settings) to a JSON file. Import from a previous backup to restore. API keys are automatically masked in exports.</p>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+            <button onclick="exportPortalData()" class="modal-btn" style="padding:0.7rem 1.5rem;">&#x1F4E5; Export Portal Data</button>
+            <button onclick="importPortalData()" class="modal-btn" style="padding:0.7rem 1.5rem;background:rgba(110,168,254,0.08);border-color:rgba(110,168,254,0.3);color:#6ea8fe;">&#x1F4E4; Import Backup</button>
+          </div>
+        </div>
+
+        <!-- Document Compliance Overview -->
+        <div class="dash-section" style="margin-top:1.5rem;">
+          <div class="dash-section-title">&#x1F4CB; Document Compliance</div>
+          <p style="font-size:0.68rem;color:var(--gray);line-height:1.6;margin-bottom:1rem;">Track required documents for every agent: NDA, Debt Rollup, ICA, AML, Code of Conduct, licenses, E&amp;O, and carrier appointments.</p>
+          <div id="docComplianceGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;"></div>
+          <script>
+            (function(){
+              var el = document.getElementById('docComplianceGrid');
+              if (!el || typeof LLFG_DocTracker === 'undefined') return;
+              var docs = LLFG_DocTracker.REQUIRED_DOCS;
+              el.innerHTML = docs.map(function(d) {
+                return '<div style="border:1px solid rgba(201,168,76,0.1);padding:0.6rem;text-align:center;background:rgba(0,0,0,0.1);"><div style="font-size:1rem;margin-bottom:0.2rem;">' + d.icon + '</div><div style="font-size:0.58rem;color:var(--cream);font-weight:500;">' + d.name + '</div><div style="font-size:0.48rem;color:var(--gray);text-transform:uppercase;margin-top:0.2rem;">' + d.category + '</div></div>';
+              }).join('');
+            })();
+          </script>
         </div>
       </div>
     </div>
@@ -8617,6 +8647,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         if (tab === 'reports') {
           if (typeof initReportsTab === 'function') initReportsTab();
           if (typeof renderReportSummary === 'function') renderReportSummary();
+          if (typeof renderRevenueOps === 'function') renderRevenueOps();
         }
 
         if (tab === 'downlineclients') {
@@ -12076,6 +12107,225 @@ contact\u0040llfg.us`
     window.clearApiLog=function(){localStorage.removeItem(LLFG_Integrations._logKey);LLFG_Integrations.renderLog();};
     window.renderIntegrationsTab=function(){var d=LLFG_Integrations.load();var s=d.surelc||{};var a=document.getElementById('surelcAgencyId'),k=document.getElementById('surelcApiKey'),sc=document.getElementById('surelcApiSecret'),e=document.getElementById('surelcEnv');if(a&&s.agencyId)a.value=s.agencyId;if(k&&s.apiKey)k.value=s.apiKey;if(sc&&s.apiSecret)sc.value=s.apiSecret;if(e&&s.env)e.value=s.env;if(s.status==='connected'){var st=document.getElementById('surelcStatus');if(st){st.textContent='Connected';st.style.color='#6ecf6e';st.style.background='rgba(110,207,110,0.08)';st.style.borderColor='rgba(110,207,110,0.3)';}}var sync=d.sync||{};var c1=document.getElementById('syncDealsEnabled'),c2=document.getElementById('syncStatusEnabled'),c3=document.getElementById('syncContractingEnabled'),c4=document.getElementById('syncLicenseEnabled');if(c1)c1.checked=!!sync.deals;if(c2)c2.checked=!!sync.status;if(c3)c3.checked=!!sync.contracting;if(c4)c4.checked=!!sync.license;[c1,c2,c3,c4].forEach(function(cb){if(cb)cb.onchange=function(){var dd=LLFG_Integrations.load();dd.sync={deals:document.getElementById('syncDealsEnabled')?.checked,status:document.getElementById('syncStatusEnabled')?.checked,contracting:document.getElementById('syncContractingEnabled')?.checked,license:document.getElementById('syncLicenseEnabled')?.checked};LLFG_Integrations.save(dd);LLFG_Integrations.renderStatusBar();};});LLFG_Integrations.renderStatusBar();LLFG_Integrations.renderCarrierList();LLFG_Integrations.renderLog();};
 
+
+    // ─── DATA BACKUP & EXPORT SYSTEM ──────────────────────────────
+    window.exportPortalData = function() {
+      var backup = { _meta: { exportedAt: new Date().toISOString(), version: '2.0', source: 'LLFG Portal' }, data: {} };
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.startsWith('llfg_')) {
+          try {
+            var val = localStorage.getItem(key);
+            if (key === 'llfg_integrations') {
+              var parsed = JSON.parse(val);
+              if (parsed.surelc && parsed.surelc.apiKey) parsed.surelc.apiKey = parsed.surelc.apiKey.substring(0,4) + '****';
+              if (parsed.surelc && parsed.surelc.apiSecret) parsed.surelc.apiSecret = '****';
+              if (parsed.carriers) parsed.carriers.forEach(function(c) { if (c.apiKey) c.apiKey = c.apiKey.substring(0,4) + '****'; if (c.apiSecret) c.apiSecret = '****'; });
+              backup.data[key] = JSON.stringify(parsed);
+            } else { backup.data[key] = val; }
+          } catch(e) { backup.data[key] = val; }
+        }
+      }
+      var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href = url; a.download = 'llfg_backup_' + new Date().toISOString().slice(0,10) + '.json'; a.click();
+      URL.revokeObjectURL(url);
+      if (typeof LLFG_EventBus !== 'undefined') LLFG_EventBus.emit('backup:exported', { keys: Object.keys(backup.data).length });
+    };
+
+    window.importPortalData = function() {
+      var input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+      input.onchange = function(e) {
+        var file = e.target.files[0]; if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          try {
+            var backup = JSON.parse(ev.target.result);
+            if (!backup._meta || !backup.data) { alert('Invalid backup file.'); return; }
+            if (!confirm('This will overwrite your current portal data with the backup from ' + backup._meta.exportedAt + '. Continue?')) return;
+            Object.entries(backup.data).forEach(function(entry) { localStorage.setItem(entry[0], entry[1]); });
+            alert('Restored ' + Object.keys(backup.data).length + ' data keys. Page will reload.');
+            location.reload();
+          } catch(err) { alert('Error reading backup: ' + err.message); }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    };
+
+    // ─── DOCUMENT TRACKING SYSTEM ──────────────────────────────
+    const LLFG_DocTracker = {
+      _key: 'llfg_doc_tracker',
+      REQUIRED_DOCS: [
+        { id: 'nda', name: 'NDA', category: 'onboarding', icon: '\uD83D\uDD12' },
+        { id: 'debt_rollup', name: 'Debt Rollup Acknowledgment', category: 'onboarding', icon: '\uD83D\uDCB3' },
+        { id: 'ica', name: 'Independent Contractor Agreement', category: 'onboarding', icon: '\uD83D\uDCDD' },
+        { id: 'aml', name: 'AML Acknowledgment', category: 'onboarding', icon: '\u26A0\uFE0F' },
+        { id: 'code_conduct', name: 'Code of Conduct', category: 'onboarding', icon: '\uD83D\uDCCB' },
+        { id: 'lh_license', name: 'Life & Health License', category: 'licensing', icon: '\uD83C\uDF93' },
+        { id: 'eo_insurance', name: 'E&O Insurance', category: 'licensing', icon: '\uD83D\uDEE1\uFE0F' },
+        { id: 'ce_credits', name: 'Continuing Education', category: 'licensing', icon: '\uD83D\uDCDA' },
+        { id: 'surelc_contract', name: 'SureLC Contracting', category: 'carrier', icon: '\uD83D\uDD17' },
+        { id: 'carrier_appt', name: 'Carrier Appointments', category: 'carrier', icon: '\uD83C\uDFE2' }
+      ],
+      load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}'); } catch(e) { return {}; } },
+      save(data) { try { localStorage.setItem(this._key, JSON.stringify(data)); } catch(e) {} },
+      getAgentDocs(agentEmail) { var d = this.load(); return d[agentEmail] || {}; },
+      setDocStatus(agentEmail, docId, status, meta) {
+        var d = this.load();
+        if (!d[agentEmail]) d[agentEmail] = {};
+        d[agentEmail][docId] = { status: status, updatedAt: Date.now(), meta: meta || null };
+        this.save(d);
+      },
+      getComplianceScore(agentEmail) {
+        var docs = this.getAgentDocs(agentEmail);
+        var completed = this.REQUIRED_DOCS.filter(function(rd) { return docs[rd.id] && docs[rd.id].status === 'complete'; }).length;
+        return { completed: completed, total: this.REQUIRED_DOCS.length, pct: Math.round(completed / this.REQUIRED_DOCS.length * 100) };
+      }
+    };
+
+    // ─── REVENUE OPS ENGINE ──────────────────────────────
+    window.getRevenueSnapshot = function() {
+      var teams = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA : [];
+      var deals = (typeof myDeals !== 'undefined') ? myDeals : [];
+      var now = new Date();
+      var monthlyDeals = deals.filter(function(d) { var dt = new Date(d.date || d.dateLogged); return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear(); });
+      var totalAP = teams.reduce(function(s, t) { return s + (t.totalAP || 0); }, 0);
+      var totalAgents = teams.reduce(function(s, t) { return s + (t.agents ? t.agents.length : 0); }, 0);
+      var producingAgents = teams.reduce(function(s, t) { return s + (t.agents ? t.agents.filter(function(a) { return (a.ap || 0) > 0; }).length : 0); }, 0);
+      var avgPersistency = teams.length > 0 ? (teams.reduce(function(s, t) { return s + (t.persistency || 0); }, 0) / teams.length).toFixed(1) : 0;
+      var avgChargeback = teams.length > 0 ? (teams.reduce(function(s, t) { return s + (t.chargeback || 0); }, 0) / teams.length).toFixed(1) : 0;
+      var avgCaseSize = monthlyDeals.length > 0 ? Math.round(monthlyDeals.reduce(function(s, d) { return s + (parseFloat(d.ap || d.premium) || 0); }, 0) / monthlyDeals.length) : 0;
+      var activityRatio = totalAgents > 0 ? Math.round(producingAgents / totalAgents * 100) : 0;
+      return {
+        totalAP: totalAP, monthlyDeals: monthlyDeals.length, avgCaseSize: avgCaseSize,
+        totalAgents: totalAgents, producingAgents: producingAgents, activityRatio: activityRatio,
+        avgPersistency: parseFloat(avgPersistency), avgChargeback: parseFloat(avgChargeback),
+        health: totalAP > 500000 ? 'green' : totalAP > 200000 ? 'yellow' : 'red',
+        teams: teams.map(function(t) {
+          return { name: t.name, leader: t.leader, ap: t.totalAP, persistency: t.persistency, chargeback: t.chargeback, agents: t.agents ? t.agents.length : 0 };
+        })
+      };
+    };
+
+    // ─── ONBOARDING PIPELINE ENGINE ──────────────────────────────
+    window.getOnboardingPipeline = function() {
+      var pending = (typeof pendingAgentQueue !== 'undefined') ? pendingAgentQueue : [];
+      var approved = (typeof approvedAgentQueue !== 'undefined') ? approvedAgentQueue : [];
+      var contracted = (typeof contractedAgents !== 'undefined') ? contractedAgents : [];
+      var submitted = (typeof mySubmittedAgents !== 'undefined') ? mySubmittedAgents : [];
+      var allApps = (typeof applications !== 'undefined') ? applications : [];
+      var training = LLFG_Gamification ? LLFG_Gamification.getOverallProgress() : { completed: 0, total: 1 };
+      var producing = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce(function(s, t) { return s + (t.agents ? t.agents.filter(function(a) { return (a.ap || 0) > 0; }).length : 0); }, 0) : 0;
+
+      var stages = [
+        { name: 'Applied', count: allApps.length + submitted.length, icon: '\uD83D\uDCE9', color: 'var(--gray)' },
+        { name: 'Approved', count: approved.length, icon: '\u2705', color: '#6ea8fe' },
+        { name: 'Contracted', count: contracted.length, icon: '\uD83D\uDCDD', color: '#c084fc' },
+        { name: 'Licensed', count: contracted.length, icon: '\uD83C\uDF93', color: '#ffa500' },
+        { name: 'Trained', count: Math.round(training.completed / Math.max(training.total, 1) * contracted.length), icon: '\uD83D\uDCDA', color: 'var(--gold)' },
+        { name: 'Producing', count: producing, icon: '\uD83D\uDCB5', color: '#6ecf6e' }
+      ];
+      return { stages: stages, pending: pending.length, bottlenecks: pending.length > 5 ? ['Approvals backlog: ' + pending.length + ' pending'] : [] };
+    };
+
+    // ─── COMMISSION RECONCILIATION ENGINE ──────────────────────────────
+    window.runReconciliation = function() {
+      var deals = (typeof myDeals !== 'undefined') ? myDeals : [];
+      var user = currentUser || window._llfgCurrentUser;
+      var commPct = (user?.comm || 65) / 100;
+      var advanceRate = 0.75;
+      var results = [];
+      var totalExpected = 0, totalDisplayed = 0;
+
+      deals.forEach(function(d) {
+        var ap = parseFloat(d.ap || d.premium) || 0;
+        var expected = Math.round(ap * commPct * advanceRate * 100) / 100;
+        var displayed = parseFloat(d.commission || d.advancedPay) || expected;
+        var variance = Math.round((displayed - expected) * 100) / 100;
+        totalExpected += expected;
+        totalDisplayed += displayed;
+        results.push({ client: d.client || d.clientName || 'Unknown', ap: ap, expected: expected, displayed: displayed, variance: variance, status: Math.abs(variance) < 1 ? 'OK' : 'VARIANCE' });
+      });
+
+      return {
+        deals: results, totalExpected: totalExpected, totalDisplayed: totalDisplayed,
+        totalVariance: Math.round((totalDisplayed - totalExpected) * 100) / 100,
+        clean: results.filter(function(r) { return r.status === 'OK'; }).length,
+        flagged: results.filter(function(r) { return r.status !== 'OK'; }).length
+      };
+    };
+
+    // ─── RENDER ENHANCED REPORTS TAB ──────────────────────────────
+    window._origRenderReportSummary = window.renderReportSummary;
+    var _revenueOpsRendered = false;
+
+    window.renderRevenueOps = function() {
+      var container = document.getElementById('revenueOpsSection');
+      if (!container) return;
+      var snap = getRevenueSnapshot();
+      var pipeline = getOnboardingPipeline();
+      var recon = runReconciliation();
+      var healthColors = { green: '#6ecf6e', yellow: '#ffa500', red: '#e05555' };
+
+      // Revenue KPI cards
+      var html = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;margin-bottom:1.2rem;">';
+      html += '<div class="dash-card"><div class="dash-card-label">Org Monthly AP</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:' + healthColors[snap.health] + ';">$' + snap.totalAP.toLocaleString() + '</div></div>';
+      html += '<div class="dash-card"><div class="dash-card-label">Avg Case Size</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">$' + snap.avgCaseSize.toLocaleString() + '</div><div class="dash-card-sub">Target: $3,000+</div></div>';
+      html += '<div class="dash-card"><div class="dash-card-label">Activity Ratio</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:' + (snap.activityRatio >= 60 ? '#6ecf6e' : '#ffa500') + ';">' + snap.activityRatio + '%</div><div class="dash-card-sub">' + snap.producingAgents + '/' + snap.totalAgents + ' producing</div></div>';
+      html += '<div class="dash-card"><div class="dash-card-label">Net Chargeback</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:' + (snap.avgChargeback < 5 ? '#6ecf6e' : '#e05555') + ';">' + snap.avgChargeback + '%</div><div class="dash-card-sub">Target: <5%</div></div>';
+      html += '</div>';
+
+      // Onboarding Pipeline Funnel
+      html += '<div class="dash-section" style="margin-bottom:1.2rem;"><div class="dash-section-title">\uD83D\uDE80 Onboarding Pipeline</div>';
+      var maxCount = Math.max.apply(null, pipeline.stages.map(function(s) { return s.count; }).concat([1]));
+      pipeline.stages.forEach(function(s) {
+        var pct = Math.round(s.count / maxCount * 100);
+        html += '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;">';
+        html += '<div style="width:90px;text-align:right;font-size:0.62rem;color:var(--gray);">' + s.icon + ' ' + s.name + '</div>';
+        html += '<div style="flex:1;height:20px;background:rgba(255,255,255,0.04);overflow:hidden;"><div style="width:' + pct + '%;height:100%;background:' + s.color + '30;display:flex;align-items:center;padding-left:0.4rem;"><span style="font-size:0.6rem;color:' + s.color + ';font-weight:600;">' + s.count + '</span></div></div>';
+        html += '</div>';
+      });
+      if (pipeline.bottlenecks.length > 0) {
+        html += '<div style="margin-top:0.6rem;padding:0.5rem 0.7rem;border-left:3px solid #ffa500;background:rgba(255,165,0,0.04);font-size:0.6rem;color:#ffa500;">' + pipeline.bottlenecks.join('<br>') + '</div>';
+      }
+      html += '</div>';
+
+      // Team Breakdown
+      html += '<div class="dash-section" style="margin-bottom:1.2rem;"><div class="dash-section-title">\uD83C\uDFC6 Team Revenue Breakdown</div>';
+      html += '<div style="overflow-x:auto;"><table class="app-table"><thead><tr><th>Team</th><th>Leader</th><th>Agents</th><th>AP</th><th>Persistency</th><th>Chargeback</th></tr></thead><tbody>';
+      snap.teams.sort(function(a, b) { return b.ap - a.ap; }).forEach(function(t) {
+        html += '<tr><td style="font-weight:600;color:var(--cream);">' + t.name + '</td><td>' + t.leader + '</td><td>' + t.agents + '</td>';
+        html += '<td style="color:var(--gold);font-weight:600;">$' + t.ap.toLocaleString() + '</td>';
+        html += '<td style="color:' + (t.persistency >= 85 ? '#6ecf6e' : t.persistency >= 78 ? '#ffa500' : '#e05555') + ';">' + t.persistency + '%</td>';
+        html += '<td style="color:' + (t.chargeback < 5 ? '#6ecf6e' : '#e05555') + ';">' + t.chargeback + '%</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+
+      // Commission Reconciliation
+      html += '<div class="dash-section"><div class="dash-section-title">\u2696\uFE0F Commission Reconciliation</div>';
+      if (recon.deals.length > 0) {
+        html += '<div style="display:flex;gap:1rem;margin-bottom:0.8rem;">';
+        html += '<div style="font-size:0.65rem;color:var(--gray);">Deals: <strong style="color:var(--cream);">' + recon.deals.length + '</strong></div>';
+        html += '<div style="font-size:0.65rem;color:#6ecf6e;">Clean: <strong>' + recon.clean + '</strong></div>';
+        html += '<div style="font-size:0.65rem;color:' + (recon.flagged > 0 ? '#e05555' : '#6ecf6e') + ';">Flagged: <strong>' + recon.flagged + '</strong></div>';
+        html += '<div style="font-size:0.65rem;color:var(--gray);">Total Variance: <strong style="color:' + (Math.abs(recon.totalVariance) < 1 ? '#6ecf6e' : '#e05555') + ';">$' + recon.totalVariance.toFixed(2) + '</strong></div>';
+        html += '</div>';
+        html += '<div style="overflow-x:auto;"><table class="app-table"><thead><tr><th>Client</th><th>AP</th><th>Expected</th><th>Displayed</th><th>Variance</th><th>Status</th></tr></thead><tbody>';
+        recon.deals.forEach(function(d) {
+          html += '<tr><td>' + d.client + '</td><td>$' + d.ap.toLocaleString() + '</td><td>$' + d.expected.toFixed(2) + '</td><td>$' + d.displayed.toFixed(2) + '</td>';
+          html += '<td style="color:' + (Math.abs(d.variance) < 1 ? '#6ecf6e' : '#e05555') + ';">$' + d.variance.toFixed(2) + '</td>';
+          html += '<td><span style="font-size:0.55rem;padding:0.1rem 0.4rem;background:' + (d.status === 'OK' ? 'rgba(110,207,110,0.1)' : 'rgba(224,85,85,0.1)') + ';color:' + (d.status === 'OK' ? '#6ecf6e' : '#e05555') + ';border:1px solid ' + (d.status === 'OK' ? 'rgba(110,207,110,0.2)' : 'rgba(224,85,85,0.2)') + ';">' + d.status + '</span></td></tr>';
+        });
+        html += '</tbody></table></div>';
+      } else {
+        html += '<div style="font-size:0.65rem;color:var(--gray);padding:1rem;text-align:center;">Log deals to see reconciliation data.</div>';
+      }
+      html += '</div>';
+
+      container.innerHTML = html;
+    };
+
     window.__R_clearBcPhoto = window.clearBcPhoto = function() {
       _bcPhotoDataUrl = null;
       const thumb = document.getElementById('bcPhotoPreviewThumb');
@@ -14296,6 +14546,10 @@ This request requires Managing Partner approval.`
       onStart() {
         this._runAll();
         this.schedule(() => this._runAll(), 120000);
+        // Cross-agent: deal logged → award XP via gamification
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('dealpipeline:updated', function(d){ if(d&&d.monthlyDeals>0&&typeof LLFG_Gamification!=='undefined'&&LLFG_Gamification.awardXP) LLFG_Gamification.awardXP('deal_logged',50,'Deal logged this period'); }.bind(this));
+        }
       }
 
       _runAll() {
@@ -14677,6 +14931,10 @@ This request requires Managing Partner approval.`
       onStart() {
         this._setupTriggers();
         this.schedule(() => this._checkExpirations(), 300000);
+        // Cross-agent: expiring docs → prioritize compliance training
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('documents:scanned', function(d){ if(d&&d.expiringSoon&&d.expiringSoon.length) this.alert('Auto-prioritizing compliance training — '+d.expiringSoon.length+' docs expiring','info'); }.bind(this));
+        }
       }
 
       _setupTriggers() {
@@ -14763,6 +15021,13 @@ This request requires Managing Partner approval.`
       onStart() {
         this._calculateScores();
         this.schedule(() => this._calculateScores(), 300000);
+        // Cross-agent risk correlation
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('sales:updated', function(d){ if(d&&d.chargebackRisk&&d.chargebackRisk.length) this.alert('Chargeback-driven churn risk: '+d.chargebackRisk.length+' agents','warning'); }.bind(this));
+          LLFG_EventBus.on('dealpipeline:updated', function(d){ if(d&&d.monthlyDeals===0&&d.totalDeals>0) this.alert('No deals this month — engagement risk','warning'); }.bind(this));
+          LLFG_EventBus.on('calendar:updated', function(d){ if(d&&d.thisWeek===0&&d.total>0) this.alert('No appointments this week — disengagement signal','info'); }.bind(this));
+          LLFG_EventBus.on('documents:scanned', function(d){ if(d&&d.expiringSoon&&d.expiringSoon.length) this.alert('Expiring docs may increase churn risk','info'); }.bind(this));
+        }
       }
 
       _calculateScores() {
@@ -15864,7 +16129,7 @@ This request requires Managing Partner approval.`
 
       onStart() {
         this._loadState();
-        this.schedule(function() { this._processQueue(); }.bind(this), 15000);
+        this.schedule(function() { this._processQueue(); }.bind(this), 30000);
       }
 
       _loadState() {
@@ -16008,7 +16273,9 @@ This request requires Managing Partner approval.`
         // Listen for recruiting and sales events to auto-nurture
         if (typeof LLFG_EventBus !== 'undefined') {
           LLFG_EventBus.on('recruiting:stageChanged', function(d){ this._autoNurture(d); }.bind(this));
-          // sales:dealClosed listener removed — no auto-post to social
+          LLFG_EventBus.on('email:sent', function(){ this.analytics.totalSent++; this._saveState(); }.bind(this));
+          LLFG_EventBus.on('compliance:checked', function(d){ if(d&&d.violations&&d.violations.length>0){ this.campaigns.forEach(function(c){if(c.status==='active')c.status='paused';}); this._saveState(); this.alert('Campaigns paused — compliance issue','critical'); } }.bind(this));
+          LLFG_EventBus.on('aicontent:completed', function(d){ if(d&&d.blobUrl) this.alert('AI image available for content','info'); }.bind(this));
         }
       }
 
@@ -16269,6 +16536,10 @@ This request requires Managing Partner approval.`
         var self = this;
         setTimeout(function(){ self.run(); }, 3000);
         this._interval = setInterval(function(){ self.run(); }, 5 * 60 * 1000);
+        // Cross-agent: preflight failures → immediate optimization run
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('preflight:completed', function(d){ if(d&&d.readiness==='red') { self.alert('Preflight RED — running emergency optimization','warning'); setTimeout(function(){ self.run(); },500); } }.bind(this));
+        }
       }
       onStop() { if (this._interval) { clearInterval(this._interval); this._interval = null; } }
       async run(ctx) {
