@@ -3402,6 +3402,15 @@
   <!-- NAV -->
   <!-- ALL inline-onclick functions defined here FIRST — before Cloudflare can inject anything -->
   <script>
+    /* Global error catcher — shows JS errors visually */
+    window.onerror = function(msg, url, line, col, err) {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#e05555;color:#fff;padding:0.5rem 1rem;font-size:0.7rem;font-family:monospace;z-index:99999;';
+      d.textContent = 'JS Error: ' + msg + ' (line ' + line + ')';
+      document.body && document.body.appendChild(d);
+      setTimeout(function(){ d.remove(); }, 15000);
+    };
+
     /* ─── LLFG Early Script ───────────────────────────────────────────
        This block runs before app.js and has NO email addresses in it,
        so Cloudflare never injects anything here. All critical login

@@ -1,0 +1,24 @@
+{
+  "free_provider": "pollinations",
+  "pollinations_base": "https://image.pollinations.ai/prompt/",
+  "pollinations_defaults": {
+    "width": 1920,
+    "height": 1080,
+    "model": "flux",
+    "nologo": true,
+    "enhance": true
+  },
+  "runway_api_key": "YOUR_RUNWAY_KEY_HERE",
+  "stability_api_key": "YOUR_STABILITY_KEY_HERE",
+  "openai_api_key": "YOUR_OPENAI_KEY_HERE",
+  "preferred_video": "runway",
+  "preferred_image": "pollinations",
+  "output_dir": "./generated",
+  "prompts": {
+    "hero_video": "Cinematic 4K video, nighttime. A majestic male lion walks confidently down the center of an empty Wall Street financial district. Hundred dollar bills float and swirl through the air around the lion, caught in a gentle wind. The camera starts close on the lion's face, then slowly zooms out and orbits around him, revealing towering glass skyscrapers with warm golden light reflecting off the buildings. The street is wet, reflecting city lights. Moody, dark atmosphere with rich gold and amber tones. No people. Dramatic cinematic lighting. Shot on ARRI Alexa.",
+    "hero_image": "Cinematic photorealistic A powerful male lion walking down empty Wall Street New York at night hundred dollar bills flying and swirling in the air all around him money raining down wet street reflecting golden lights from skyscrapers towering glass buildings dark moody dramatic lighting gold and black color palette cinematic film still no people ultrarealistic 8K",
+    "section_bg": "Abstract financial growth Dark background with flowing golden light trails forming an upward trajectory Particles of gold dust floating Ultra wide 21:9 Minimal luxurious dark",
+    "about_bg": "Dark luxury office interior with gold accents floor to ceiling windows overlooking city skyline at night cinematic moody",
+    "carrier_bg": "Abstract dark background with subtle golden geometric patterns connecting nodes like a network professional financial dark luxury"
+  }
+}
