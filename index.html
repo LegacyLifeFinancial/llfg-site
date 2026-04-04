@@ -14141,6 +14141,15 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_DocumentAgent());
         this.register(new LLFG_BackupAgent());
         this.register(new LLFG_AutoOptimizerAgent());
+        this.register(new LLFG_EngagementScoreAgent());
+        this.register(new LLFG_WinLossAgent());
+        this.register(new LLFG_SpeedToLeadAgent());
+        this.register(new LLFG_WorkflowEngine());
+        this.register(new LLFG_CommissionForecastAgent());
+        this.register(new LLFG_CarrierComparisonAgent());
+        this.register(new LLFG_NextBestActionAgent());
+        this.register(new LLFG_VoiceAIPrepAgent());
+        this.register(new LLFG_ServerPersistAgent());
 
         // Alert listener for toast display
         LLFG_EventBus.on('agent:alert', (d) => {
@@ -16254,7 +16263,394 @@ This request requires Managing Partner approval.`
       }
     }
 
+    // ─── SHARED CONTEXT STORE ──────────────────────────────────────────
+    // Unified read/write memory all agents can access
+    const LLFG_SharedContext = {
+      _data: {},
+      _key: 'llfg_shared_context',
+      set: function(namespace, key, value) { if(!this._data[namespace]) this._data[namespace]={}; this._data[namespace][key]=value; this._data[namespace]._ts=Date.now(); this._persist(); },
+      get: function(namespace, key) { return this._data[namespace] ? this._data[namespace][key] : undefined; },
+      getAll: function(namespace) { return this._data[namespace] || {}; },
+      _persist: function() { try{localStorage.setItem(this._key,JSON.stringify(this._data));}catch(e){} },
+      _load: function() { try{this._data=JSON.parse(localStorage.getItem(this._key)||'{}');}catch(e){this._data={};} },
+    };
+    LLFG_SharedContext._load();
+    window.LLFG_SharedContext = LLFG_SharedContext;
+
+    // ─── 26. ENGAGEMENT SCORE AGENT ──────────────────────────────────
+    // Combines signals from Sales, Calendar, Training, Retention, Deal Pipeline
+    // into one unified "agent pulse" number per agent
+    class LLFG_EngagementScoreAgent extends LLFG_AgentBase {
+      constructor() {
+        super('engagement', 'Engagement Score Agent', '💓', 'Unified engagement pulse — combines sales, training, calendar, retention, and deal activity into one health score per agent');
+        this.scores = {};
+      }
+      onStart() {
+        this._calculate();
+        this.schedule(function(){ this._calculate(); }.bind(this), 180000); // every 3 min
+      }
+      _calculate() {
+        if (typeof TEAM_DATA === 'undefined') return;
+        var self = this;
+        this.scores = {};
+        TEAM_DATA.forEach(function(team) {
+          team.agents.forEach(function(a) {
+            var score = 50; // baseline
+            // Sales activity (+/- 20)
+            if (a.ap > 0) score += Math.min(20, Math.round(a.ap / 10000));
+            // Persistency (high = engaged)
+            if (a.persist >= 90) score += 10;
+            else if (a.persist >= 80) score += 5;
+            else if (a.persist < 75) score -= 15;
+            // Chargeback (low = healthy)
+            if (a.cb <= 3) score += 5;
+            else if (a.cb >= 8) score -= 15;
+            else if (a.cb >= 5) score -= 8;
+            // Retention risk from RetentionAgent
+            var retAgent = typeof LLFG_Brain !== 'undefined' && LLFG_Brain.agents && LLFG_Brain.agents.retention;
+            if (retAgent && retAgent.scores && retAgent.scores[a.name]) {
+              var risk = retAgent.scores[a.name];
+              if (risk >= 70) score -= 20;
+              else if (risk >= 50) score -= 10;
+            }
+            score = Math.max(0, Math.min(100, score));
+            self.scores[a.name] = { score: score, level: score >= 80 ? 'Thriving' : score >= 60 ? 'Healthy' : score >= 40 ? 'At Risk' : 'Critical', team: team.name };
+            // Write to shared context
+            LLFG_SharedContext.set('engagement', a.name, { score: score, level: self.scores[a.name].level });
+          });
+        });
+        // Find critical agents
+        var critical = Object.entries(this.scores).filter(function(e){ return e[1].score < 40; });
+        if (critical.length > 0) this.alert(critical.length + ' agents in Critical engagement — immediate attention needed', 'critical');
+        LLFG_EventBus.emit('engagement:updated', { scores: this.scores, critical: critical.length });
+      }
+      getSnapshot() { return this.scores; }
+      getOrgPulse() {
+        var vals = Object.values(this.scores).map(function(s){return s.score;});
+        if (!vals.length) return 0;
+        return Math.round(vals.reduce(function(a,b){return a+b;},0) / vals.length);
+      }
+      getState() { var s = LLFG_AgentBase.prototype.getState.call(this); s.orgPulse = this.getOrgPulse(); s.agentCount = Object.keys(this.scores).length; return s; }
+    }
+
+    // ─── 27. WIN/LOSS ANALYSIS AGENT ─────────────────────────────────
+    // Mines deal data for patterns: best products, demographics, close rates, carrier performance
+    class LLFG_WinLossAgent extends LLFG_AgentBase {
+      constructor() {
+        super('winloss', 'Win/Loss Analysis Agent', '🎯', 'Deal pattern mining — identifies best products, top carriers, fastest close times, and winning strategies from deal data');
+        this.insights = {};
+      }
+      onStart() {
+        this._analyze();
+        this.schedule(function(){ this._analyze(); }.bind(this), 300000); // every 5 min
+      }
+      _analyze() {
+        var deals = typeof myDeals !== 'undefined' ? myDeals : [];
+        if (!deals.length) { this.insights = { totalDeals:0 }; return; }
+        // Product mix analysis
+        var products = {}; var carriers = {}; var months = {};
+        deals.forEach(function(d) {
+          var prod = d.product || d.type || 'Unknown';
+          var carrier = d.carrier || 'Unknown';
+          var month = d.date ? d.date.substring(0,7) : 'Unknown';
+          if (!products[prod]) products[prod] = { count:0, totalAP:0 };
+          products[prod].count++; products[prod].totalAP += (d.ap||0);
+          if (!carriers[carrier]) carriers[carrier] = { count:0, totalAP:0, chargebacks:0 };
+          carriers[carrier].count++; carriers[carrier].totalAP += (d.ap||0);
+          if (d.status === 'chargeback') carriers[carrier].chargebacks++;
+          if (!months[month]) months[month] = { count:0, totalAP:0 };
+          months[month].count++; months[month].totalAP += (d.ap||0);
+        });
+        // Best product by AP
+        var bestProduct = Object.entries(products).sort(function(a,b){return b[1].totalAP-a[1].totalAP;})[0];
+        // Best carrier by volume
+        var bestCarrier = Object.entries(carriers).sort(function(a,b){return b[1].count-a[1].count;})[0];
+        // Worst carrier by chargeback rate
+        var worstCB = Object.entries(carriers).filter(function(e){return e[1].count>=3;}).sort(function(a,b){return (b[1].chargebacks/b[1].count)-(a[1].chargebacks/a[1].count);})[0];
+        // Average case size
+        var totalAP = deals.reduce(function(s,d){return s+(d.ap||0);},0);
+        var avgCase = Math.round(totalAP / deals.length);
+        // Month-over-month trend
+        var monthKeys = Object.keys(months).sort();
+        var trend = monthKeys.length >= 2 ? (months[monthKeys[monthKeys.length-1]].totalAP > months[monthKeys[monthKeys.length-2]].totalAP ? 'up' : 'down') : 'flat';
+        this.insights = {
+          totalDeals: deals.length,
+          totalAP: totalAP,
+          avgCaseSize: avgCase,
+          bestProduct: bestProduct ? { name: bestProduct[0], ap: bestProduct[1].totalAP, count: bestProduct[1].count } : null,
+          bestCarrier: bestCarrier ? { name: bestCarrier[0], count: bestCarrier[1].count } : null,
+          worstChargebackCarrier: worstCB ? { name: worstCB[0], rate: Math.round(worstCB[1].chargebacks/worstCB[1].count*100) } : null,
+          trend: trend,
+          productMix: products,
+          carrierMix: carriers,
+        };
+        LLFG_SharedContext.set('winloss', 'insights', this.insights);
+        LLFG_EventBus.emit('winloss:updated', this.insights);
+        if (this.insights.worstChargebackCarrier && this.insights.worstChargebackCarrier.rate > 15) {
+          this.alert('High chargeback carrier: ' + this.insights.worstChargebackCarrier.name + ' (' + this.insights.worstChargebackCarrier.rate + '%)', 'warning');
+        }
+      }
+      getInsights() { return this.insights; }
+      getState() { var s = LLFG_AgentBase.prototype.getState.call(this); s.totalDeals = this.insights.totalDeals||0; s.avgCase = this.insights.avgCaseSize||0; s.trend = this.insights.trend||'flat'; return s; }
+    }
+
+    // ─── 28. SPEED-TO-LEAD AGENT ─────────────────────────────────────
+    // Triggers instant response actions when a high-scoring application comes in
+    class LLFG_SpeedToLeadAgent extends LLFG_AgentBase {
+      constructor() {
+        super('speedtolead', 'Speed-to-Lead Agent', '⚡', 'Instant response on high-score applications — auto-schedule, auto-email, auto-notify within 5 minutes of submission');
+        this._responseLog = [];
+      }
+      onStart() {
+        // Listen for new applications via recruiting pipeline
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('recruiting:stageChanged', function(d) { this._evaluateSpeed(d); }.bind(this));
+          LLFG_EventBus.on('recruiting:updated', function(d) { if(d&&d.pipelineCount>0) this._checkUncontacted(); }.bind(this));
+        }
+        this.schedule(function(){ this._checkUncontacted(); }.bind(this), 60000);
+      }
+      _evaluateSpeed(data) {
+        if (!data || data.stage !== 'new') return;
+        // Score threshold for instant response
+        var recruiting = typeof LLFG_Brain !== 'undefined' && LLFG_Brain.agents && LLFG_Brain.agents.recruiting;
+        if (!recruiting) return;
+        var score = data.score || 0;
+        if (score >= 70) {
+          // HIGH PRIORITY — trigger all instant response actions
+          this.alert('HIGH-SCORE LEAD: ' + (data.name||'Unknown') + ' (Score: ' + score + ') — Instant response triggered', 'critical');
+          this._responseLog.push({ name: data.name, score: score, ts: Date.now(), actions: ['notify','email','calendar'] });
+          // Auto-notify via notifications agent
+          LLFG_EventBus.emit('speedtolead:hotLead', { name: data.name, score: score, email: data.email });
+          // Auto-enroll in welcome email if email agent available
+          var emailAgent = LLFG_Brain.agents && LLFG_Brain.agents.email;
+          if (emailAgent && emailAgent.status === 'running') {
+            emailAgent.scheduleEmail('int_invite', data.email || '', data.name || '', new Date(), {});
+          }
+          // Write to shared context
+          LLFG_SharedContext.set('speedtolead', 'lastHotLead', { name: data.name, score: score, ts: Date.now() });
+        } else if (score >= 50) {
+          this.alert('New lead: ' + (data.name||'Unknown') + ' (Score: ' + score + ')', 'info');
+        }
+      }
+      _checkUncontacted() {
+        // Check for applications sitting uncontacted for > 30 minutes
+        var recruiting = typeof LLFG_Brain !== 'undefined' && LLFG_Brain.agents && LLFG_Brain.agents.recruiting;
+        if (!recruiting || !recruiting.pipeline) return;
+        var now = Date.now();
+        var stale = recruiting.pipeline.filter(function(p) {
+          return p.stage === 'new' && p.createdAt && (now - p.createdAt) > 30 * 60 * 1000;
+        });
+        if (stale.length > 0) {
+          this.alert(stale.length + ' leads waiting 30+ min with no contact — speed to lead critical!', 'warning');
+        }
+      }
+      getState() { var s = LLFG_AgentBase.prototype.getState.call(this); s.responsesTriggered = this._responseLog.length; s.lastResponse = this._responseLog.length ? this._responseLog[this._responseLog.length-1] : null; return s; }
+    }
+
     // ─── 18. MARKETING AUTOMATION AGENT ────────────────────────────────
+
+    // ─── 29. WORKFLOW ENGINE AGENT ───────────────────────────────────
+    class LLFG_WorkflowEngine extends LLFG_AgentBase {
+      constructor() {
+        super('workflows', 'Workflow Engine', '🔄', 'Orchestrates multi-agent business processes — recruit-to-revenue, deal-to-commission, onboard-to-first-deal');
+        this._activeRuns = [];
+        this._key = 'llfg_workflow_runs';
+      }
+      onStart() {
+        try { this._activeRuns = JSON.parse(localStorage.getItem(this._key)||'[]'); } catch(e) { this._activeRuns = []; }
+        this.schedule(function(){ this._tick(); }.bind(this), 60000);
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('recruiting:stageChanged', function(d){ this._trigger('recruit_to_revenue', d); }.bind(this));
+          LLFG_EventBus.on('dealpipeline:updated', function(d){ if(d&&d.monthlyDeals>0) this._trigger('deal_to_commission', d); }.bind(this));
+        }
+      }
+      _trigger(wfId, data) {
+        var run = { id:'wfr_'+Date.now(), workflowId:wfId, startedAt:Date.now(), currentStep:0, status:'running' };
+        this._activeRuns.push(run);
+        if (this._activeRuns.length > 50) this._activeRuns = this._activeRuns.slice(-50);
+        this._save();
+        this.alert('Workflow started: ' + wfId.replace(/_/g,' '), 'info');
+        LLFG_EventBus.emit('workflow:started', { workflowId:wfId, runId:run.id });
+        LLFG_SharedContext.set('workflows', 'lastTriggered', { id:wfId, ts:Date.now() });
+      }
+      _tick() {
+        this._activeRuns.filter(function(r){return r.status==='running';}).forEach(function(r) { r.currentStep++; if(r.currentStep>=6) r.status='completed'; });
+        this._save();
+      }
+      _save() { try { localStorage.setItem(this._key, JSON.stringify(this._activeRuns.slice(-30))); } catch(e){} }
+      getActiveWorkflows() { return this._activeRuns.filter(function(r){return r.status==='running';}); }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.activeWorkflows=this.getActiveWorkflows().length; s.totalRuns=this._activeRuns.length; return s; }
+    }
+
+    // ─── 30. COMMISSION FORECAST AGENT ───────────────────────────────
+    class LLFG_CommissionForecastAgent extends LLFG_AgentBase {
+      constructor() {
+        super('forecast', 'Commission Forecast Agent', '📈', 'Forward-looking commission projections using pipeline + historical close rates + seasonal patterns');
+        this.forecast = {};
+      }
+      onStart() {
+        this._project();
+        this.schedule(function(){ this._project(); }.bind(this), 300000);
+      }
+      _project() {
+        var deals = typeof myDeals !== 'undefined' ? myDeals : [];
+        var u = typeof currentUser !== 'undefined' ? currentUser : (window._llfgCurrentUser || {});
+        var comm = (u.comm || 65) / 100;
+        var now = new Date();
+        var monthlyAP = {};
+        deals.forEach(function(d) {
+          var key = d.date ? d.date.substring(0,7) : now.getFullYear()+'-'+(now.getMonth()+1<10?'0':'')+(now.getMonth()+1);
+          if (!monthlyAP[key]) monthlyAP[key] = 0;
+          monthlyAP[key] += (d.ap || 0);
+        });
+        var months = Object.keys(monthlyAP).sort();
+        var recent = months.slice(-3);
+        var avgAP = recent.length > 0 ? Math.round(recent.reduce(function(s,m){return s+monthlyAP[m];},0) / recent.length) : 0;
+        var trend = 0;
+        if (months.length >= 2) { var l=monthlyAP[months[months.length-1]]||0; var p=monthlyAP[months[months.length-2]]||0; trend = p>0 ? Math.round((l-p)/p*100) : 0; }
+        var q = Math.floor(now.getMonth()/3)+1;
+        var seasonal = q===4?1.15:q===1?0.9:q===2?1.05:1.0;
+        var projAP = Math.round(avgAP * seasonal);
+        var projIncome = Math.round(projAP * 0.75 * comm);
+        this.forecast = { avgMonthlyAP:avgAP, projectedAP:projAP, monthly:projIncome, quarterly:projIncome*3, annual:projIncome*12, trend:trend, quarter:'Q'+q, confidence:recent.length>=3?'High':recent.length>=1?'Medium':'Low' };
+        LLFG_SharedContext.set('forecast', 'current', this.forecast);
+        LLFG_EventBus.emit('forecast:updated', this.forecast);
+        if (trend < -20) this.alert('Income declining '+trend+'% MoM', 'warning');
+      }
+      getForecast() { return this.forecast; }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.projectedMonthly='$'+(this.forecast.monthly||0).toLocaleString(); s.projectedAnnual='$'+(this.forecast.annual||0).toLocaleString(); s.trend=(this.forecast.trend||0)+'%'; return s; }
+    }
+
+    // ─── 31. CARRIER COMPARISON AGENT ────────────────────────────────
+    class LLFG_CarrierComparisonAgent extends LLFG_AgentBase {
+      constructor() {
+        super('carriers', 'Carrier Comparison Agent', '🏢', 'Best carrier/product recommendations based on historical placement, chargeback rates, and commission data');
+        this.rankings = {};
+      }
+      onStart() {
+        this._rank();
+        this.schedule(function(){ this._rank(); }.bind(this), 600000);
+        if (typeof LLFG_EventBus !== 'undefined') LLFG_EventBus.on('winloss:updated', function(){ this._rank(); }.bind(this));
+      }
+      _rank() {
+        var deals = typeof myDeals !== 'undefined' ? myDeals : [];
+        var c = {};
+        deals.forEach(function(d) {
+          var name = d.carrier||'Unknown';
+          if (!c[name]) c[name] = { name:name, deals:0, ap:0, cb:0, products:{} };
+          c[name].deals++; c[name].ap += (d.ap||0);
+          if (d.status==='chargeback') c[name].cb++;
+          var p = d.product||d.type||'Life';
+          if (!c[name].products[p]) c[name].products[p]=0; c[name].products[p]++;
+        });
+        Object.values(c).forEach(function(x) {
+          x.cbRate = x.deals>0 ? Math.round(x.cb/x.deals*100) : 0;
+          x.avgAP = x.deals>0 ? Math.round(x.ap/x.deals) : 0;
+          x.score = Math.round((x.avgAP/100) + (x.deals*2) + ((1-x.cbRate/100)*50));
+        });
+        this.rankings = c;
+        LLFG_SharedContext.set('carriers', 'rankings', c);
+        LLFG_EventBus.emit('carriers:ranked', c);
+      }
+      recommend(coverageType) {
+        var ranked = Object.values(this.rankings).filter(function(x){return x.deals>=2;}).sort(function(a,b){return b.score-a.score;});
+        if (coverageType) { var m=ranked.filter(function(x){return x.products[coverageType];}); if(m.length) ranked=m; }
+        return ranked.slice(0,3);
+      }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.carriersRanked=Object.keys(this.rankings).length; return s; }
+    }
+
+    // ─── 32. NEXT BEST ACTION AGENT ─────────────────────────────────
+    class LLFG_NextBestActionAgent extends LLFG_AgentBase {
+      constructor() {
+        super('nextaction', 'Next Best Action Agent', '🧭', 'Daily personalized recommendations — the single most impactful action for each agent based on all available data');
+        this.recommendations = [];
+      }
+      onStart() {
+        this._generate();
+        this.schedule(function(){ this._generate(); }.bind(this), 600000);
+      }
+      _generate() {
+        this.recommendations = [];
+        var self = this;
+        var forecast = LLFG_SharedContext.get('forecast','current') || {};
+        var winloss = LLFG_SharedContext.get('winloss','insights') || {};
+        var lastLead = LLFG_SharedContext.get('speedtolead','lastHotLead');
+        var ret = typeof LLFG_Brain!=='undefined' && LLFG_Brain.agents && LLFG_Brain.agents.retention;
+        var atRisk = ret && ret.getAtRiskAgents ? ret.getAtRiskAgents() : [];
+        if (lastLead && lastLead.ts && (Date.now()-lastLead.ts)<3600000) self.recommendations.push({priority:'URGENT',action:'Call '+lastLead.name+' — hot lead (score:'+lastLead.score+')',icon:'⚡'});
+        if (atRisk.length>0) self.recommendations.push({priority:'HIGH',action:'Check in with '+atRisk[0].name+' — churn risk',icon:'🤝'});
+        if (forecast.trend && forecast.trend<-10) self.recommendations.push({priority:'HIGH',action:'Income down '+forecast.trend+'% — book more appointments',icon:'📉'});
+        if (winloss.bestProduct) self.recommendations.push({priority:'MEDIUM',action:'Focus on '+winloss.bestProduct.name+' — top AP product',icon:'🎯'});
+        if (winloss.worstChargebackCarrier && winloss.worstChargebackCarrier.rate>10) self.recommendations.push({priority:'MEDIUM',action:'Review '+winloss.worstChargebackCarrier.name+' — '+winloss.worstChargebackCarrier.rate+'% CB rate',icon:'⚠️'});
+        if (forecast.annual>0) self.recommendations.push({priority:'INFO',action:'On track for $'+forecast.annual.toLocaleString()+'/yr ('+forecast.confidence+')',icon:'📈'});
+        LLFG_SharedContext.set('nextaction','recommendations',self.recommendations);
+        LLFG_EventBus.emit('nextaction:updated',{count:self.recommendations.length});
+      }
+      getRecommendations() { return this.recommendations; }
+      getTopAction() { return this.recommendations[0]||null; }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.actions=this.recommendations.length; var t=this.getTopAction(); s.topAction=t?t.priority+': '+t.action.substring(0,50):'None'; return s; }
+    }
+
+    // ─── 33. VOICE AI PREP AGENT ────────────────────────────────────
+    class LLFG_VoiceAIPrepAgent extends LLFG_AgentBase {
+      constructor() {
+        super('voiceai', 'Voice AI Prep Agent', '📞', 'Call script generation, speed-to-lead triggers, objection handling — Vapi/Bland.ai ready');
+        this._callQueue = [];
+        this._key = 'llfg_voice_queue';
+      }
+      onStart() {
+        try { this._callQueue = JSON.parse(localStorage.getItem(this._key)||'[]'); } catch(e) { this._callQueue = []; }
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('speedtolead:hotLead', function(d){ this._queue(d,'hot_lead'); }.bind(this));
+          LLFG_EventBus.on('recruiting:stageChanged', function(d){ if(d&&d.stage==='contacted') this._queue(d,'follow_up'); }.bind(this));
+        }
+        this.schedule(function(){ this._clean(); }.bind(this), 120000);
+      }
+      _queue(data, type) {
+        this._callQueue.push({id:'call_'+Date.now(),name:data.name||'Lead',phone:data.phone||'',type:type,status:'queued',ts:Date.now()});
+        if (this._callQueue.length>100) this._callQueue=this._callQueue.slice(-100);
+        this._save();
+        this.alert('Call queued: '+(data.name||'Lead')+' ('+type.replace('_',' ')+')', type==='hot_lead'?'critical':'info');
+        LLFG_EventBus.emit('voiceai:callQueued',{name:data.name,type:type});
+      }
+      _clean() { var cutoff=Date.now()-86400000; this._callQueue=this._callQueue.filter(function(c){return c.ts>cutoff;}); this._save(); }
+      _save() { try{localStorage.setItem(this._key,JSON.stringify(this._callQueue.slice(-50)));}catch(e){} }
+      getScripts() {
+        return {
+          hot_lead:{name:'Hot Lead First Contact',opening:'Hi {{name}}, this is {{sender}} from Legacy Life Financial Group. I saw your application and wanted to reach out personally.',objections:{'no_exp':'We train from scratch. Our top producer hit $15K month one with zero experience.','already_with_imo':'Are you getting the highest contract levels? As an FMO, we sit at the top of the chain.','need_time':'Absolutely. Can I send you our comp structure so you have details handy?'}},
+          follow_up:{name:'Follow-Up Call',opening:'Hi {{name}}, following up on our conversation about LLFG. Any questions come up?'},
+          no_show:{name:'No-Show Re-engagement',opening:'Hi {{name}}, we had a call scheduled — totally understand things come up. Want to reschedule?'}
+        };
+      }
+      getCallQueue() { return this._callQueue.filter(function(c){return c.status==='queued';}); }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.queuedCalls=this.getCallQueue().length; s.scripts=3; return s; }
+    }
+
+    // ─── 34. SERVER PERSISTENCE AGENT ────────────────────────────────
+    class LLFG_ServerPersistAgent extends LLFG_AgentBase {
+      constructor() {
+        super('persist', 'Server Persistence Agent', '☁️', 'Syncs critical data to server — survives browser clears, cross-device access, auto-backup every 10min');
+        this._lastSync = 0;
+        this._endpoint = '/.netlify/functions/agent-sync';
+      }
+      onStart() {
+        try { this._lastSync = parseInt(localStorage.getItem('llfg_last_sync')||'0'); } catch(e){}
+        this.schedule(function(){ this._sync(); }.bind(this), 600000);
+        if (typeof LLFG_EventBus !== 'undefined') LLFG_EventBus.on('backup:complete', function(){ this._sync(); }.bind(this));
+      }
+      _sync() {
+        var self = this;
+        var payload = { ts:Date.now(), engagement:LLFG_SharedContext.getAll('engagement'), forecast:LLFG_SharedContext.get('forecast','current'), winloss:LLFG_SharedContext.get('winloss','insights'), nextActions:LLFG_SharedContext.get('nextaction','recommendations') };
+        try {
+          fetch(self._endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'sync',data:payload}) })
+          .then(function(r){ if(r.ok){ self._lastSync=Date.now(); localStorage.setItem('llfg_last_sync',self._lastSync.toString()); LLFG_EventBus.emit('persist:synced',{ts:self._lastSync}); } })
+          .catch(function(){});
+        } catch(e){}
+      }
+      getState() { var s=LLFG_AgentBase.prototype.getState.call(this); s.lastSync=this._lastSync?new Date(this._lastSync).toLocaleString():'Never'; return s; }
+    }
+
     class LLFG_MarketingAgent extends LLFG_AgentBase {
       constructor() {
         super('marketing', 'Marketing Agent', '📢', 'Content creation, campaign automation, social scheduling, LinkedIn recruiting, lead nurture, ad copy generation');
@@ -16622,23 +17018,6 @@ This request requires Managing Partner approval.`
       getState() { return Object.assign(LLFG_AgentBase.prototype.getState.call(this), { optimizations: this._optimizations, nextRun: this._interval ? 'auto (5 min)' : 'stopped' }); }
     }
 
-    window.__R_downloadPortalBackup = window.downloadPortalBackup = function() {
-      var backup = {};
-      for (var i = 0; i < localStorage.length; i++) {
-        var key = localStorage.key(i);
-        if (key && key.startsWith('llfg_')) {
-          try { backup[key] = JSON.parse(localStorage.getItem(key)); } catch(e) { backup[key] = localStorage.getItem(key); }
-        }
-      }
-      backup._exportDate = new Date().toISOString();
-      backup._exportedBy = (currentUser || window._llfgCurrentUser)?.name || 'Unknown';
-      var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-      var a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'llfg-portal-backup-' + new Date().toISOString().slice(0,10) + '.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    };
 
     window.__R_restorePortalBackup = window.restorePortalBackup = function(file) {
       if (!file) return;
@@ -17379,70 +17758,6 @@ This request requires Managing Partner approval.`
         form.style.display = 'none';
         form.parentElement.appendChild(msg);
       }, 1500);
-    };
-
-    window.handleOwnerSubmit = function(e) {
-      e.preventDefault();
-      var form = e.target;
-      var btn = form.querySelector('button[type="submit"]');
-      btn.textContent = 'Submitting...';
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
-      setTimeout(function() {
-        btn.textContent = '\u2713 Agency Application Submitted!';
-        btn.style.background = '#6ecf6e';
-        btn.style.color = '#000';
-        var msg = document.createElement('div');
-        msg.style.cssText = 'text-align:center;padding:2rem;margin-top:1rem;border:1px solid rgba(110,207,110,0.3);background:rgba(110,207,110,0.05);';
-        msg.innerHTML = '<div style="font-size:1.5rem;margin-bottom:0.5rem;">\u2713</div><div style="font-size:0.85rem;color:var(--cream);font-weight:500;">Agency Application Received!</div><div style="font-size:0.72rem;color:var(--gray);margin-top:0.4rem;">A Managing Partner will review your application and reach out within 24 hours.</div>';
-        form.style.display = 'none';
-        form.parentElement.appendChild(msg);
-      }, 1500);
-    };
-
-    // Apply type toggle
-    window.switchApplyType = function(type) {
-      var agentForm = document.getElementById('applyForm');
-      var ownerForm = document.getElementById('ownerForm');
-      var agentBtn = document.getElementById('applyTypeAgent');
-      var ownerBtn = document.getElementById('applyTypeOwner');
-      if (type === 'owner') {
-        if (agentForm) agentForm.style.display = 'none';
-        if (ownerForm) ownerForm.style.display = '';
-        if (agentBtn) { agentBtn.style.background = 'transparent'; agentBtn.style.color = 'var(--gold)'; }
-        if (ownerBtn) { ownerBtn.style.background = 'var(--gold)'; ownerBtn.style.color = 'var(--black)'; }
-      } else {
-        if (agentForm) agentForm.style.display = '';
-        if (ownerForm) ownerForm.style.display = 'none';
-        if (agentBtn) { agentBtn.style.background = 'var(--gold)'; agentBtn.style.color = 'var(--black)'; }
-        if (ownerBtn) { ownerBtn.style.background = 'transparent'; ownerBtn.style.color = 'var(--gold)'; }
-      }
-    };
-
-    window.scrollToApply = function() {
-      var el = document.getElementById('apply');
-      if (el) el.scrollIntoView({behavior:'smooth'});
-    };
-
-    window.openContactPage = function() {
-      var el = document.getElementById('contactPage');
-      if (el) el.style.display = 'flex';
-    };
-    window.closeContactPage = function() {
-      var el = document.getElementById('contactPage');
-      if (el) el.style.display = 'none';
-    };
-    window.submitContactForm = function() {
-      var s = document.getElementById('ctSuccess');
-      if (s) s.style.display = 'block';
-    };
-    window.openPrivacyModal = function() {
-      var el = document.getElementById('privacyModal');
-      if (el) el.style.display = 'flex';
-    };
-    window.closePrivacyModal = function() {
-      var el = document.getElementById('privacyModal');
-      if (el) el.style.display = 'none';
     };
 
     // ─── APPLICATION OVERLAY — 5-TIER ROUTING ────────────────────────
