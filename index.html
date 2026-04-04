@@ -22,6 +22,11 @@
       --gray: #b0b0b0;
       --gray-light: #555555;
       --blue-trust: #3b82f6;
+      /* ── Purple Accent Layer ── */
+      --purple: #7c3aed;
+      --purple-light: #a78bfa;
+      --purple-dim: #5b21b6;
+      --purple-glow: rgba(124, 58, 237, 0.15);
     }
 
     html { scroll-behavior: smooth; }
@@ -30,27 +35,35 @@
     /* ═══════════════════════════════════════
        PREMIUM DARK SaaS DESIGN SYSTEM
        ═══════════════════════════════════════ */
-    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
-    .glass-gold { background: rgba(201,168,76,0.04); backdrop-filter: blur(12px); border: 1px solid rgba(201,168,76,0.12); }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(16px) saturate(1.2); border: 1px solid rgba(255,255,255,0.06); }
+    .glass-gold { background: rgba(201,168,76,0.04); backdrop-filter: blur(16px) saturate(1.2); border: 1px solid rgba(201,168,76,0.12); }
+    .glass-purple { background: rgba(124,58,237,0.04); backdrop-filter: blur(16px) saturate(1.2); border: 1px solid rgba(124,58,237,0.12); }
     .glow-gold { box-shadow: 0 0 20px rgba(201,168,76,0.15), 0 0 60px rgba(201,168,76,0.05); }
     .glow-gold-strong { box-shadow: 0 0 30px rgba(201,168,76,0.25), 0 0 80px rgba(201,168,76,0.1), inset 0 1px 0 rgba(201,168,76,0.1); }
+    .glow-purple { box-shadow: 0 0 20px rgba(124,58,237,0.15), 0 0 60px rgba(124,58,237,0.05); }
+    .glow-purple-strong { box-shadow: 0 0 30px rgba(124,58,237,0.25), 0 0 80px rgba(124,58,237,0.1), inset 0 1px 0 rgba(124,58,237,0.1); }
+    .glow-dual { box-shadow: 0 0 25px rgba(201,168,76,0.12), 0 0 50px rgba(124,58,237,0.08), 0 0 80px rgba(0,0,0,0.3); }
     .glow-text { text-shadow: 0 0 30px rgba(201,168,76,0.4), 0 0 60px rgba(201,168,76,0.1); }
     @keyframes borderPulse { 0%,100%{ border-color: rgba(201,168,76,0.12); } 50%{ border-color: rgba(201,168,76,0.3); } }
     .pulse-border { animation: borderPulse 3s ease-in-out infinite; }
     @keyframes float { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-12px); } }
     .float { animation: float 6s ease-in-out infinite; }
     .float-delay { animation: float 6s ease-in-out 1.5s infinite; }
-    .grid-bg { background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+    .grid-bg { background-image: linear-gradient(rgba(201,168,76,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.015) 1px, transparent 1px); background-size: 60px 60px; }
     .gradient-text { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--cream) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .gradient-text-purple { background: linear-gradient(135deg, var(--purple-light) 0%, var(--purple) 50%, var(--gold) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .gradient-text-dual { background: linear-gradient(135deg, var(--gold) 0%, var(--purple-light) 50%, var(--gold-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .premium-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(201,168,76,0.08); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
-    .premium-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, transparent 50%); opacity: 0; transition: opacity 0.4s; }
-    .premium-card:hover { border-color: rgba(201,168,76,0.25); transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(201,168,76,0.08); }
+    .premium-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.05) 0%, rgba(124,58,237,0.03) 50%, transparent 100%); opacity: 0; transition: opacity 0.4s; }
+    .premium-card:hover { border-color: rgba(201,168,76,0.25); transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(201,168,76,0.08), 0 0 60px rgba(124,58,237,0.04); }
     .premium-card:hover::before { opacity: 1; }
     .badge-pill { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.15); padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.6rem; color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase; }
+    .badge-pill-purple { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.6rem; color: var(--purple-light); letter-spacing: 0.1em; text-transform: uppercase; }
+    .badge-pill-purple .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-light); animation: badgePulse 2s ease-in-out infinite; }
     .badge-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: badgePulse 2s ease-in-out infinite; }
     @keyframes badgePulse { 0%,100%{ opacity: 0.5; } 50%{ opacity: 1; } }
     .section-glow { position: relative; }
-    .section-glow::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent); }
+    .section-glow::before { content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), rgba(124,58,237,0.15), rgba(201,168,76,0.2), transparent); }
 
     body {
       background: var(--black);
@@ -232,6 +245,7 @@
       position: absolute; inset: 0; z-index: 0;
       background:
         radial-gradient(ellipse 60% 50% at 50% 45%, rgba(201,168,76,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 70% 60%, rgba(124,58,237,0.04) 0%, transparent 70%),
         radial-gradient(circle at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 50%),
         var(--black);
     }
@@ -3565,6 +3579,8 @@
   <!-- GSAP + ScrollTrigger for 3D animations -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
+  <!-- Three.js for WebGL particle background -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.min.js" defer></script>
 </head>
 <body>
 
@@ -4025,9 +4041,14 @@
     <div class="hero-sticky">
       <div class="hero-bg grid-bg"></div>
 
-      <!-- Ambient glow orbs -->
+      <!-- Three.js WebGL Particle Canvas -->
+      <canvas id="heroParticles" style="position:absolute;inset:0;z-index:0;pointer-events:none;"></canvas>
+
+      <!-- Ambient glow orbs — gold + purple -->
       <div style="position:absolute;top:20%;left:15%;width:300px;height:300px;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);z-index:0;animation:float 8s ease-in-out infinite;"></div>
-      <div style="position:absolute;bottom:20%;right:10%;width:250px;height:250px;background:radial-gradient(circle,rgba(201,168,76,0.04) 0%,transparent 70%);z-index:0;animation:float 8s ease-in-out 2s infinite;"></div>
+      <div style="position:absolute;bottom:20%;right:10%;width:250px;height:250px;background:radial-gradient(circle,rgba(124,58,237,0.05) 0%,transparent 70%);z-index:0;animation:float 8s ease-in-out 2s infinite;"></div>
+      <div style="position:absolute;top:60%;left:5%;width:200px;height:200px;background:radial-gradient(circle,rgba(124,58,237,0.04) 0%,transparent 70%);z-index:0;animation:float 10s ease-in-out 1s infinite;"></div>
+      <div style="position:absolute;top:10%;right:20%;width:180px;height:180px;background:radial-gradient(circle,rgba(201,168,76,0.04) 0%,transparent 70%);z-index:0;animation:float 9s ease-in-out 3s infinite;"></div>
 
       <!-- 3D Lion Scene -->
       <div class="hero-lion-scene" id="lionScene">
@@ -6119,6 +6140,9 @@
 
   <!-- COMMAND CENTER TAB -->
   <div class="admin-tab-content" id="ptab-commandcenter" style="display:none;padding:1.5rem;"></div>
+
+  <!-- CREATIVE STUDIO TAB -->
+  <div class="admin-tab-content" id="ptab-creativestudio" style="display:none;padding:1.5rem;"></div>
 
   <!-- API INTEGRATIONS TAB (Admin Only) -->
   <div class="admin-tab-content" id="ptab-integrations">
@@ -8701,11 +8725,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
       agent:             ['commreq'],
-      manager:           ['commreq','reports','emailtemplates','commandcenter'],
-      executive:         ['commreq','teammetrics','reports','emailtemplates','commandcenter'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','integrations','commandcenter'],
+      manager:           ['commreq','reports','emailtemplates','creativestudio','commandcenter'],
+      executive:         ['commreq','teammetrics','reports','emailtemplates','creativestudio','commandcenter'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','commandcenter'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','commandcenter'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
@@ -8714,6 +8738,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       portals:'Carrier Portals',
       commreq:'Commission Request', permissions:'Permissions', integrations:'API Integrations',
       downlineclients:'All Clients', reports:'Reports', emailtemplates:'Email Templates',
+      creativestudio:'Creative Studio',
       commandcenter:'Command Center',
     };
 
@@ -8822,7 +8847,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
           tools:      ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-          management: ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','integrations','commandcenter'],
+          management: ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','integrations','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentGroups)) {
@@ -8960,6 +8985,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
         if (tab === 'emailtemplates')  { if (typeof renderEmailTemplates === 'function') renderEmailTemplates(); }
 
+        if (tab === 'creativestudio') { if (typeof renderCreativeStudio === 'function') renderCreativeStudio(); }
         if (tab === 'commandcenter') {
           if (typeof LLFG_Brain !== 'undefined' && !LLFG_Brain._initialized) LLFG_Brain.init();
           if (typeof renderCommandCenter === 'function') renderCommandCenter();
@@ -18834,6 +18860,333 @@ This request requires Managing Partner approval.`
           card.addEventListener('mouseenter', function() { hint.style.opacity = '1'; });
           card.addEventListener('mouseleave', function() { hint.style.opacity = '0'; });
         }
+      });
+    })();
+
+    // ─── CREATIVE STUDIO ─────────────────────────────────────────────
+    var _csParticles = null;
+    var _csHistory = [];
+
+    window.__R_renderCreativeStudio = window.renderCreativeStudio = function() {
+      var el = document.getElementById('ptab-creativestudio');
+      if (!el) return;
+
+      _csHistory = JSON.parse(localStorage.getItem('llfg_creative_history') || '[]');
+
+      el.innerHTML = '<div class="dash-body">'
+        + '<div class="dash-welcome"><h2>Creative <em>Studio</em></h2>'
+        + '<p>AI-powered image generation, prompt engineering, and visual asset creation — all built in.</p></div>'
+
+        // Canvas for 3D particles
+        + '<div style="position:relative;height:200px;overflow:hidden;border:1px solid rgba(201,168,76,0.08);margin-bottom:1.5rem;background:#0a0a0a;" id="csCanvasWrap">'
+        + '<canvas id="csParticleCanvas" style="width:100%;height:100%;"></canvas>'
+        + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">'
+        + '<div style="text-align:center;">'
+        + '<div style="font-family:Cinzel,serif;font-size:1.4rem;color:var(--gold);letter-spacing:0.15em;">CREATIVE STUDIO</div>'
+        + '<div style="font-size:0.55rem;color:var(--gray);letter-spacing:0.2em;text-transform:uppercase;margin-top:0.3rem;">AI Image Generation + Prompt Engineering</div>'
+        + '</div></div></div>'
+
+        // Prompt Generator
+        + '<div class="dash-section"><div class="dash-section-title">Generate AI Image</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">'
+        + '<div><label style="font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;">Subject</label>'
+        + '<input id="csSubject" type="text" placeholder="e.g. Lion on Wall Street, luxury office, city skyline" style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.7rem;width:100%;font-size:0.75rem;font-family:Raleway,sans-serif;outline:none;"/></div>'
+        + '<div><label style="font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;">Style</label>'
+        + '<select id="csStyle" style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.7rem;width:100%;font-size:0.75rem;font-family:Raleway,sans-serif;outline:none;">'
+        + '<option value="cinematic">Cinematic</option><option value="editorial">Editorial</option><option value="abstract">Abstract</option>'
+        + '<option value="dramatic">Dramatic</option><option value="minimal">Minimal</option><option value="futuristic">Futuristic</option></select></div>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">'
+        + '<div><label style="font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;">Mood</label>'
+        + '<select id="csMood" style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.7rem;width:100%;font-size:0.72rem;font-family:Raleway,sans-serif;outline:none;">'
+        + '<option value="dark moody">Dark Moody</option><option value="golden hour">Golden Hour</option><option value="neon night">Neon Night</option>'
+        + '<option value="luxury">Luxury</option><option value="bold aggressive">Bold Aggressive</option></select></div>'
+        + '<div><label style="font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;">Size</label>'
+        + '<select id="csSize" style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.7rem;width:100%;font-size:0.72rem;font-family:Raleway,sans-serif;outline:none;">'
+        + '<option value="1920x1080">1920x1080 (Hero)</option><option value="1080x1080">1080x1080 (Square)</option>'
+        + '<option value="1080x1920">1080x1920 (Story)</option><option value="2560x1440">2560x1440 (4K)</option></select></div>'
+        + '<div><label style="font-size:0.6rem;color:var(--gold-dim);letter-spacing:0.1em;text-transform:uppercase;display:block;margin-bottom:0.4rem;">Seed</label>'
+        + '<input id="csSeed" type="number" value="' + Math.floor(Math.random()*9999) + '" style="background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.7rem;width:100%;font-size:0.72rem;font-family:monospace;outline:none;"/></div>'
+        + '</div>'
+        + '<div style="display:flex;gap:0.8rem;">'
+        + '<button onclick="csGenerate()" class="btn-primary" style="padding:0.7rem 2rem;font-size:0.7rem;">Generate Image</button>'
+        + '<button onclick="csGenerateBatch()" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);color:var(--gold);padding:0.7rem 1.5rem;font-size:0.7rem;font-family:Raleway,sans-serif;cursor:pointer;letter-spacing:0.06em;">Generate 3 Variations</button>'
+        + '</div></div>'
+
+        // Preview area
+        + '<div class="dash-section" id="csPreview" style="display:none;">'
+        + '<div class="dash-section-title">Preview</div>'
+        + '<div id="csPreviewContent" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;"></div></div>'
+
+        // Prompt builder output
+        + '<div class="dash-section" id="csPromptOutput" style="display:none;">'
+        + '<div class="dash-section-title">Generated Prompt</div>'
+        + '<div id="csPromptText" style="font-family:monospace;font-size:0.68rem;color:var(--gray);line-height:1.7;padding:1rem;background:rgba(0,0,0,0.3);border:1px solid rgba(201,168,76,0.06);word-break:break-word;"></div>'
+        + '<button onclick="csCopyPrompt()" style="margin-top:0.5rem;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.12);color:var(--gold);padding:0.4rem 1rem;font-size:0.6rem;font-family:Raleway,sans-serif;cursor:pointer;">Copy Prompt</button></div>'
+
+        // History
+        + '<div class="dash-section"><div class="dash-section-title">Recent Generations (' + _csHistory.length + ')</div>'
+        + '<div id="csHistoryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.8rem;">'
+        + (_csHistory.length > 0 ? _csHistory.slice(0, 12).map(function(h) {
+            return '<div class="premium-card" style="padding:0.6rem;cursor:pointer;" onclick="window.open(\'' + h.url + '\',\'_blank\')">'
+              + '<img src="' + h.url + '" style="width:100%;height:100px;object-fit:cover;opacity:0.8;margin-bottom:0.4rem;" loading="lazy"/>'
+              + '<div style="font-size:0.55rem;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + h.subject + '</div>'
+              + '<div style="font-size:0.48rem;color:var(--gray);">' + new Date(h.ts).toLocaleDateString() + '</div></div>';
+          }).join('') : '<div style="font-size:0.65rem;color:var(--gray);padding:1rem;">No generations yet. Create your first image above.</div>')
+        + '</div></div>'
+        + '</div>';
+
+      // Init particle canvas
+      _initCSParticles();
+    };
+
+    function _initCSParticles() {
+      var canvas = document.getElementById('csParticleCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var w = canvas.parentElement.clientWidth;
+      var h = canvas.parentElement.clientHeight;
+      canvas.width = w * 2; canvas.height = h * 2;
+      ctx.scale(2, 2);
+
+      var particles = [];
+      for (var i = 0; i < 80; i++) {
+        particles.push({
+          x: Math.random() * w, y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+          r: 1 + Math.random() * 2, a: 0.1 + Math.random() * 0.4
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(function(p) {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')';
+          ctx.fill();
+        });
+        // Draw connections
+        for (var i = 0; i < particles.length; i++) {
+          for (var j = i + 1; j < particles.length; j++) {
+            var dx = particles[i].x - particles[j].x;
+            var dy = particles[i].y - particles[j].y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 80) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = 'rgba(201,168,76,' + (0.08 * (1 - dist / 80)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        if (document.getElementById('csParticleCanvas')) _csParticles = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function _buildCSPrompt(subject, style, mood) {
+      var base = subject || 'luxury financial services';
+      var qualityTags = 'photorealistic hyperrealistic 8K UHD RAW photo highly detailed sharp focus volumetric lighting cinematic color grading shot on Canon EOS R5 85mm f/1.4 shallow depth of field film grain';
+      var brandTags = 'dark moody atmosphere rich gold and black color palette luxury financial aesthetic no text no watermark';
+      var styleMap = {
+        cinematic: 'cinematic film still anamorphic lens dramatic shadows',
+        editorial: 'editorial photography clean composition studio lighting',
+        abstract: 'abstract visualization flowing particles data visualization',
+        dramatic: 'dramatic low angle hero shot intense rim lighting',
+        minimal: 'minimal clean negative space elegant simplicity',
+        futuristic: 'futuristic neon holographic HUD interface sci-fi technology'
+      };
+      return base + ' ' + (mood || 'dark moody') + ' ' + (styleMap[style] || styleMap.cinematic) + ' ' + qualityTags + ' ' + brandTags;
+    }
+
+    window.csGenerate = function() {
+      var subject = document.getElementById('csSubject').value.trim();
+      var style = document.getElementById('csStyle').value;
+      var mood = document.getElementById('csMood').value;
+      var size = document.getElementById('csSize').value.split('x');
+      var seed = document.getElementById('csSeed').value || Math.floor(Math.random() * 9999);
+      if (!subject) { alert('Enter a subject'); return; }
+
+      var prompt = _buildCSPrompt(subject, style, mood);
+      var url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=' + size[0] + '&height=' + size[1] + '&seed=' + seed + '&model=flux&nologo=true&enhance=true';
+
+      // Show prompt
+      var promptOut = document.getElementById('csPromptOutput');
+      var promptText = document.getElementById('csPromptText');
+      if (promptOut) promptOut.style.display = '';
+      if (promptText) promptText.textContent = prompt;
+
+      // Show preview
+      _csShowPreview([{ url: url, subject: subject, style: style, seed: seed }]);
+
+      // Save to history
+      _csHistory.unshift({ url: url, subject: subject, style: style, seed: seed, ts: Date.now() });
+      if (_csHistory.length > 50) _csHistory = _csHistory.slice(0, 50);
+      localStorage.setItem('llfg_creative_history', JSON.stringify(_csHistory));
+    };
+
+    window.csGenerateBatch = function() {
+      var subject = document.getElementById('csSubject').value.trim();
+      var style = document.getElementById('csStyle').value;
+      var mood = document.getElementById('csMood').value;
+      var size = document.getElementById('csSize').value.split('x');
+      if (!subject) { alert('Enter a subject'); return; }
+
+      var prompt = _buildCSPrompt(subject, style, mood);
+      var items = [];
+      for (var i = 0; i < 3; i++) {
+        var seed = Math.floor(Math.random() * 9999);
+        var url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=' + size[0] + '&height=' + size[1] + '&seed=' + seed + '&model=flux&nologo=true&enhance=true';
+        items.push({ url: url, subject: subject, style: style, seed: seed });
+        _csHistory.unshift({ url: url, subject: subject, style: style, seed: seed, ts: Date.now() });
+      }
+      if (_csHistory.length > 50) _csHistory = _csHistory.slice(0, 50);
+      localStorage.setItem('llfg_creative_history', JSON.stringify(_csHistory));
+
+      var promptOut = document.getElementById('csPromptOutput');
+      var promptText = document.getElementById('csPromptText');
+      if (promptOut) promptOut.style.display = '';
+      if (promptText) promptText.textContent = prompt;
+
+      _csShowPreview(items);
+    };
+
+    function _csShowPreview(items) {
+      var preview = document.getElementById('csPreview');
+      var content = document.getElementById('csPreviewContent');
+      if (!preview || !content) return;
+      preview.style.display = '';
+      content.innerHTML = items.map(function(item) {
+        return '<div class="premium-card" style="padding:0;overflow:hidden;">'
+          + '<div style="position:relative;background:#0a0a0a;min-height:180px;display:flex;align-items:center;justify-content:center;">'
+          + '<div class="cs-loading" style="font-size:0.6rem;color:var(--gray);">Generating...</div>'
+          + '<img src="' + item.url + '" style="width:100%;display:block;" onload="this.previousElementSibling.style.display=\'none\'" onerror="this.previousElementSibling.textContent=\'Failed\'"/>'
+          + '</div>'
+          + '<div style="padding:0.8rem;">'
+          + '<div style="font-size:0.68rem;color:var(--cream);margin-bottom:0.3rem;">' + item.subject + '</div>'
+          + '<div style="display:flex;gap:0.5rem;align-items:center;">'
+          + '<span style="font-size:0.5rem;color:var(--gold-dim);">Seed: ' + item.seed + '</span>'
+          + '<span style="font-size:0.5rem;color:var(--gray);">' + item.style + '</span>'
+          + '<button onclick="csApplyToHero(\'' + item.url.replace(/'/g, "\\'") + '\')" style="margin-left:auto;background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.2);color:#6ecf6e;padding:0.2rem 0.6rem;font-size:0.48rem;cursor:pointer;font-family:Raleway,sans-serif;">Apply to Hero</button>'
+          + '</div></div></div>';
+      }).join('');
+    }
+
+    window.csApplyToHero = function(url) {
+      var heroImg = document.querySelector('.hero-bg-img');
+      if (heroImg) { heroImg.src = url; }
+      LLFG_Brain._showToast('Hero image updated from Creative Studio', '#6ecf6e');
+    };
+
+    window.csCopyPrompt = function() {
+      var text = document.getElementById('csPromptText');
+      if (text) {
+        navigator.clipboard.writeText(text.textContent).then(function() {
+          LLFG_Brain._showToast('Prompt copied to clipboard', '#6ea8fe');
+        });
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    //  THREE.JS PARTICLE BACKGROUND — GOLD + PURPLE CINEMATIC
+    // ═══════════════════════════════════════════════════════════
+    (function initHeroParticles() {
+      if (typeof THREE === 'undefined') {
+        if (document.getElementById('heroParticles')) setTimeout(initHeroParticles, 300);
+        return;
+      }
+      var canvas = document.getElementById('heroParticles');
+      if (!canvas) return;
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 10;
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x000000, 0);
+
+      // Gold particles — warm, dominant
+      var goldCount = 400;
+      var goldGeo = new THREE.BufferGeometry();
+      var goldPos = new Float32Array(goldCount * 3);
+      for (var i = 0; i < goldCount * 3; i++) goldPos[i] = (Math.random() - 0.5) * 25;
+      goldGeo.setAttribute('position', new THREE.BufferAttribute(goldPos, 3));
+      var goldPts = new THREE.Points(goldGeo, new THREE.PointsMaterial({
+        color: 0xc9a84c, size: 0.04, transparent: true, opacity: 0.5, sizeAttenuation: true
+      }));
+      scene.add(goldPts);
+
+      // Purple particles — cool accent, fewer
+      var purpleCount = 250;
+      var purpleGeo = new THREE.BufferGeometry();
+      var purplePos = new Float32Array(purpleCount * 3);
+      for (var j = 0; j < purpleCount * 3; j++) purplePos[j] = (Math.random() - 0.5) * 25;
+      purpleGeo.setAttribute('position', new THREE.BufferAttribute(purplePos, 3));
+      var purplePts = new THREE.Points(purpleGeo, new THREE.PointsMaterial({
+        color: 0x7c3aed, size: 0.035, transparent: true, opacity: 0.35, sizeAttenuation: true
+      }));
+      scene.add(purplePts);
+
+      // Faint white dust — depth
+      var dustCount = 150;
+      var dustGeo = new THREE.BufferGeometry();
+      var dustPos = new Float32Array(dustCount * 3);
+      for (var k = 0; k < dustCount * 3; k++) dustPos[k] = (Math.random() - 0.5) * 30;
+      dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+      var dustPts = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+        color: 0xffffff, size: 0.02, transparent: true, opacity: 0.12, sizeAttenuation: true
+      }));
+      scene.add(dustPts);
+
+      // GSAP scroll-driven rotation
+      var scrollProg = { value: 0 };
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.to(scrollProg, {
+          value: 1, ease: 'none',
+          scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+        });
+      }
+
+      // Only render when hero visible (perf)
+      var heroVisible = true;
+      var heroObs = new IntersectionObserver(function(entries) {
+        heroVisible = entries[0].isIntersecting;
+      }, { threshold: 0 });
+      var heroEl = document.getElementById('hero');
+      if (heroEl) heroObs.observe(heroEl);
+
+      var clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        if (!heroVisible) return;
+        var t = clock.getElapsedTime();
+
+        goldPts.rotation.y = t * 0.02 + scrollProg.value * Math.PI * 0.5;
+        goldPts.rotation.x = Math.sin(t * 0.05) * 0.1;
+        purplePts.rotation.y = -t * 0.015 + scrollProg.value * Math.PI * 0.3;
+        purplePts.rotation.x = Math.cos(t * 0.04) * 0.08;
+        dustPts.rotation.y = t * 0.008;
+
+        // Subtle camera drift
+        camera.position.x = Math.sin(t * 0.1) * 0.3;
+        camera.position.y = Math.cos(t * 0.08) * 0.2;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
       });
     })();
   </script>
