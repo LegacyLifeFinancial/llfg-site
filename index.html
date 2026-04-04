@@ -3654,8 +3654,8 @@
     <div class="hero-sticky">
       <div class="hero-bg">
         <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85">
-          <source src="https://assets.mixkit.co/videos/42342/42342-1080.mp4" type="video/mp4"/>
-          <source src="https://assets.mixkit.co/videos/41542/41542-1080.mp4" type="video/mp4"/>
+          <source src="https://videos.pexels.com/video-files/5727833/5727833-uhd_2560_1440_30fps.mp4" type="video/mp4"/>
+          <source src="https://videos.pexels.com/video-files/5727833/5727833-hd_1920_1080_30fps.mp4" type="video/mp4"/>
         </video>
       </div>
 
@@ -4326,6 +4326,7 @@
           <li>Will be deducted from future commission payments until fully repaid</li>
           <li>Must be repaid in full before any commission advances are resumed</li>
           <li>Carries forward across commission periods until resolved</li>
+          <li>Commission levels may decrease up to a maximum of <strong style="color:var(--gold);">10%</strong> from the agent's highest production month if current monthly production declines</li>
         </ol>
         <h4>3. Team-Level Debt Responsibility</h4>
         <p>For Agents holding a Manager role or above, the Debt Rollup balance may include chargebacks attributed to their downline agents when those agents are unable to cover their own chargeback obligations. The upline Manager's override commissions will be applied to cover any shortfall.</p>
@@ -4766,6 +4767,7 @@
       </div>
 
 
+    </div>
     <!-- TAB: REPORTS -->
     <div class="admin-tab-content" id="ptab-reports">
       <div class="dash-body">
@@ -7862,7 +7864,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       const isExec    = role === 'executive' || role === 'managing_partner' || role === 'admin' || isOwner;
 
       document.getElementById('portalWelcomeSub').textContent =
-        isAgent   ? "Here\'s your portal overview." :
+        isAgent   ? "Your portal overview \u2014 integrity first, always." :
         isManager ? 'Manager portal — your team and deals.' :
         'Executive portal — full access.';
 
@@ -7899,6 +7901,26 @@ Object.defineProperty(window, "_llfgCurrentUser", {
             </div>
           </div>
         </div>`;
+      }
+
+      // ── Core Values Strip ──
+      var welcomeEl = document.querySelector('#ptab-overview .dash-welcome');
+      if (welcomeEl && !document.getElementById('coreValuesStrip')) {
+        var strip = document.createElement('div');
+        strip.id = 'coreValuesStrip';
+        strip.style.cssText = 'display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;';
+        var values = [
+          {icon:'\u2696\uFE0F',label:'Integrity First'},
+          {icon:'\uD83C\uDF31',label:'Agent-Centered Growth'},
+          {icon:'\uD83D\uDCCB',label:'Compliance & Accountability'},
+          {icon:'\u2B50',label:'Service Excellence'},
+          {icon:'\uD83D\uDD04',label:'Continuous Improvement'},
+          {icon:'\uD83E\uDD1D',label:'Collaboration Over Competition'}
+        ];
+        strip.innerHTML = values.map(function(v) {
+          return '<div style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.08);font-size:0.58rem;color:var(--gray);white-space:nowrap;"><span style="font-size:0.7rem;">' + v.icon + '</span>' + v.label + '</div>';
+        }).join('');
+        welcomeEl.appendChild(strip);
       }
 
       const q = getQuoteOfTheDay();
@@ -11211,6 +11233,10 @@ contact\u0040llfg.us`
         licensing:{ label:'Licensing', icon:'📋' },
         welcome:  { label:'Welcome', icon:'🎉' },
         followup: { label:'Follow-Up', icon:'🔄' },
+        'Recruiting':     { label:'Recruiting', icon:'📣' },
+        'Follow-Up':      { label:'Follow-Up (SOP)', icon:'🔁' },
+        'Retention':      { label:'Retention', icon:'🛡️' },
+        'Accountability': { label:'Accountability', icon:'📈' },
         custom:   { label:'My Templates', icon:'⭐' },
       };
       const allTpls = [...(typeof EMAIL_TEMPLATES!=='undefined'?EMAIL_TEMPLATES:[]), ...(typeof customTemplates!=='undefined'?customTemplates:[])];
@@ -12675,6 +12701,63 @@ If you have any questions or need assistance, don't hesitate to reach out.
 Licensed Insurance Agent | Legacy Life Financial Group
 {{phone}}`
       },
+      // ── Recruiting & Accountability Templates (from SOP) ──
+      {
+        id: 'recruit_outreach',
+        name: 'Recruiting — Initial Outreach',
+        category: 'Recruiting',
+        subject: 'Quick question about your career goals',
+        body: 'Hi {{name}},\n\nI came across your profile and wanted to reach out. I work with a fast-growing financial services firm that\'s actively expanding.\n\nWe\'re not offering a "job" — we\'re offering an opportunity to build your own business with:\n\n• Uncapped income (our top agents earn $10K–$30K/month)\n• A clear leadership path from agent to agency owner\n• Full training, mentorship, and carrier access from day one\n• No cold calling — we provide lead systems\n\nWould you be open to a quick 15-minute overview to see if it\'s a fit?\n\nBest,\n{{sender}}'
+      },
+      {
+        id: 'recruit_qualify',
+        name: 'Recruiting — Qualifying Questions',
+        category: 'Recruiting',
+        subject: 'Next step — a few quick questions',
+        body: 'Hi {{name}},\n\nThanks for your interest! Before we schedule your overview call, I have a few quick questions:\n\n1. Are you currently licensed in life or health insurance?\n2. Do you have any previous sales experience?\n3. Are you looking for part-time or full-time income?\n4. Are you comfortable with a commission-based role?\n5. Are you open to eventually building and leading your own team?\n\nYour answers help me tailor the overview to what matters most to you.\n\nLooking forward to hearing from you,\n{{sender}}'
+      },
+      {
+        id: 'recruit_book',
+        name: 'Recruiting — Book Overview Call',
+        category: 'Recruiting',
+        subject: 'Let\'s get you scheduled',
+        body: 'Hi {{name}},\n\nBased on what you shared, I think this could be a strong fit.\n\nLet\'s do a quick 15-minute overview so you can see exactly how the business model works, the income potential, and what your first 90 days would look like.\n\nHere\'s my calendar to pick a time that works: [INSERT CALENDAR LINK]\n\nNo pressure — just information. If it\'s a fit, great. If not, no hard feelings.\n\nTalk soon,\n{{sender}}'
+      },
+      {
+        id: 'followup_objection',
+        name: 'Follow-Up — Objection Response',
+        category: 'Follow-Up',
+        subject: 'Wanted to circle back with you',
+        body: 'Hi {{name}},\n\nI wanted to follow up on our last conversation. I completely understand your hesitation — this is a big decision.\n\nA few things I want you to consider:\n\n• You don\'t need experience — we train from scratch\n• There\'s no upfront cost to get started\n• You\'ll have a mentor and a proven system from day one\n• Many of our top producers started in the exact same position you\'re in now\n\nThe worst that can happen is you learn something new. The best? You build a career that changes your family\'s financial future.\n\nWould you be open to one more quick conversation? I\'d love to answer any questions.\n\nBest,\n{{sender}}'
+      },
+      {
+        id: 'retention_client',
+        name: 'Retention — Client At-Risk',
+        category: 'Retention',
+        subject: 'Checking in on your coverage',
+        body: 'Hi {{name}},\n\nI hope you\'re doing well! I\'m reaching out because I want to make sure your coverage is still working for you.\n\nLife changes — and your insurance should change with it. Whether it\'s a new job, a growing family, or just making sure you\'re getting the best value, I\'m here to help.\n\nI\'d love to schedule a quick annual review to:\n• Confirm your coverage still fits your needs\n• Check for any savings opportunities\n• Answer any questions you might have\n\nWhen would be a good time for a 10-minute call?\n\nBest,\n{{sender}}'
+      },
+      {
+        id: 'accountability_ontrack',
+        name: 'Accountability — Agent On Track',
+        category: 'Accountability',
+        subject: 'Monthly Performance Update — Keep Pushing',
+        body: 'Hi {{name}},\n\nYou\'re in a strong position right now.\n\nAt your current pace, you\'re maintaining solid production — but you haven\'t yet broken into your next level.\n\nHere\'s where you stand:\n• Current Monthly AP: [INSERT AP]\n• Target for Next Tier: [INSERT TARGET]\n• Gap: [INSERT GAP]\n\nYou\'re close. The difference between where you are and where you want to be comes down to consistency.\n\nFocus this month on:\n1. Adding 2-3 more appointments per week\n2. Following up with every warm lead within 24 hours\n3. Asking every client for one referral\n\nYour next level is within reach. Let\'s make it happen.\n\n{{sender}}'
+      },
+      {
+        id: 'accountability_decrease',
+        name: 'Accountability — Commission Adjustment',
+        category: 'Accountability',
+        subject: 'Commission Level Update — Action Required',
+        body: 'Hi {{name}},\n\nBased on your recent production compared to your highest month, your current output has decreased.\n\nAs a result, your commission level is adjusting accordingly. This isn\'t a setback — it\'s a reflection of current production.\n\nThe positive: You can return to your previous level quickly by increasing output back to your prior standard.\n\nFocus this month on:\n• Rebuilding your daily activity (calls, appointments, presentations)\n• Closing the gap in production\n• Re-engaging with your lead pipeline\n\nYour previous level is still within reach. I\'m here to help you get back on track.\n\n{{sender}}'
+      },
+      {
+        id: 'accountability_leader',
+        name: 'Accountability — Leadership Evaluation',
+        category: 'Accountability',
+        subject: 'Monthly Leadership Review',
+        body: 'Hi {{name}},\n\nAs part of our monthly review, here\'s your leadership snapshot:\n\n• Team Production: [INSERT]\n• Active Agents: [INSERT]\n• New Recruits This Month: [INSERT]\n• Training Sessions Held: [INSERT]\n• Team Persistency: [INSERT]\n\nKey Focus Areas:\n1. Are you actively recruiting? No recruiting = no growth.\n2. Are you developing your people? No development = no promotions.\n3. Is your team engaged? No accountability = no culture.\n\nRemember: Production without duplication is capped growth. Your job isn\'t just to sell — it\'s to build leaders.\n\nLet\'s discuss your plan for next month.\n\n{{sender}}'
+      }
     ];
 
     let customTemplates = [];
@@ -12689,6 +12772,10 @@ Licensed Insurance Agent | Legacy Life Financial Group
         licensing: { label:'Licensing', icon:'📋' },
         welcome:   { label:'Welcome', icon:'🎉' },
         followup:  { label:'Follow-Up', icon:'🔄' },
+        'Recruiting':     { label:'Recruiting', icon:'📣' },
+        'Follow-Up':      { label:'Follow-Up (SOP)', icon:'🔁' },
+        'Retention':      { label:'Retention', icon:'🛡️' },
+        'Accountability': { label:'Accountability', icon:'📈' },
         custom:    { label:'My Templates', icon:'⭐' },
       };
 
@@ -16324,62 +16411,58 @@ This request requires Managing Partner approval.`
           apps.push({ tier: tier, data: appData, ts: Date.now() });
           if (apps.length > 100) apps = apps.slice(-100);
           localStorage.setItem('llfg_applications', JSON.stringify(apps));
-        } catch(ex) {}
-      }, 1200);
-    };
-
-    // ─── CINEMATIC HERO SCROLL — ZOOM OUT + BRAND REVEAL ───────────
+    // ─── CINEMATIC 4K HERO — SCROLL ZOOM + BRAND REVEAL ─────────────
     (function initHeroCinematic() {
-      var heroImg = document.querySelector('.hero-bg video') || document.querySelector('.hero-bg-img');
+      var heroMedia = document.querySelector('.hero-bg video') || document.querySelector('.hero-bg-img');
       var heroContent = document.querySelector('#hero .hero-content');
       var brandReveal = document.getElementById('heroBrandReveal');
       var brandLine = document.getElementById('heroBrandLine');
-      var heroSection = document.getElementById('hero');
-      if (!heroImg || !heroSection) return;
+      var heroBg = document.querySelector('.hero-bg');
+      if (!heroMedia) return;
 
+      // Dynamic vignette overlay that intensifies on scroll
+      var vig = document.createElement('div');
+      vig.style.cssText = 'position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;background:radial-gradient(ellipse 70% 50% at 50% 50%,transparent 20%,rgba(10,10,10,0.8) 80%);';
+      if (heroBg) heroBg.appendChild(vig);
+
+      var ticking = false;
       window.addEventListener('scroll', function() {
-        var scrollY = window.scrollY || window.pageYOffset;
-        var vh = window.innerHeight;
-        // hero is 200vh tall, so pct goes 0 to 1 over 100vh of scroll
-        var pct = Math.min(scrollY / vh, 1);
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function() {
+          var scrollY = window.scrollY || window.pageYOffset;
+          var vh = window.innerHeight;
+          var pct = Math.min(scrollY / vh, 1);
 
-        // Phase 1 (0-0.4): City zooms out from 1.6x to 1.0x — dramatic camera pullback
-        var scale = 1.6 - (pct * 0.6);
-        heroImg.style.transform = 'scale(' + Math.max(scale, 1.0) + ')';
+          // 4K zoom out: 1.6x to 1.0x with subtle rotation
+          var scale = 1.6 - (pct * 0.6);
+          heroMedia.style.transform = 'scale(' + Math.max(scale, 1.0) + ') rotate(' + (pct * 0.8) + 'deg)';
 
-        // Phase 1 (0-0.35): Text fades out and rises
-        if (heroContent) {
-          var textFade = Math.max(0, 1 - (pct * 2.8));
-          heroContent.style.opacity = textFade;
-          heroContent.style.transform = 'translateY(' + (-pct * 120) + 'px)';
-        }
+          // Dynamic vignette + brightness shift
+          vig.style.opacity = pct * 0.7;
+          heroMedia.style.filter = 'saturate(' + (1.1 - pct * 0.3) + ') contrast(' + (1.05 + pct * 0.1) + ') brightness(' + (0.85 - pct * 0.25) + ')';
 
-        // Phase 2 (0.4-0.9): Brand name fades in as city is fully zoomed out
-        if (brandReveal) {
-          var brandStart = 0.4;
-          var brandEnd = 0.75;
-          if (pct < brandStart) {
-            brandReveal.style.opacity = '0';
-          } else if (pct > brandEnd) {
-            brandReveal.style.opacity = '1';
-          } else {
-            var brandPct = (pct - brandStart) / (brandEnd - brandStart);
-            brandReveal.style.opacity = brandPct;
+          // Text fades out and rises
+          if (heroContent) {
+            heroContent.style.opacity = Math.max(0, 1 - (pct * 2.8));
+            heroContent.style.transform = 'translateY(' + (-pct * 120) + 'px)';
           }
-          // Scale brand text from 0.85 to 1.0
-          var brandScale = 0.85 + (Math.min(pct, 1) * 0.15);
-          brandReveal.style.transform = 'scale(' + brandScale + ')';
-        }
 
-        // Animate the gold line width
-        if (brandLine) {
-          var linePct = Math.max(0, (pct - 0.5) / 0.3);
-          brandLine.style.width = Math.min(linePct * 80, 80) + 'px';
-        }
+          // Brand reveal at 40-75% scroll
+          if (brandReveal) {
+            var bs = 0.4, be = 0.75;
+            brandReveal.style.opacity = pct < bs ? '0' : pct > be ? '1' : ((pct - bs) / (be - bs));
+            brandReveal.style.transform = 'scale(' + (0.85 + Math.min(pct, 1) * 0.15) + ')';
+          }
 
-        // Darken overlay as we zoom out for contrast with brand text
-        var overlay = heroSection.querySelector('.hero-bg::after');
+          // Gold line width
+          if (brandLine) {
+            var lp = Math.max(0, (pct - 0.5) / 0.3);
+            brandLine.style.width = Math.min(lp * 80, 80) + 'px';
+          }
 
+          ticking = false;
+        });
       }, { passive: true });
     })();
 
