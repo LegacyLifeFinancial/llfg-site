@@ -2693,7 +2693,8 @@
     }
     @media (max-width: 480px) {
       .tier-grid { grid-template-columns: 1fr !important; }
-
+      #chatPanel { width: 300px !important; right: -1rem; }
+      #llfgChatWidget { bottom: 1rem; right: 1rem; }
     }
 
     /* ══════════════════════════════════════════════
@@ -3437,6 +3438,9 @@
       .llfg-org-branch { flex-wrap: wrap; justify-content: center; }
     }
   </style>
+  <!-- GSAP + ScrollTrigger for 3D animations -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
 </head>
 <body>
 
@@ -4364,6 +4368,37 @@
             <div style="font-size:0.62rem;color:var(--gray);margin-top:0.2rem;">Agent portal &amp; resources</div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHAT WIDGET -->
+  <div id="llfgChatWidget" style="position:fixed;bottom:2rem;right:2rem;z-index:997;">
+    <div id="chatBubble" onclick="toggleChat()" style="width:56px;height:56px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);transition:transform 0.3s,box-shadow 0.3s;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(201,168,76,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(201,168,76,0.4)'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div id="chatPanel" style="display:none;position:absolute;bottom:70px;right:0;width:360px;max-height:500px;background:#111;border:1px solid rgba(201,168,76,0.2);box-shadow:0 12px 40px rgba(0,0,0,0.6);overflow:hidden;animation:fadeUp 0.3s ease;">
+      <div style="padding:1rem 1.2rem;background:rgba(201,168,76,0.06);border-bottom:1px solid rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-family:'Raleway',sans-serif;font-size:0.75rem;font-weight:600;color:var(--cream);letter-spacing:0.08em;">LLFG Assistant</div>
+          <div style="font-size:0.55rem;color:var(--gold-dim);">Ask about careers, commissions, or getting started</div>
+        </div>
+        <button onclick="toggleChat()" style="background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer;">&times;</button>
+      </div>
+      <div id="chatMessages" style="height:320px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.8rem;">
+        <div style="background:rgba(201,168,76,0.06);padding:0.7rem 1rem;font-size:0.72rem;color:var(--cream);line-height:1.6;align-self:flex-start;max-width:85%;">
+          Hey! I'm the LLFG Assistant. Ask me anything about joining Legacy Life — earnings, training, licensing, or how to apply.
+        </div>
+      </div>
+      <div style="padding:0.8rem;border-top:1px solid rgba(201,168,76,0.08);display:flex;gap:0.5rem;">
+        <input id="chatInput" type="text" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChatMsg()" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.12);color:var(--cream);padding:0.6rem 0.8rem;font-size:0.72rem;font-family:'Raleway',sans-serif;outline:none;"/>
+        <button onclick="sendChatMsg()" style="background:var(--gold);border:none;color:#0a0a0a;padding:0.6rem 1rem;font-size:0.65rem;font-weight:600;font-family:'Raleway',sans-serif;cursor:pointer;letter-spacing:0.06em;">Send</button>
+      </div>
+      <div style="padding:0.4rem 0.8rem;display:flex;gap:0.3rem;flex-wrap:wrap;border-top:1px solid rgba(201,168,76,0.05);">
+        <button onclick="quickChat('How much can I earn?')" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);color:var(--gold);padding:0.25rem 0.6rem;font-size:0.55rem;cursor:pointer;font-family:'Raleway',sans-serif;">Earnings</button>
+        <button onclick="quickChat('Do I need a license?')" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);color:var(--gold);padding:0.25rem 0.6rem;font-size:0.55rem;cursor:pointer;font-family:'Raleway',sans-serif;">Licensing</button>
+        <button onclick="quickChat('How do I apply?')" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);color:var(--gold);padding:0.25rem 0.6rem;font-size:0.55rem;cursor:pointer;font-family:'Raleway',sans-serif;">Apply</button>
+        <button onclick="quickChat('What training is provided?')" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);color:var(--gold);padding:0.25rem 0.6rem;font-size:0.55rem;cursor:pointer;font-family:'Raleway',sans-serif;">Training</button>
       </div>
     </div>
   </div>
@@ -17936,39 +17971,121 @@ This request requires Managing Partner approval.`
       }, 1200);
     };
 
-    // ─── HERO SCROLL PARALLAX ─────────────────────────────────────
-    (function initHeroScroll() {
-      var heroBg = document.querySelector('#hero .hero-bg');
-      var heroContent = document.querySelector('#hero .hero-content');
-      var heroLine = document.querySelector('#hero .hero-line');
-      if (!heroBg && !heroContent) return;
-
-      var ticking = false;
-      window.addEventListener('scroll', function() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(function() {
-          var scrollY = window.scrollY || window.pageYOffset;
-          var vh = window.innerHeight;
-          if (scrollY > vh) { ticking = false; return; }
-          var pct = scrollY / vh;
-
-          // Background parallax shift
-          if (heroBg) heroBg.style.transform = 'translateY(' + (pct * 30) + 'px)';
-
-          // Content fades and rises
-          if (heroContent) {
-            heroContent.style.opacity = Math.max(0, 1 - (pct * 1.5));
-            heroContent.style.transform = 'translateY(' + (-pct * 60) + 'px)';
-          }
-
-          // Gold line fades
-          if (heroLine) heroLine.style.opacity = Math.max(0, 1 - (pct * 2));
-
-          ticking = false;
+    // ─── GSAP 3D SCROLL ANIMATIONS ─────────────────────────────────
+    (function initGSAPAnimations() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        // Fallback: retry after GSAP loads (deferred script)
+        window.addEventListener('load', function() {
+          if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') initGSAP();
         });
-      }, { passive: true });
+        return;
+      }
+      initGSAP();
     })();
+
+    function initGSAP() {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Hero: parallax background + content fade
+      gsap.to('#hero .hero-bg', {
+        y: 80,
+        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
+      });
+      gsap.to('#hero .hero-content', {
+        y: -100, opacity: 0,
+        scrollTrigger: { trigger: '#hero', start: '30% top', end: 'bottom top', scrub: 1 }
+      });
+      gsap.to('#hero .hero-line', {
+        opacity: 0,
+        scrollTrigger: { trigger: '#hero', start: '20% top', end: '60% top', scrub: 1 }
+      });
+
+      // About section: left slides in, right slides in
+      gsap.from('#about .about-left', {
+        x: -80, opacity: 0, duration: 1,
+        scrollTrigger: { trigger: '#about', start: 'top 80%', toggleActions: 'play none none reverse' }
+      });
+      gsap.from('#about .about-right', {
+        x: 80, opacity: 0, duration: 1, delay: 0.2,
+        scrollTrigger: { trigger: '#about', start: 'top 80%', toggleActions: 'play none none reverse' }
+      });
+
+      // Pillar cards: stagger 3D flip in
+      gsap.from('.pillar', {
+        rotateY: 90, opacity: 0, duration: 0.8,
+        stagger: 0.15, transformOrigin: 'left center',
+        scrollTrigger: { trigger: '.about-right', start: 'top 85%', toggleActions: 'play none none reverse' }
+      });
+
+      // Carrier cards: stagger scale up
+      gsap.from('.carrier-card', {
+        scale: 0.7, opacity: 0, duration: 0.4,
+        stagger: { amount: 0.8, grid: 'auto', from: 'center' },
+        scrollTrigger: { trigger: '#carriers', start: 'top 75%', toggleActions: 'play none none reverse' }
+      });
+
+      // Why cards: stagger slide up with 3D rotation
+      gsap.from('.why-card', {
+        y: 60, rotateX: 15, opacity: 0, duration: 0.7,
+        stagger: 0.12, transformOrigin: 'bottom center',
+        scrollTrigger: { trigger: '#why', start: 'top 75%', toggleActions: 'play none none reverse' }
+      });
+
+      // Why card numbers: count up animation
+      document.querySelectorAll('.why-num').forEach(function(el) {
+        var target = parseInt(el.textContent);
+        if (isNaN(target)) return;
+        var obj = { val: 0 };
+        gsap.to(obj, {
+          val: target, duration: 1.5, ease: 'power2.out',
+          onUpdate: function() { el.textContent = String(Math.round(obj.val)).padStart(2, '0'); },
+          scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' }
+        });
+      });
+
+      // Agency tier cards: stagger from bottom with 3D tilt
+      gsap.from('.tier-grid > div', {
+        y: 50, rotateX: 10, opacity: 0, duration: 0.6,
+        stagger: 0.1, transformOrigin: 'bottom center',
+        scrollTrigger: { trigger: '#agency', start: 'top 70%', toggleActions: 'play none none reverse' }
+      });
+
+      // Apply CTA: scale pulse
+      gsap.from('#apply .btn-primary', {
+        scale: 0.8, opacity: 0, duration: 0.8, ease: 'back.out(1.7)',
+        scrollTrigger: { trigger: '#apply', start: 'top 85%', toggleActions: 'play none none reverse' }
+      });
+
+      // Section tags: slide in from left with gold underline
+      gsap.from('.section-tag', {
+        x: -40, opacity: 0, duration: 0.6,
+        stagger: 0.1,
+        scrollTrigger: { trigger: '.section-tag', start: 'top 90%', toggleActions: 'play none none reverse' }
+      });
+
+      // Nav: hide on scroll down, show on scroll up
+      var nav = document.querySelector('nav');
+      if (nav) {
+        ScrollTrigger.create({
+          start: 'top -80',
+          onUpdate: function(self) {
+            if (self.direction === 1) { nav.style.transform = 'translateY(-100%)'; nav.style.transition = 'transform 0.3s ease'; }
+            else { nav.style.transform = 'translateY(0)'; }
+          }
+        });
+      }
+
+      // Stat track: pause animation on scroll past hero
+      var statTrack = document.querySelector('.stat-track');
+      if (statTrack) {
+        ScrollTrigger.create({
+          trigger: '#hero',
+          start: 'bottom top',
+          onEnter: function() { statTrack.style.animationPlayState = 'paused'; },
+          onLeaveBack: function() { statTrack.style.animationPlayState = 'running'; }
+        });
+      }
+    }
 
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
@@ -18273,6 +18390,115 @@ This request requires Managing Partner approval.`
       }
     };
 
+
+    // ─── AI CHAT WIDGET ──────────────────────────────────────────────
+    var LLFG_AI_KB = {
+      'earn|income|money|pay|salary|commission': 'New agents consistently earn $10,000-$15,000 in their first month. By months 3-6, committed producers average $30,000-$50,000/month. Top producers exceed $500,000+/month. Commissions are uncapped and advanced — you get paid before the policy even starts drafting.',
+      'license|licensed|licensing': 'If you are not yet licensed, we guide you through the entire process. Most states require a Life & Health license. Study materials, exam prep, and scheduling support are all included at no cost. Most agents get licensed within 2-3 weeks.',
+      'apply|join|start|get started|sign up': 'Click the "Join Our Team" button on this page to open our application. Choose Solo Agent or Agency partnership. A team member will contact you within 24 hours to schedule your interview. The whole process from application to first sale can happen in under 2 weeks.',
+      'train|training|learn|course': 'We provide comprehensive training from day one: product knowledge, sales scripts, objection handling, carrier systems, and live coaching. Our training library includes 10+ full courses covering everything from term life basics to advanced IUL strategies. Senior agents mentor you through your first presentations.',
+      'lead|leads|prospect': 'We provide free leads when you start so you can hit the ground running with zero out-of-pocket cost. As your income grows, we show you how to strategically invest in additional lead sources to scale your business.',
+      'carrier|product|insurance|sell': 'We partner with 30+ A-rated carriers including Mutual of Omaha, Transamerica, Corebridge, Foresters, Americo, and more. You can sell Term Life, Whole Life, IUL, Annuities, Medicare Supplements, and Final Expense products.',
+      'team|agency|partner|tier': 'We offer 5 partnership tiers: Solo Agent (recruiting team support), Small Agency 5-10 (manager support), Medium 10-150 (executive support), Large 150-300 (managing partner), Enterprise 300+ (direct owner access). Each tier gets dedicated onboarding.',
+      'experience|new|beginner|no experience': 'No experience needed! Many of our top producers started with zero insurance background. Our training program is built by top producers who have been where you are. We guide every step from licensing to closing your first deal.',
+      'remote|work from home|location|where': 'Yes, this is a fully remote opportunity. You can work from anywhere in the US. All training, meetings, and support are virtual. You build your own schedule and work on your own terms.',
+      'cost|fee|invest|pay to start': 'There is zero cost to join LLFG. We do not charge fees, desk rent, or startup costs. Your only investment is getting your state insurance license if you do not already have one (typically $100-$300 depending on your state).'
+    };
+
+    window.toggleChat = function() {
+      var panel = document.getElementById('chatPanel');
+      if (panel) panel.style.display = panel.style.display === 'none' ? '' : 'none';
+    };
+
+    window.sendChatMsg = function() {
+      var input = document.getElementById('chatInput');
+      var text = input ? input.value.trim() : '';
+      if (!text) return;
+      input.value = '';
+      addChatBubble(text, true);
+      setTimeout(function() { addChatBubble(getAIResponse(text), false); }, 600 + Math.random() * 800);
+    };
+
+    window.quickChat = function(q) {
+      addChatBubble(q, true);
+      setTimeout(function() { addChatBubble(getAIResponse(q), false); }, 600 + Math.random() * 800);
+    };
+
+    function addChatBubble(text, isUser) {
+      var container = document.getElementById('chatMessages');
+      if (!container) return;
+      var div = document.createElement('div');
+      div.style.cssText = isUser
+        ? 'background:rgba(201,168,76,0.15);padding:0.6rem 0.9rem;font-size:0.72rem;color:var(--cream);line-height:1.6;align-self:flex-end;max-width:85%;'
+        : 'background:rgba(201,168,76,0.06);padding:0.7rem 1rem;font-size:0.72rem;color:var(--cream);line-height:1.6;align-self:flex-start;max-width:85%;animation:fadeUp 0.3s ease;';
+      div.textContent = text;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function getAIResponse(q) {
+      var lower = q.toLowerCase();
+      for (var pattern in LLFG_AI_KB) {
+        var keywords = pattern.split('|');
+        for (var i = 0; i < keywords.length; i++) {
+          if (lower.indexOf(keywords[i]) !== -1) return LLFG_AI_KB[pattern];
+        }
+      }
+      return 'Great question! For detailed information, I would recommend clicking "Join Our Team" to start your application, or click "Agent Login" if you are already part of the team. You can also email support@llfg.us for a personal response within 24 hours.';
+    }
+
+    // ─── CRM INTEGRATION HOOKS (Twenty CRM ready) ────────────────────
+    window.LLFG_CRM = {
+      endpoint: null, // Set to 'https://crm.llfg.us/api' when Twenty CRM is deployed
+      apiKey: null,
+
+      // Push new lead to CRM when application is submitted
+      pushLead: function(data) {
+        if (!this.endpoint) {
+          console.log('[CRM] Lead captured (CRM not configured):', data);
+          return;
+        }
+        fetch(this.endpoint + '/people', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + this.apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: data.firstName, lastName: data.lastName,
+            email: data.email, phone: data.phone,
+            company: data.agencyName || 'Individual',
+            customFields: { tier: data.tier, source: 'llfg.us', referral: data.referral }
+          })
+        }).catch(function(e) { console.error('[CRM] Push failed:', e); });
+      },
+
+      // Push deal/opportunity when agent is onboarded
+      pushDeal: function(agentName, tier) {
+        if (!this.endpoint) return;
+        fetch(this.endpoint + '/opportunities', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + this.apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: agentName + ' - ' + tier, stage: 'New Application', source: 'llfg.us' })
+        }).catch(function(e) { console.error('[CRM] Deal push failed:', e); });
+      }
+    };
+
+    // Wire CRM to application submissions
+    if (typeof LLFG_EventBus !== 'undefined') {
+      LLFG_EventBus.on('recruiting:applicationSubmitted', function(data) {
+        LLFG_CRM.pushLead(data.data);
+      });
+    }
+
+    // ─── AI ASSISTANT CONFIG (LobeHub ready) ─────────────────────────
+    window.LLFG_AI = {
+      lobeHubUrl: null, // Set to 'https://ai.llfg.us' when LobeHub is deployed
+      enabled: false,
+
+      init: function(url) {
+        this.lobeHubUrl = url;
+        this.enabled = true;
+        console.log('[AI] LobeHub configured at', url);
+      }
+    };
   </script>
 </body>
 </html>
