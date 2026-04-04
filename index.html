@@ -188,47 +188,126 @@
       *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
     }
 
-    /* ─── HERO ─── */
+    /* 250025002500 HERO 2014 3D LION SCROLL 250025002500 */
     #hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
+      min-height: 300vh;
       position: relative;
-      overflow: hidden;
-      padding: 8rem 4rem 4rem;
       background: var(--black);
+    }
+    .hero-sticky {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: var(--black);
     }
     .hero-bg {
       position: absolute; inset: 0; z-index: 0;
       background:
-        radial-gradient(ellipse 70% 55% at 68% 42%, rgba(201,168,76,0.09) 0%, transparent 70%),
-        radial-gradient(ellipse 45% 45% at 25% 75%, rgba(201,168,76,0.05) 0%, transparent 60%),
-        radial-gradient(circle at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 40%),
-        linear-gradient(135deg, #0a0a0a 0%, #111 40%, #0d0d0d 100%);
-      animation: heroBgShift 12s ease-in-out infinite alternate;
+        radial-gradient(ellipse 60% 50% at 50% 45%, rgba(201,168,76,0.06) 0%, transparent 70%),
+        radial-gradient(circle at 50% 50%, rgba(201,168,76,0.03) 0%, transparent 50%),
+        var(--black);
     }
-    @keyframes heroBgShift {
-      0% { background-position: 0% 0%; }
-      100% { background-position: 100% 100%; }
+    /* Lion SVG container */
+    .hero-lion-scene {
+      position: absolute; z-index: 2;
+      width: 320px; height: 320px;
+      top: 50%; left: 50%; transform: translate(-50%, -55%);
     }
-    .hero-bg::before {
-      content: ''; position: absolute; inset: 0;
-      background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='none'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='rgba(201,168,76,0.025)' stroke-width='0.5'/%3E%3C/svg%3E");
-      animation: gridDrift 20s linear infinite;
+    .hero-lion-scene svg { width: 100%; height: 100%; }
+    .lion-jaw { transform-origin: 50% 65%; transition: transform 0.1s linear; }
+    .lion-glow {
+      position: absolute; inset: -40%; z-index: 1;
+      background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 60%);
+      animation: lionBreath 3s ease-in-out infinite;
     }
-    @keyframes gridDrift {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(80px, 80px); }
+    @keyframes lionBreath { 0%,100%{ transform:scale(1); opacity:0.6; } 50%{ transform:scale(1.08); opacity:1; } }
+    /* Particle burst on roar */
+    .roar-particles {
+      position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none;
     }
-    .hero-bg::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
-      background: linear-gradient(to top, var(--black) 0%, transparent 100%);
+    .roar-particle {
+      position: absolute; width: 3px; height: 3px; background: var(--gold); border-radius: 50%;
+      top: 60%; left: 50%;
     }
-    .hero-line {
-      position: absolute; top: 0; bottom: 0; left: 52%; width: 1px; z-index: 0;
-      background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.15) 30%, rgba(201,168,76,0.15) 70%, transparent);
+    /* LLFG Logo overlay (hidden initially) */
+    .hero-logo-reveal {
+      position: absolute; z-index: 3;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      text-align: center; opacity: 0;
+    }
+    .hero-logo-reveal h2 {
+      font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 3.5vw, 3rem);
+      font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); text-shadow: 0 0 40px rgba(201,168,76,0.3);
+    }
+    .hero-logo-line { width: 0; height: 1px; background: var(--gold); margin: 1rem auto; }
+    .hero-logo-sub {
+      font-family: 'Raleway', sans-serif; font-size: 0.7rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: rgba(245,240,232,0.5);
+    }
+    /* Hero text overlay */
+    .hero-text-overlay {
+      position: absolute; z-index: 4; bottom: 20%; left: 50%;
+      transform: translateX(-50%); text-align: center;
+    }
+    .hero-text-overlay h1 {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3.5rem);
+      color: var(--cream); line-height: 1.1; margin-bottom: 0.5rem;
+    }
+    .hero-text-overlay p { font-size: 0.75rem; color: var(--gray); letter-spacing: 0.15em; }
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      z-index: 5; text-align: center;
+    }
+    .scroll-arrow {
+      width: 20px; height: 20px; border-right: 1px solid var(--gold); border-bottom: 1px solid var(--gold);
+      transform: rotate(45deg); margin: 0 auto;
+      animation: scrollBounce 2s ease-in-out infinite;
+    }
+    @keyframes scrollBounce { 0%,100%{ transform:rotate(45deg) translateY(0); } 50%{ transform:rotate(45deg) translateY(8px); } }
+    .scroll-label { font-size: 0.5rem; color: var(--gold-dim); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem; }
+    /* Income stats section */
+    #income-stats {
+      padding: 6rem 4rem; background: var(--black);
+      border-top: 1px solid rgba(201,168,76,0.08);
+    }
+    .income-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+      max-width: 900px; margin: 0 auto;
+    }
+    .income-card {
+      text-align: center; padding: 2.5rem 1.5rem;
+      border: 1px solid rgba(201,168,76,0.1); background: rgba(201,168,76,0.02);
+      transition: transform 0.4s, border-color 0.3s, box-shadow 0.4s;
+      transform-style: preserve-3d;
+    }
+    .income-card:hover { transform: translateY(-6px) rotateX(3deg); border-color: var(--gold); box-shadow: 0 16px 40px rgba(201,168,76,0.1); }
+    .income-num {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 5vw, 3.5rem);
+      color: var(--gold); font-weight: 600; line-height: 1;
+    }
+    .income-label { font-size: 0.62rem; color: var(--gray); letter-spacing: 0.18em; text-transform: uppercase; margin-top: 0.6rem; }
+    .income-sub { font-size: 0.72rem; color: var(--cream); margin-top: 0.4rem; line-height: 1.5; }
+    /* Encrypted form styling */
+    .encrypted-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(110,207,110,0.08); border: 1px solid rgba(110,207,110,0.2);
+      padding: 0.3rem 0.8rem; font-size: 0.55rem; color: #6ecf6e;
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .form-progress {
+      display: flex; gap: 0; margin-bottom: 2rem;
+    }
+    .form-progress-step {
+      flex: 1; height: 3px; background: rgba(201,168,76,0.1);
+    }
+    .form-progress-step.active { background: var(--gold); }
+    @media (max-width: 768px) {
+      .hero-lion-scene { width: 220px; height: 220px; }
+      .hero-text-overlay h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); }
+      .hero-logo-reveal h2 { font-size: clamp(1.2rem, 5vw, 2rem); letter-spacing: 0.12em; }
+      .income-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .income-card { padding: 1.5rem 1rem; }
     }
     /* ─── 3D INTERACTIVE ENHANCEMENTS ─── */
     .carrier-card { transition: transform 0.4s ease, border-color 0.3s, box-shadow 0.4s; transform-style: preserve-3d; }
@@ -3570,13 +3649,14 @@
       'jaalyn\u0040llfg.us':         {password:'agent123',   role:'financial_advisor', name:'Jaalyn Bowman',   comm:65  },
       'manager\u0040llfg.us':        {password:'mgr123',     role:'manager',           name:'Marcus Reid',     comm:100 },
       'executive\u0040llfg.us':      {password:'exec123',    role:'executive',         name:'Sofia Lane',      comm:120 },
+      'director\u0040llfg.us':       {password:'dir123',     role:'director',          name:'Terrence Blake',  comm:135 },
       'partner\u0040llfg.us':        {password:'partner123', role:'managing_partner',  name:'Diana Walsh',     comm:140 },
       'lorenzoparenza\u0040llfg.us': {password:'admin123',   role:'admin',             name:'Lorenzo Parenza', comm:140, isOwner:true },
       'admin\u0040llfg.us':          {password:'admin123',   role:'admin',             name:'Admin',           comm:140 },
     };
 
     var LLFG_ROLE_DISPLAY = {
-      admin:'Admin', managing_partner:'Managing Partner', executive:'Executive',
+      admin:'Admin', managing_partner:'Managing Partner', director:'Director', executive:'Executive',
       manager:'Manager', financial_advisor:'Financial Advisor', agent:'Financial Advisor',
     };
 
@@ -3585,6 +3665,7 @@
       agent:            ['overview','mydeals','tools','calendar','messages','management'],
       manager:          ['overview','mydeals','tools','calendar','messages','management'],
       executive:        ['overview','mydeals','tools','calendar','messages','management'],
+      director:         ['overview','mydeals','tools','calendar','messages','management'],
       managing_partner: ['overview','mydeals','tools','calendar','messages','management'],
       admin:            ['overview','mydeals','tools','calendar','messages','management'],
     };
@@ -3688,6 +3769,7 @@
         'jaalyn@llfg.us',
         'manager@llfg.us',
         'executive@llfg.us',
+        'director@llfg.us',
         'partner@llfg.us',
         'lorenzoparenza@llfg.us',
         'admin@llfg.us'
@@ -3910,37 +3992,91 @@
 
   <!-- HERO — CINEMATIC SCROLL -->
   <section id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-line"></div>
-    <div class="hero-content" style="z-index:5;">
-      <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
-      <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
-      <p class="hero-sub">
-        Legacy Life Financial Group is seeking driven individuals ready to build a thriving financial services career — with industry-leading training, free leads, and a team that invests in your success from day one.
-      </p>
-      <div class="hero-btns">
-        <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
-        <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Learn More</button>
+    <div class="hero-sticky">
+      <div class="hero-bg"></div>
+
+      <!-- 3D Lion Scene -->
+      <div class="hero-lion-scene" id="lionScene">
+        <div class="lion-glow"></div>
+        <svg viewBox="0 0 200 200" id="lionSvg">
+          <!-- Mane outer -->
+          <path class="lion-mane" d="M100,12 Q145,18 165,48 Q180,72 182,98 Q183,122 172,145 Q160,168 142,180 Q122,192 100,194 Q78,192 58,180 Q40,168 28,145 Q17,122 18,98 Q20,72 35,48 Q55,18 100,12Z" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="1.2"/>
+          <!-- Mane inner -->
+          <path class="lion-mane-inner" d="M100,28 Q138,33 155,55 Q168,74 170,98 Q172,118 164,138 Q154,158 138,170 Q120,180 100,182 Q80,180 62,170 Q46,158 36,138 Q28,118 30,98 Q32,74 45,55 Q62,33 100,28Z" fill="none" stroke="rgba(201,168,76,0.18)" stroke-width="0.8"/>
+          <!-- Face -->
+          <path class="lion-face" d="M100,45 Q128,48 142,65 Q155,80 157,100 Q157,118 148,135 Q138,150 122,160 Q112,165 100,167 Q88,165 78,160 Q62,150 52,135 Q43,118 43,100 Q45,80 58,65 Q72,48 100,45Z" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1.2"/>
+          <!-- Eyes -->
+          <ellipse class="lion-eye-l" cx="78" cy="92" rx="9" ry="5.5" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="1"/>
+          <ellipse class="lion-eye-r" cx="122" cy="92" rx="9" ry="5.5" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="1"/>
+          <circle cx="78" cy="92" r="3" fill="rgba(201,168,76,0.5)"/>
+          <circle cx="122" cy="92" r="3" fill="rgba(201,168,76,0.5)"/>
+          <!-- Brows -->
+          <path d="M65,82 Q78,75 90,80" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="0.8"/>
+          <path d="M135,82 Q122,75 110,80" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="0.8"/>
+          <!-- Nose -->
+          <path d="M94,108 L100,116 L106,108 Z" fill="rgba(201,168,76,0.3)" stroke="rgba(201,168,76,0.5)" stroke-width="0.8"/>
+          <!-- Jaw (animated on scroll) -->
+          <g class="lion-jaw" id="lionJaw">
+            <path d="M100,116 Q92,125 85,128 Q78,130 72,128" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+            <path d="M100,116 Q108,125 115,128 Q122,130 128,128" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+            <path d="M85,128 Q92,135 100,137 Q108,135 115,128" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="0.6"/>
+          </g>
+          <!-- Ears -->
+          <path d="M60,52 Q52,35 63,30 Q72,34 68,50" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+          <path d="M140,52 Q148,35 137,30 Q128,34 132,50" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
+        </svg>
       </div>
-      <div class="hero-stats">
-        <div class="stat-track">
-          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
-          <div class="stat-divider"></div>
-        </div>
+
+      <!-- Roar particles (hidden initially) -->
+      <div class="roar-particles" id="roarParticles"></div>
+
+      <!-- LLFG Logo Reveal (hidden initially) -->
+      <div class="hero-logo-reveal" id="heroLogoReveal">
+        <svg width="60" height="60" viewBox="0 0 28 28" style="margin:0 auto 1rem;display:block;">
+          <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+          <polygon points="14,6 22,10 22,18 14,22 6,18 6,10" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.6"/>
+          <text x="14" y="16" text-anchor="middle" fill="#c9a84c" font-family="Cormorant Garamond, serif" font-size="9" font-weight="600">L</text>
+        </svg>
+        <h2>Legacy Life<br>Financial Group</h2>
+        <div class="hero-logo-line" id="heroLogoLine"></div>
+        <div class="hero-logo-sub">Build Your Legacy. Lead the Industry.</div>
+      </div>
+
+      <!-- Text overlay -->
+      <div class="hero-text-overlay" id="heroTextOverlay">
+        <h1><em>Lead the Pack.</em></h1>
+        <p>Scroll to begin your journey</p>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator" id="scrollIndicator">
+        <div class="scroll-arrow"></div>
+        <div class="scroll-label">Scroll</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INCOME STATS -->
+  <section id="income-stats">
+    <div style="text-align:center;margin-bottom:3rem;">
+      <p class="section-tag" style="display:inline-block;">What You Can Earn</p>
+      <h2 style="max-width:500px;margin:0.6rem auto 0;">Real Numbers from<br><em>Real Producers</em></h2>
+    </div>
+    <div class="income-grid">
+      <div class="income-card">
+        <div class="income-num" data-count="10000" data-prefix="$" data-suffix="+">$0</div>
+        <div class="income-label">First 30 Days</div>
+        <div class="income-sub">Average new agent income in their first month with LLFG.</div>
+      </div>
+      <div class="income-card">
+        <div class="income-num" data-count="30000" data-prefix="$" data-suffix="+">$0</div>
+        <div class="income-label">First 90 Days</div>
+        <div class="income-sub">Committed producers earning $20K-$30K+ by month three.</div>
+      </div>
+      <div class="income-card">
+        <div class="income-num" data-count="500000" data-prefix="$" data-suffix="+">$0</div>
+        <div class="income-label">Top Producers</div>
+        <div class="income-sub">Our highest earners exceed $500K per month in production.</div>
       </div>
     </div>
   </section>
@@ -4180,7 +4316,7 @@
           <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;">300+</div>
           <div style="font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.8rem;">Enterprise</div>
           <div style="font-size:0.68rem;color:var(--cream);line-height:1.6;margin-bottom:0.8rem;">Custom enterprise partnership with direct access to ownership for nationwide expansion.</div>
-          <div style="font-size:0.55rem;color:var(--gold-dim);">Assigned to: Lorenzo Parenza (Owner)</div>
+          <div style="font-size:0.55rem;color:var(--gold-dim);">Assigned to: CEO / Executive Leadership</div>
         </div>
       </div>
 
@@ -4207,7 +4343,7 @@
       <!-- Step 1: Choose Path -->
       <div id="appStep1">
         <div style="text-align:center;margin-bottom:2.5rem;">
-          <div style="font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Application</div>
+          <div class="encrypted-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Secure Encrypted Application</div><div class="form-progress"><div class="form-progress-step active"></div><div class="form-progress-step"></div><div class="form-progress-step"></div></div>
           <h2 style="margin-bottom:0.5rem;">How Would You Like to<br><em>Join LLFG?</em></h2>
           <p style="font-size:0.78rem;color:var(--gray);max-width:420px;margin:0 auto;">Choose the path that fits your situation.</p>
         </div>
@@ -4286,6 +4422,10 @@
           <div style="font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.4rem;">You Will Be Contacted By</div>
           <div id="confirmContact" style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);"></div>
           <div id="confirmTimeline" style="font-size:0.68rem;color:var(--gray);margin-top:0.3rem;"></div>
+        </div>
+        <div style="margin:1rem auto;max-width:380px;text-align:center;">
+          <div style="font-size:0.5rem;color:var(--gray);letter-spacing:0.14em;text-transform:uppercase;">Reference ID</div>
+          <div id="confirmRefId" style="font-family:monospace;font-size:0.75rem;color:var(--gold-dim);margin-top:0.2rem;letter-spacing:0.08em;"></div>
         </div>
         <button onclick="closeApplicationOverlay()" class="btn-ghost" style="padding:0.7rem 2rem;">Close</button>
       </div>
@@ -7700,7 +7840,7 @@ Legacy Life Financial Group`
     };
 
     const ROLE_DISPLAY = {
-      admin:'Admin', managing_partner:'Managing Partner', executive:'Executive',
+      admin:'Admin', managing_partner:'Managing Partner', director:'Director', executive:'Executive',
       manager:'Manager', financial_advisor:'Financial Advisor', agent:'Financial Advisor',
     };
 
@@ -8531,11 +8671,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
       agent:             ['commreq'],
-      manager:           ['commreq','reports','commandcenter'],
-      executive:         ['commreq','teammetrics','reports','commandcenter'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','integrations','commandcenter'],
+      manager:           ['commreq','reports','emailtemplates','commandcenter'],
+      executive:         ['commreq','teammetrics','reports','emailtemplates','commandcenter'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
@@ -8543,7 +8683,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       contracting:'Send Contracts', applications:'Applications', bizcard:'Business Card',
       portals:'Carrier Portals',
       commreq:'Commission Request', permissions:'Permissions', integrations:'API Integrations',
-      downlineclients:'All Clients', reports:'Reports',
+      downlineclients:'All Clients', reports:'Reports', emailtemplates:'Email Templates',
       commandcenter:'Command Center',
     };
 
@@ -8652,7 +8792,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
           tools:      ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-          management: ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+          management: ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','integrations','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentGroups)) {
@@ -13858,11 +13998,11 @@ This request requires Managing Partner approval.`
       }
       if (!el) return;
 
-      const isAdmin   = role === 'admin' || role === 'managing_partner';
-      const isManager = role === 'manager' || role === 'executive';
+      const isAdminLevel   = role === 'admin' || role === 'managing_partner' || role === 'director';
+      const isManagerLevel = role === 'manager' || role === 'executive';
 
-      const clients = isAdmin ? DOWNLINE_CLIENTS :
-                      isManager ? DOWNLINE_CLIENTS.filter(c => ['Jaalyn Bowman','Karen Ford','Aisha Moore'].includes(c.agentName)) :
+      const clients = isAdminLevel ? DOWNLINE_CLIENTS :
+                      isManagerLevel ? DOWNLINE_CLIENTS.filter(c => ['Jaalyn Bowman','Karen Ford','Aisha Moore'].includes(c.agentName)) :
                       DOWNLINE_CLIENTS.filter(c => c.agentName === (currentUser?.name));
 
       if (clients.length === 0) {
@@ -13870,17 +14010,17 @@ This request requires Managing Partner approval.`
         return;
       }
 
-      const privacyNote = isAdmin
+      const privacyNote = isAdminLevel
         ? '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);padding:0.5rem 0.8rem;font-size:0.65rem;color:var(--gold-dim);margin-bottom:0.8rem;">🔐 Admin View — all client data including private fields visible</div>'
         : '<div style="background:rgba(110,168,254,0.06);border:1px solid rgba(110,168,254,0.15);padding:0.5rem 0.8rem;font-size:0.65rem;color:#6ea8fe;margin-bottom:0.8rem;">👁 Manager View — client names and policy info visible. Private data hidden per compliance policy.</div>';
 
       el.innerHTML = privacyNote + `
         <div style="overflow-x:auto;" id="clientTableWrap">
-          <table class="app-table" style="min-width:${isAdmin?'950px':'750px'};">
+          <table class="app-table" style="min-width:${isAdminLevel?'950px':'750px'};">
             <thead><tr>
               <th>Agent</th><th>Client</th><th>Carrier</th><th>Product</th>
               <th>AP</th><th>Mo. Prem</th><th>Status</th><th>Placed</th>
-              ${isAdmin ? '<th>SSN</th><th>Bank</th><th>DOB</th>' : ''}
+              ${isAdminLevel ? '<th>SSN</th><th>Bank</th><th>DOB</th>' : ''}
             </tr></thead>
             <tbody id="clientTableBody">
               ${clients.map(c => `<tr>
@@ -13892,7 +14032,7 @@ This request requires Managing Partner approval.`
                 <td>$${c.moP}</td>
                 <td><span class="app-status ${c.status==='Active'?'status-scheduled':'status-new'}" style="font-size:0.6rem;">${c.status}</span></td>
                 <td style="font-size:0.7rem;color:var(--gray);">${c.placed}</td>
-                ${isAdmin ? `<td style="font-family:monospace;font-size:0.68rem;color:var(--gold-dim);">${c.ssn}</td><td style="font-size:0.68rem;color:var(--gold-dim);">${c.bank}</td><td style="font-size:0.68rem;color:var(--gold-dim);">${c.dob}</td>` : ''}
+                ${isAdminLevel ? `<td style="font-family:monospace;font-size:0.68rem;color:var(--gold-dim);">${c.ssn}</td><td style="font-size:0.68rem;color:var(--gold-dim);">${c.bank}</td><td style="font-size:0.68rem;color:var(--gold-dim);">${c.dob}</td>` : ''}
               </tr>`).join('')}
             </tbody>
           </table>
@@ -13907,11 +14047,14 @@ This request requires Managing Partner approval.`
 
     function configureRoleUI(user) {
       const role = user.role;
-      const isAgent   = role === 'financial_advisor' || role === 'agent';
-      const isManager = role === 'manager';
-      const isExec    = role === 'executive';
-      const isMP      = role === 'managing_partner';
-      const isAdmin   = role === 'admin';
+      const isAgent    = role === 'financial_advisor' || role === 'agent';
+      const isManager  = role === 'manager';
+      const isExec     = role === 'executive';
+      const isDirector = role === 'director';
+      const isMP       = role === 'managing_partner';
+      const isAdmin    = role === 'admin';
+      const isManagerPlus = isManager || isExec || isDirector || isMP || isAdmin;
+      const isExecPlus    = isExec || isDirector || isMP || isAdmin;
 
       // Promotion request: agents only
       const promoSection = document.getElementById('promotionRequestSection');
@@ -13919,31 +14062,31 @@ This request requires Managing Partner approval.`
 
       // Exec promotion approvals
       const promoExecSection = document.getElementById('promotionSection');
-      if (promoExecSection) promoExecSection.style.display = (isExec || isAdmin || isMP) ? 'block' : 'none';
-      if (isExec || isAdmin || isMP) renderPromotionRequests();
+      if (promoExecSection) promoExecSection.style.display = isExecPlus ? 'block' : 'none';
+      if (isExecPlus) renderPromotionRequests();
 
       // Team formation: manager+ only
       const teamFormSection = document.getElementById('teamFormationSection');
-      if (teamFormSection) teamFormSection.style.display = (isManager || isExec || isMP || isAdmin) ? 'block' : 'none';
+      if (teamFormSection) teamFormSection.style.display = isManagerPlus ? 'block' : 'none';
 
       // Tier-based training
       const managerSections = document.querySelectorAll('.training-manager-only');
       const execSections    = document.querySelectorAll('.training-executive-only');
-      managerSections.forEach(el => el.style.display = (isManager||isExec||isMP||isAdmin) ? 'block' : 'none');
-      execSections.forEach(el    => el.style.display = (isExec||isMP||isAdmin) ? 'block' : 'none');
+      managerSections.forEach(el => el.style.display = isManagerPlus ? 'block' : 'none');
+      execSections.forEach(el    => el.style.display = isExecPlus ? 'block' : 'none');
 
       // Render carrier training
       renderCarrierTraining();
 
       // Create ptab-downlineclients content div without adding orphan nav buttons
-      if (isManager || isExec || isMP || isAdmin) {
+      if (isManagerPlus) {
         if (!document.getElementById('ptab-downlineclients')) {
           const agentDash = document.getElementById('agentDash');
           if (agentDash) {
             const tc = document.createElement('div');
             tc.className = 'admin-tab-content';
             tc.id = 'ptab-downlineclients';
-            const isAdminView = isAdmin || isMP;
+            const isAdminView = isAdmin || isMP || isDirector;
             tc.innerHTML = `<div class="dash-body"><div class="dash-welcome">
               <h2>${isAdminView ? 'All <em>Client Information</em>' : 'Downline <em>Client Overview</em>'}</h2>
               <p>${isAdminView ? 'Full client data across all agents and teams.' : "Your downline agents' clients. Private data is hidden per compliance policy."}</p>
@@ -13961,7 +14104,7 @@ This request requires Managing Partner approval.`
       }
 
       // Create ptab-teammetrics content div without adding orphan nav buttons
-      if (isExec || isMP || isAdmin) {
+      if (isExecPlus) {
         if (!document.getElementById('ptab-teammetrics')) {
           const agentDash = document.getElementById('agentDash');
           if (agentDash) {
@@ -14059,8 +14202,9 @@ This request requires Managing Partner approval.`
     // ── Permission level options by granter role ──
     const PERMISSION_LEVELS = {
       executive:        [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'}],
-      managing_partner: [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'}],
-      admin:            [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'},{value:'managing_partner',label:'Managing Partner'},{value:'admin',label:'Admin'}],
+      director:         [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'}],
+      managing_partner: [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'},{value:'director',label:'Director'}],
+      admin:            [{value:'financial_advisor',label:'Financial Advisor'},{value:'manager',label:'Manager'},{value:'executive',label:'Executive'},{value:'director',label:'Director'},{value:'managing_partner',label:'Managing Partner'},{value:'admin',label:'Admin'}],
     };
 
     function renderPermissionsOptions() {
@@ -17865,7 +18009,7 @@ This request requires Managing Partner approval.`
       small:      { name: 'Tier 2 — Small Agency (5-10)',  contact: 'Senior Agent / Manager', timeline: 'Personal call within 24 hours', desc: 'A Senior Agent or Manager will personally oversee your team integration and contracting setup.' },
       medium:     { name: 'Tier 3 — Medium Agency (10-150)', contact: 'Executive',           timeline: 'Executive call within 24 hours', desc: 'An Executive will coordinate your full team onboarding, carrier contracting, and training integration.' },
       large:      { name: 'Tier 4 — Large Agency (150-300)', contact: 'Managing Partner',    timeline: 'Priority review within 12 hours', desc: 'A Managing Partner will personally handle your enterprise onboarding with white-glove partnership support.' },
-      enterprise: { name: 'Tier 5 — Enterprise (300+)',    contact: 'Lorenzo Parenza (Owner)', timeline: 'Direct outreach within 6 hours', desc: 'Our owner Lorenzo Parenza will personally reach out to discuss a custom enterprise partnership.' }
+      enterprise: { name: 'Tier 5 — Enterprise (300+)',    contact: 'CEO / Executive Leadership', timeline: 'Direct outreach within 6 hours', desc: 'Our CEO will personally reach out to discuss a custom enterprise partnership.' }
     };
 
     window.openApplicationOverlay = function() {
@@ -17968,6 +18112,8 @@ This request requires Managing Partner approval.`
         if (msg) msg.textContent = tierInfo.desc;
         if (contact) contact.textContent = tierInfo.contact;
         if (timeline) timeline.textContent = tierInfo.timeline;
+        var refEl = document.getElementById('confirmRefId');
+        if (refEl) refEl.textContent = 'LLFG-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
         showAppStep('confirm');
 
         if (typeof LLFG_EventBus !== 'undefined') {
@@ -18002,21 +18148,85 @@ This request requires Managing Partner approval.`
     function initGSAP() {
       gsap.registerPlugin(ScrollTrigger);
 
-      // Hero: parallax background + content fade
-      gsap.to('#hero .hero-bg', {
-        y: 80,
-        scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 }
-      });
-      gsap.to('#hero .hero-content', {
-        y: -100, opacity: 0,
-        scrollTrigger: { trigger: '#hero', start: '30% top', end: 'bottom top', scrub: 1 }
-      });
-      gsap.to('#hero .hero-line', {
-        opacity: 0,
-        scrollTrigger: { trigger: '#hero', start: '20% top', end: '60% top', scrub: 1 }
+      // ── HERO: 3D Lion Roar → Logo Morph (scroll-driven) ──
+      var lionScene = document.getElementById('lionScene');
+      var lionJaw = document.getElementById('lionJaw');
+      var heroLogoReveal = document.getElementById('heroLogoReveal');
+      var heroLogoLine = document.getElementById('heroLogoLine');
+      var heroTextOverlay = document.getElementById('heroTextOverlay');
+      var scrollIndicator = document.getElementById('scrollIndicator');
+      var roarParticles = document.getElementById('roarParticles');
+
+      // Generate roar particles
+      if (roarParticles) {
+        for (var i = 0; i < 20; i++) {
+          var p = document.createElement('div');
+          p.className = 'roar-particle';
+          p.style.cssText = 'position:absolute;width:' + (2 + Math.random()*3) + 'px;height:' + (2 + Math.random()*3) + 'px;background:rgba(201,168,76,' + (0.3 + Math.random()*0.5) + ');border-radius:50%;top:58%;left:50%;';
+          roarParticles.appendChild(p);
+        }
+      }
+
+      if (lionScene) {
+        var heroTL = gsap.timeline({
+          scrollTrigger: {
+            trigger: '#hero',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.5,
+            pin: false
+          }
+        });
+
+        // Phase 1 (0-30%): Lion breathes, text visible
+        heroTL.to(scrollIndicator, { opacity: 0, y: 20, duration: 0.1 }, 0);
+
+        // Phase 2 (30-60%): Lion roars — jaw opens, particles burst, glow intensifies
+        heroTL.to(lionJaw, { rotate: 18, y: 8, duration: 0.3 }, 0.15);
+        heroTL.to('.lion-glow', { scale: 1.5, opacity: 1, duration: 0.3 }, 0.2);
+        heroTL.to(heroTextOverlay, { opacity: 0, y: -40, duration: 0.2 }, 0.15);
+        if (roarParticles) {
+          heroTL.to(roarParticles, { opacity: 1, duration: 0.1 }, 0.25);
+          heroTL.to('.roar-particle', {
+            x: function() { return (Math.random() - 0.5) * 300; },
+            y: function() { return (Math.random() - 0.5) * 200 - 50; },
+            opacity: 0, scale: 0,
+            duration: 0.3, stagger: 0.01
+          }, 0.25);
+        }
+
+        // Phase 3 (60-90%): Lion fades, LLFG logo reveals
+        heroTL.to(lionScene, { opacity: 0, scale: 0.5, duration: 0.25 }, 0.5);
+        heroTL.to('.lion-glow', { opacity: 0, duration: 0.15 }, 0.5);
+        heroTL.to(heroLogoReveal, { opacity: 1, duration: 0.3 }, 0.55);
+        heroTL.to(heroLogoLine, { width: 80, duration: 0.2 }, 0.65);
+
+        // Phase 4 (90-100%): Hold logo, then section ends
+        heroTL.to(heroLogoReveal, { opacity: 1, duration: 0.15 }, 0.85);
+      }
+
+      // ── INCOME STATS: Counter animation ──
+      document.querySelectorAll('.income-num[data-count]').forEach(function(el) {
+        var target = parseInt(el.getAttribute('data-count'));
+        var prefix = el.getAttribute('data-prefix') || '';
+        var suffix = el.getAttribute('data-suffix') || '';
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 85%',
+          once: true,
+          onEnter: function() {
+            var obj = { val: 0 };
+            gsap.to(obj, {
+              val: target, duration: 2, ease: 'power2.out',
+              onUpdate: function() {
+                el.textContent = prefix + Math.round(obj.val).toLocaleString() + suffix;
+              }
+            });
+          }
+        });
       });
 
-      // About section: left slides in, right slides in
+      // ── ABOUT: Slide-in animations ──
       gsap.from('#about .about-left', {
         x: -80, opacity: 0, duration: 1,
         scrollTrigger: { trigger: '#about', start: 'top 80%', toggleActions: 'play none none reverse' }
@@ -18026,28 +18236,29 @@ This request requires Managing Partner approval.`
         scrollTrigger: { trigger: '#about', start: 'top 80%', toggleActions: 'play none none reverse' }
       });
 
-      // Pillar cards: stagger 3D flip in
+      // Pillar cards: 3D flip in
       gsap.from('.pillar', {
         rotateY: 90, opacity: 0, duration: 0.8,
         stagger: 0.15, transformOrigin: 'left center',
         scrollTrigger: { trigger: '.about-right', start: 'top 85%', toggleActions: 'play none none reverse' }
       });
 
-      // Carrier cards: stagger scale up
+      // Carrier cards: stagger with alternating 3D rotation
       gsap.from('.carrier-card', {
-        scale: 0.7, opacity: 0, duration: 0.4,
-        stagger: { amount: 0.8, grid: 'auto', from: 'center' },
+        scale: 0.7, opacity: 0, rotateY: function(i) { return i % 2 === 0 ? -30 : 30; },
+        duration: 0.5,
+        stagger: { amount: 1, grid: 'auto', from: 'center' },
         scrollTrigger: { trigger: '#carriers', start: 'top 75%', toggleActions: 'play none none reverse' }
       });
 
-      // Why cards: stagger slide up with 3D rotation
+      // Why cards: slide up with 3D tilt
       gsap.from('.why-card', {
         y: 60, rotateX: 15, opacity: 0, duration: 0.7,
         stagger: 0.12, transformOrigin: 'bottom center',
         scrollTrigger: { trigger: '#why', start: 'top 75%', toggleActions: 'play none none reverse' }
       });
 
-      // Why card numbers: count up animation
+      // Why card numbers: count up
       document.querySelectorAll('.why-num').forEach(function(el) {
         var target = parseInt(el.textContent);
         if (isNaN(target)) return;
@@ -18059,24 +18270,24 @@ This request requires Managing Partner approval.`
         });
       });
 
-      // Agency tier cards: stagger from bottom with 3D tilt
+      // Agency tier cards: 3D tilt stagger
       gsap.from('.tier-grid > div', {
         y: 50, rotateX: 10, opacity: 0, duration: 0.6,
         stagger: 0.1, transformOrigin: 'bottom center',
         scrollTrigger: { trigger: '#agency', start: 'top 70%', toggleActions: 'play none none reverse' }
       });
 
-      // Apply CTA: scale pulse
+      // Apply CTA: scale bounce
       gsap.from('#apply .btn-primary', {
         scale: 0.8, opacity: 0, duration: 0.8, ease: 'back.out(1.7)',
         scrollTrigger: { trigger: '#apply', start: 'top 85%', toggleActions: 'play none none reverse' }
       });
 
-      // Section tags: slide in from left with gold underline
-      gsap.from('.section-tag', {
-        x: -40, opacity: 0, duration: 0.6,
-        stagger: 0.1,
-        scrollTrigger: { trigger: '.section-tag', start: 'top 90%', toggleActions: 'play none none reverse' }
+      // Income cards: stagger scale in
+      gsap.from('.income-card', {
+        y: 40, scale: 0.9, opacity: 0, duration: 0.7,
+        stagger: 0.2,
+        scrollTrigger: { trigger: '#income-stats', start: 'top 80%', toggleActions: 'play none none reverse' }
       });
 
       // Nav: hide on scroll down, show on scroll up
@@ -18088,17 +18299,6 @@ This request requires Managing Partner approval.`
             if (self.direction === 1) { nav.style.transform = 'translateY(-100%)'; nav.style.transition = 'transform 0.3s ease'; }
             else { nav.style.transform = 'translateY(0)'; }
           }
-        });
-      }
-
-      // Stat track: pause animation on scroll past hero
-      var statTrack = document.querySelector('.stat-track');
-      if (statTrack) {
-        ScrollTrigger.create({
-          trigger: '#hero',
-          start: 'bottom top',
-          onEnter: function() { statTrack.style.animationPlayState = 'paused'; },
-          onLeaveBack: function() { statTrack.style.animationPlayState = 'running'; }
         });
       }
     }
