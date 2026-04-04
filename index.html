@@ -230,7 +230,23 @@
       position: absolute; top: 0; bottom: 0; left: 52%; width: 1px; z-index: 0;
       background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.15) 30%, rgba(201,168,76,0.15) 70%, transparent);
     }
-    /* orphaned rules cleaned */
+    /* ─── 3D INTERACTIVE ENHANCEMENTS ─── */
+    .carrier-card { transition: transform 0.4s ease, border-color 0.3s, box-shadow 0.4s; transform-style: preserve-3d; }
+    .carrier-card:hover { transform: translateY(-6px) rotateX(4deg) rotateY(-2deg); box-shadow: 0 12px 30px rgba(201,168,76,0.12); }
+    .pillar { transition: transform 0.4s ease, border-color 0.3s, box-shadow 0.4s; transform-style: preserve-3d; }
+    .pillar:hover { transform: translateY(-8px) rotateY(5deg); box-shadow: 0 16px 40px rgba(201,168,76,0.1); }
+    .why-card { transition: transform 0.4s ease, border-color 0.3s, box-shadow 0.4s; transform-style: preserve-3d; }
+    .why-card:hover { transform: translateY(-8px) rotateX(3deg) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .why-card:hover .why-num { color: var(--gold); transform: scale(1.15); transition: transform 0.3s, color 0.3s; }
+    .dash-card { transition: transform 0.3s ease, box-shadow 0.3s; }
+    .dash-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(201,168,76,0.08); }
+    .dash-section { transition: border-color 0.3s; }
+    .dash-section:hover { border-color: rgba(201,168,76,0.15); }
+    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+    h1 em, h2 em { background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 25%, var(--gold) 50%, var(--gold-light) 75%, var(--gold) 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s linear infinite; }
+    .btn-primary { position: relative; overflow: hidden; }
+    .btn-primary::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.15); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.4s ease, height 0.4s ease; }
+    .btn-primary:hover::after { width: 300px; height: 300px; }
 
     .hero-content {
       position: relative;
@@ -18499,6 +18515,97 @@ This request requires Managing Partner approval.`
         console.log('[AI] LobeHub configured at', url);
       }
     };
+
+    // ─── CARRIER DETAIL POPUPS ───────────────────────────────────────
+    var CARRIER_INFO = {
+      'Mutual of Omaha':   { rating:'A+', founded:'1909', hq:'Omaha, NE', benefits:'Industry-leading term and whole life products. Fast underwriting with e-app. Strong final expense line. Living benefits included at no extra cost. One of the most recognized names in insurance.' },
+      'Trinity Life':      { rating:'A-', founded:'2022', hq:'Dallas, TX', benefits:'Simplified issue term life with fast approvals. No exam required for most policies. Competitive rates for healthy applicants. Great for quick closes and high-volume production.' },
+      'Baltimore Life':    { rating:'A', founded:'1882', hq:'Owings Mills, MD', benefits:'Top final expense carrier with graded and modified whole life options. Excellent for the senior market. Simple applications, quick issue, and strong agent compensation.' },
+      'Foresters Financial':{ rating:'A', founded:'1874', hq:'Toronto, ON', benefits:'Unique member benefits including scholarships and community grants that differentiate you. Competitive whole life and annuity products. No-exam options available.' },
+      'Liberty Bankers Life':{ rating:'A-', founded:'1905', hq:'Dallas, TX', benefits:'Strong final expense and pre-need products. Simplified issue for ages 0-85. Fast turnaround on applications. Known for competitive FE commission levels.' },
+      'Corebridge Financial':{ rating:'A', founded:'2022', hq:'Houston, TX', benefits:'Former AIG Life and Retirement with massive carrier backing. Excellent IUL products with strong cap rates. Fixed and indexed annuities. One of the largest retirement solutions providers.' },
+      'American Amicable': { rating:'A-', founded:'1910', hq:'Waco, TX', benefits:'Simplified issue final expense specialist. Graded, modified, and immediate coverage options. Quick e-app process. Strong niche in the senior and final expense market.' },
+      'SPLI Term':         { rating:'A-', founded:'1983', hq:'Salt Lake City, UT', benefits:'Security Plan Life with competitive term products and simplified underwriting. Fast issue times. Good fit for clients who need affordable term coverage quickly.' },
+      'Transamerica':      { rating:'A', founded:'1904', hq:'Cedar Rapids, IA', benefits:'Full product suite: term, whole, IUL, annuities, and long-term care. Strong brand recognition. Excellent IUL accumulation product. One of the most versatile carriers.' },
+      'Lafayette Life':    { rating:'A+', founded:'1905', hq:'Cincinnati, OH', benefits:'Premium whole life carrier with exceptional dividend history. Top choice for cash value accumulation. Paid-up additions rider creates compound growth. Ideal for wealth-building clients.' },
+      'Americo':           { rating:'A', founded:'1890', hq:'Kansas City, MO', benefits:'Diverse product line: life, FE, annuities. Strong final expense products with immediate and graded options. Competitive fixed annuity rates. Reliable carrier with 130+ year track record.' },
+      'SPLI Senior Life':  { rating:'A-', founded:'1983', hq:'Salt Lake City, UT', benefits:'Security Plan senior life products. Simplified issue for the 50-85 market. Final expense and burial coverage. Quick application process designed for the senior market.' },
+      'United Home Life':  { rating:'B++', founded:'1948', hq:'Indianapolis, IN', benefits:'Final expense specialist known for liberal underwriting. Accepts conditions other carriers decline. Great option for hard-to-place clients. Graded and modified whole life.' },
+      'Banner Life':       { rating:'A+', founded:'1949', hq:'Frederick, MD', benefits:'Part of Legal and General Group. One of the most competitive term life carriers in the US. Excellent rates for healthy clients. Strong conversion options to permanent coverage.' },
+      'Royal Neighbors':   { rating:'A', founded:'1895', hq:'Rock Island, IL', benefits:'Fraternal benefit society with unique member perks. Whole life and annuity products. Simplified issue options. Community-focused organization with scholarship programs.' },
+      'Columbus Life':     { rating:'A+', founded:'1906', hq:'Cincinnati, OH', benefits:'Part of Western and Southern Financial Group. Excellent IUL products with competitive caps. Strong whole life with guaranteed cash value growth. Premium carrier for accumulation.' },
+      'GTL':               { rating:'A', founded:'1936', hq:'Glenview, IL', benefits:'Guaranteed Trust Life is a Medicare supplement specialist. Also offers life and accident products. Known for competitive Med Supp rates and strong agent support. Fast policy issue.' },
+      'Ethos Life':        { rating:'A-', founded:'2016', hq:'San Francisco, CA', benefits:'InsurTech pioneer with fully digital application process. Term and whole life with instant decisioning. No medical exam for most applicants. Appeals to tech-savvy younger clients.' },
+      'Polish Falcons':    { rating:'NR', founded:'1887', hq:'Pittsburgh, PA', benefits:'Fraternal benefit society offering life insurance and annuity products for members. Unique community and cultural benefits. Niche market with loyal membership base.' },
+      'American Home Life':{ rating:'A-', founded:'1955', hq:'Fayetteville, AR', benefits:'Final expense and simplified issue specialist. Pre-need and burial insurance. Quick underwriting for the senior market. Competitive commission structure.' },
+      'Aetna':             { rating:'A', founded:'1853', hq:'Hartford, CT', benefits:'One of the largest health insurers in the US, part of CVS Health. Comprehensive health, dental, vision, life, and disability. Medicare Advantage and Supplement plans. Massive brand recognition.' },
+      'Athene':            { rating:'A', founded:'2009', hq:'Hamilton, Bermuda', benefits:'Fixed and fixed indexed annuity powerhouse. Industry-leading FIA rates. Strong accumulation and income products. Backed by Apollo Global Management. Excellent for retirement planning.' },
+      'MassMutual':        { rating:'A++', founded:'1851', hq:'Springfield, MA', benefits:'Highest-rated carrier (A++ AM Best). Exceptional whole life with industry-best dividends. Disability income leader. Mutual company where profits go to policyholders. The gold standard in permanent life.' },
+      'Fidelity Life':     { rating:'A-', founded:'1896', hq:'Chicago, IL', benefits:'Term, whole life, and guaranteed issue products. RAPIDecision instant underwriting for fast closes. Final expense and simplified issue options. Known for agent-friendly technology.' },
+      'Chubb':             { rating:'A++', founded:'1882', hq:'Zurich, Switzerland', benefits:'Largest publicly traded P&C insurer. Supplemental insurance including accident, critical illness, and hospital indemnity. Premium brand for high-net-worth clients.' },
+      'InstaBrain':        { rating:'NR', founded:'2020', hq:'InsurTech', benefits:'AI-powered insurance technology platform. Instant term life quotes and approvals. Guaranteed issue products. Fully digital experience designed for modern consumers.' },
+      'Aflac':             { rating:'A+', founded:'1955', hq:'Columbus, GA', benefits:'Number one supplemental insurance provider in America. Cancer, critical illness, accident, hospital, and disability products. Payroll deduction model for worksite sales. Massive brand awareness.' }
+    };
+
+    window.showCarrierDetail = function(name) {
+      var info = CARRIER_INFO[name];
+      if (!info) return;
+      var existing = document.getElementById('carrierDetailModal');
+      if (existing) existing.remove();
+      var modal = document.createElement('div');
+      modal.id = 'carrierDetailModal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(6px);animation:fadeUp 0.2s ease;';
+      modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+      var html = '<div style="background:#111;border:1px solid rgba(201,168,76,0.2);max-width:500px;width:100%;padding:2rem 2.5rem;position:relative;">';
+      html += '<button onclick="document.getElementById(\'carrierDetailModal\').remove()" style="position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--gray);font-size:1.3rem;cursor:pointer;">&times;</button>';
+      html += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:1.6rem;color:var(--cream);margin-bottom:0.3rem;">' + name + '</div>';
+      html += '<div style="display:flex;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap;">';
+      html += '<span style="font-size:0.6rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;">AM Best: ' + info.rating + '</span>';
+      html += '<span style="font-size:0.6rem;color:var(--gray);letter-spacing:0.1em;">Est. ' + info.founded + '</span>';
+      html += '<span style="font-size:0.6rem;color:var(--gray);letter-spacing:0.1em;">' + info.hq + '</span>';
+      html += '</div>';
+      html += '<div style="width:32px;height:1px;background:var(--gold);margin-bottom:1rem;"></div>';
+      html += '<p style="font-size:0.78rem;color:var(--gray);line-height:1.8;">' + info.benefits + '</p>';
+      html += '</div>';
+      modal.innerHTML = html;
+      document.body.appendChild(modal);
+    };
+
+    // Wire click handlers to carrier cards
+    (function wireCarrierCards() {
+      var keyMap = {
+        'Mutual of Omaha':'Mutual of Omaha', 'TRINITY LIFE':'Trinity Life', 'BALTIMORE LIFE':'Baltimore Life',
+        'Foresters FINANCIAL':'Foresters Financial', 'LIBERTY BANKERS LIFE':'Liberty Bankers Life',
+        'Corebridge FINANCIAL':'Corebridge Financial', 'AMERICAN AMICABLE':'American Amicable',
+        'SPLI TERM':'SPLI Term', 'TRANSAMERICA':'Transamerica', 'Lafayette LIFE':'Lafayette Life',
+        'AMERICO':'Americo', 'SPLI SENIOR LIFE':'SPLI Senior Life', 'UHL UNITED HOME LIFE':'United Home Life',
+        'BANNER LIFE':'Banner Life', 'Royal Neighbors OF AMERICA':'Royal Neighbors',
+        'Columbus LIFE':'Columbus Life', 'GTL GUARANTEED TRUST LIFE':'GTL', 'ETHOS LIFE':'Ethos Life',
+        'Polish Falcons OF AMERICA':'Polish Falcons', 'American Home Life':'American Home Life',
+        'aetna INSURANCE':'Aetna', 'ATHENE':'Athene', 'MassMutual':'MassMutual',
+        'Fidelity LIFE':'Fidelity Life', 'CHUBB':'Chubb', 'InstaBrain':'InstaBrain',
+        'Aflac SUPPLEMENTAL':'Aflac', 'Fidelity TERM LIFE':'Fidelity Life',
+        'Fidelity FINAL EXPENSE':'Fidelity Life', 'Fidelity GUAR. ISSUE':'Fidelity Life',
+        'aetna MEDICARE SUPP':'Aetna', 'aetna MEDICARE ADV':'Aetna',
+        'Aflac CANCER / CI':'Aflac', 'Aflac ACCIDENT':'Aflac'
+      };
+      document.querySelectorAll('.carrier-card').forEach(function(card) {
+        var brand = card.querySelector('.c-brand');
+        if (!brand) return;
+        var name = brand.textContent.replace(/\s+/g, ' ').trim();
+        var key = keyMap[name] || name;
+        if (CARRIER_INFO[key]) {
+          card.style.cursor = 'pointer';
+          card.onclick = function() { showCarrierDetail(key); };
+          var hint = document.createElement('div');
+          hint.style.cssText = 'font-size:0.42rem;color:var(--gold-dim);text-align:center;margin-top:0.3rem;letter-spacing:0.08em;opacity:0;transition:opacity 0.2s;';
+          hint.textContent = 'tap for details';
+          card.appendChild(hint);
+          card.addEventListener('mouseenter', function() { hint.style.opacity = '1'; });
+          card.addEventListener('mouseleave', function() { hint.style.opacity = '0'; });
+        }
+      });
+    })();
   </script>
 </body>
 </html>
