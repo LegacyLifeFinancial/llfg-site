@@ -4383,7 +4383,7 @@
       <div class="dash-body">
         <div class="dash-welcome">
           <h2>Agent <em>Training</em></h2>
-          <p id="trainingSubtitle">Your training curriculum — unlocked as you advance through each tier. Click any chapter to expand its units.</p>
+          <p id="trainingSubtitle">Courses, certifications, and role training. Complete units to earn XP, unlock badges, and level up. Click any module to expand.</p>
         </div>
 
         <div id="trainingCurriculum" style="display:flex;flex-direction:column;gap:1rem;"></div>
@@ -5219,14 +5219,9 @@
             <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email</button>
           </div>
 
-          <!-- Filter row (Chat tab: contact type + search) -->
+          <!-- Search bar -->
           <div class="msg-filter-row" id="msgFilterRow">
-            <select id="msgContactFilter" onchange="renderMsgContactList()">
-              <option value="team">Team</option>
-              <option value="upline">Upline</option>
-              <option value="downline">Downline</option>
-            </select>
-            <input type="text" placeholder="Search..." oninput="filterMsgContacts(this.value)" id="msgSearchInput"/>
+            <input type="text" placeholder="Search contacts..." oninput="renderMsgContactList()" id="msgSearchInput" style="flex:1;"/>
           </div>
 
           <!-- Email folder filter -->
@@ -7273,6 +7268,9 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     /* handleLogin is defined in index.html early script */
 
     window._appLaunchPortal = function launchPortal(user) {
+      // Initialize gamification on every portal launch
+      if (typeof LLFG_Gamification !== 'undefined' && !LLFG_Gamification.data) LLFG_Gamification.init();
+
       const isOwner = user.email === 'lorenzoparenza\u0040llfg.us' || user.isOwner === true;
       const isAdmin = user.role === 'admin' || user.role === 'managing_partner';
 
@@ -7797,6 +7795,34 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         <div class="dash-card"><div class="dash-card-label">My AP</div><div class="dash-card-value" id="ovAP">$0</div><div class="dash-card-sub">Annual premium total</div></div>
         <div class="dash-card"><div class="dash-card-label">Advanced Pay</div><div class="dash-card-value" id="ovPay" style="color:var(--gold-light);">$0</div><div class="dash-card-sub">Commission × 9-mo advance</div></div>`
         + (isAgent ? `<div class="dash-card" style="border-color:rgba(110,207,110,0.3);"><div class="dash-card-label">Monthly Earnings</div><div class="dash-card-value" id="ovMonthlyEarnings" style="color:#6ecf6e;">$0</div><div class="dash-card-sub">This month\'s commission</div></div>` : '');
+
+      // ── Gamification XP Bar on Dashboard ──
+      if (!LLFG_Gamification.data) LLFG_Gamification.init();
+      const xpBarEl = document.getElementById('portalOverviewCards');
+      if (xpBarEl) {
+        const level = LLFG_Gamification.getLevel();
+        const next = LLFG_Gamification.getNextLevel();
+        const pct = LLFG_Gamification.getLevelProgress();
+        const streak = LLFG_Gamification.data.streak;
+        const challenges = LLFG_Gamification.getDailyChallenges();
+        const doneChallenges = challenges.filter(c => c.completed).length;
+        xpBarEl.innerHTML += `<div class="dash-card" style="border-color:${level.color}40;grid-column:1/-1;">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="text-align:center;"><span style="font-size:1.6rem;">${level.icon}</span><div style="font-size:0.5rem;color:var(--gray);margin-top:0.1rem;">Lvl ${level.level}</div></div>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                <span style="font-size:0.72rem;color:${level.color};font-weight:600;">${level.name}</span>
+                <span style="font-size:0.55rem;color:var(--gray);">${LLFG_Gamification.data.xp.toLocaleString()} XP</span>
+              </div>
+              <div style="background:rgba(255,255,255,0.06);height:8px;"><div style="height:100%;background:linear-gradient(90deg,${level.color},${next.color||level.color});width:${pct}%;transition:width 0.6s;"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:0.2rem;">
+                <span style="font-size:0.48rem;color:var(--gray);">${pct}% to ${next.name}</span>
+                <span style="font-size:0.48rem;color:var(--gray);">\uD83D\uDD25 ${streak}-day streak \u00b7 \uD83C\uDFAF ${doneChallenges}/3 daily challenges</span>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }
 
       const q = getQuoteOfTheDay();
 
@@ -8749,91 +8775,126 @@ Object.defineProperty(window, "_llfgCurrentUser", {
             { id:'mp_1_3', title:'Unit 3 — Multi-State Licensing & Compliance', icon:'', duration:'20 min', content:`<p>Maintain a current tracking system for every license across all states where your organization writes business. Build a compliance calendar with renewal reminders set 120 days before each expiration. Engage a licensed insurance attorney familiar with multi-state operations to review contracts, compensation agreements, and recruiting materials. At this scale, a compliance oversight can threaten carrier relationships that underpin your entire organization's revenue.</p>` }
           ]}
         ]
-      }
-    ];
-      ,
+      },
       {id:'100k_blueprint',role:'financial_advisor',roleLabel:'$100K Monthly AP Blueprint',icon:'\uD83D\uDCB0',color:'#6ecf6e',isCourse:true,courseTag:'PRODUCTION',description:'The exact system to produce $100,000+ in monthly AP.',chapters:[{title:'Module 1 \u2014 The Math of $100K',units:[{id:'100k_1_1',title:'Reverse-Engineering $100K AP',icon:'\uD83E\uDDEE',duration:'15 min',content:`<h4>Know Your Numbers</h4><p>$100K monthly AP is a math problem. At $1,200 avg case you need 84 policies/month. Raise average to $5,000 (IULs+annuities) and you need 20 &mdash; 1/day.</p><p style="background:rgba(201,168,76,0.08);padding:0.8rem;border-left:3px solid var(--gold);"><strong>15 contacts &rarr; 3 presentations &rarr; 1 placement &rarr; $5K AP/day &rarr; $100K/month</strong></p><h4>The Revenue Stack</h4><p>8 IULs ($6K=$48K) + 5 conversions ($2.4K=$12K) + 10 final expense ($1.2K=$12K) + 3 annuities ($8K=$24K) = <strong>$96K+ from 26 policies</strong>. Product mix beats volume.</p>`},{id:'100k_1_2',title:'Premium Product Mix Strategy',icon:'\uD83D\uDCCA',duration:'20 min',content:`<h4>Move Up the Value Ladder</h4><ul><li><strong>IUL:</strong> $4K&ndash;$8K AP avg. Lead with tax-free retirement income.</li><li><strong>Fixed Indexed Annuities:</strong> $3K&ndash;$12K AP. Target pre-retirees 55&ndash;70.</li><li><strong>Term-to-Permanent Conversions:</strong> $2K&ndash;$4K AP. Mine your existing term book.</li><li><strong>Final Expense:</strong> $800&ndash;$1,800 AP. High volume, fast issue.</li></ul><p>Weekly target: 2 IULs + 1 annuity + 1 conversion + 2 FE = $22K/week = $88K+/month.</p>`}]},{title:'Module 2 \u2014 The 20-Contact Daily System',units:[{id:'100k_2_1',title:'Building Your Contact Pipeline',icon:'\uD83D\uDCDE',duration:'20 min',content:`<h4>Morning Block (8&ndash;10 AM) &mdash; 10 Contacts</h4><ul><li>5 warm follow-ups</li><li>3 new outreach (leads, LinkedIn)</li><li>2 center-of-influence touches (CPAs, realtors)</li></ul><h4>Afternoon Block (2&ndash;4 PM) &mdash; 10 Contacts</h4><ul><li>5 new outreach</li><li>3 social engagements (DM, comment, connect)</li><li>2 client check-ins (reviews, birthdays)</li></ul><p>Sunday evening: populate next week list. Never start a day wondering who to call.</p>`},{id:'100k_2_2',title:'Lead Sources by Close Rate',icon:'\uD83C\uDFAF',duration:'20 min',content:`<h4>Tier 1 &mdash; Referrals (50&ndash;70%)</h4><p>Ask within 48hrs of delivery. 3-Name Method: a family member, a colleague, a friend.</p><h4>Tier 2 &mdash; Centers of Influence (30&ndash;50%)</h4><p>CPAs, attorneys, realtors. Give value first.</p><h4>Tier 3 &mdash; Social Media (15&ndash;25%)</h4><p>LinkedIn for 35+. Post 3&ndash;5x/week. DM engaged prospects.</p><h4>Tier 4 &mdash; Purchased Leads (5&ndash;15%)</h4><p>Supplement only. Work within 5 minutes.</p>`},{id:'100k_2_3',title:'Time Blocking for Peak Production',icon:'\u23F0',duration:'15 min',content:`<p>7&ndash;8: Development | 8&ndash;10: Prospecting (10 contacts) | 10&ndash;12: Presentations (2) | 12&ndash;1: Admin | 1&ndash;2: Processing | 2&ndash;4: Prospecting (10) | 4&ndash;5:30: Presentation | 5:30&ndash;6: Review+prep. Guard prospecting blocks like appointments.</p>`}]},{title:'Module 3 \u2014 Closing High-Premium Cases',units:[{id:'100k_3_1',title:'The IUL Presentation Framework',icon:'\uD83D\uDCB5',duration:'25 min',content:`<h4>4-Part Close</h4><p><strong>1. Problem (3 min):</strong> Most retirement accounts fully taxable on withdrawal.</p><p><strong>2. Concept (5 min):</strong> Market gains, 0% floor, tax-free access. Do not name product yet.</p><p><strong>3. Illustration (10 min):</strong> Personalized projections vs current 401k.</p><p><strong>4. Close (2 min):</strong> Does this make sense? Let us lock in your health rating.</p>`},{id:'100k_3_2',title:'Overcoming Price Objections',icon:'\uD83D\uDCAA',duration:'20 min',content:`<h4>Reframe Method</h4><p><strong>Too expensive &rarr; Daily Cost:</strong> $600/mo = $20/day, less than lunch.</p><p><strong>&rarr; Cost of Nothing:</strong> What would it cost your family if you did not act?</p><p><strong>&rarr; Comparison:</strong> Redirect half your taxable 401k here for tax-free income.</p><p>If truly unaffordable: reduce premium, not coverage.</p>`},{id:'100k_3_3',title:'The Annuity Close',icon:'\uD83C\uDFE6',duration:'20 min',content:`<h4>The Income Gap</h4><p>Do you know your exact monthly retirement income? SS + pension + savings (4% rule) = guaranteed. Expenses minus guaranteed = the gap.</p><p><strong>Close:</strong> This annuity turns $150K into $2,100/month guaranteed for life &mdash; closing 91% of your gap. You can never outlive it.</p>`}]},{title:'Module 4 \u2014 Referral Multiplication',units:[{id:'100k_4_1',title:'The 4 Referral Moments',icon:'\uD83E\uDD1D',duration:'15 min',content:`<ol><li><strong>Application signing</strong> &mdash; enthusiasm peaks</li><li><strong>Policy delivery</strong> &mdash; gratitude natural</li><li><strong>After positive claim</strong> &mdash; product proved itself</li><li><strong>Annual review</strong> &mdash; ongoing commitment shown</li></ol><p>3-Name Method: a family member, a colleague, a friend.</p>`},{id:'100k_4_2',title:'Referral-Only Practice',icon:'\uD83D\uDD04',duration:'15 min',content:`<p>Every closed case generates 2&ndash;3 warm intros. By Month 6: 15+ warm intros/month, zero purchased leads. Thank-you within 24hrs. Gift card for converted referrals.</p>`}]}]},
       {id:'zero_chargeback',role:'financial_advisor',roleLabel:'Zero Chargeback System',icon:'\uD83D\uDEE1\uFE0F',color:'#e05555',isCourse:true,courseTag:'RETENTION',description:'Eliminate chargebacks and protect your income.',chapters:[{title:'Module 1 \u2014 Understanding Chargebacks',units:[{id:'cb_1_1',title:'How Chargebacks Destroy Income',icon:'\uD83D\uDCC9',duration:'15 min',content:`<h4>The Silent Killer</h4><p>$80K AP x 75% comm = $60K. 9-mo advance = $45K. But 15% of last quarter lapses: <strong>$20,250 clawed back</strong>. Net: $24,750 &mdash; barely half.</p><p>Agent writing $60K with 3% chargebacks earns more than one writing $100K with 15%.</p>`},{id:'cb_1_2',title:'The 5 Root Causes',icon:'\uD83D\uDD0D',duration:'15 min',content:`<ol><li><strong>Unaffordable premium (45%)</strong></li><li><strong>Bank issues (20%)</strong></li><li><strong>Buyer remorse (15%)</strong></li><li><strong>Life circumstances (10%)</strong></li><li><strong>No relationship (10%)</strong></li></ol><p><strong>80% from causes 1&ndash;3 &mdash; all preventable at point of sale.</strong></p>`}]},{title:'Module 2 \u2014 Writing Business That Sticks',units:[{id:'cb_2_1',title:'Affordability Qualification',icon:'\uD83D\uDCB3',duration:'20 min',content:`<p>Ask: take-home &rarr; fixed expenses &rarr; disposable income. <strong>Rule:</strong> Premium should not exceed 8&ndash;10% of disposable. $400 disposable + $200 premium = WILL lapse. Start $30&ndash;40/mo.</p>`},{id:'cb_2_2',title:'Draft Date and Bank Verification',icon:'\uD83D\uDCC5',duration:'15 min',content:`<p>Set draft 2&ndash;3 days after payday (3rd or 18th). Verify: routing number, account number (read back twice), checking vs savings. One wrong digit = 20% of all chargebacks.</p>`},{id:'cb_2_3',title:'Education Close vs Pressure Close',icon:'\uD83C\uDF93',duration:'15 min',content:`<p><strong>Pressure:</strong> 50 placements x 15% lapse = 42.5 retained + debt. <strong>Education:</strong> 35 x 4% = 33.6 retained, zero debt, 90%+ persistency. Two-call process wins.</p>`}]},{title:'Module 3 \u2014 Post-Sale Retention',units:[{id:'cb_3_1',title:'7-Touch Retention Protocol',icon:'\uD83D\uDCF1',duration:'20 min',content:`<ol><li><strong>Day 0:</strong> Application submitted</li><li><strong>Day 7:</strong> Underwriting update</li><li><strong>Delivery:</strong> Full review + free-look explanation</li><li><strong>Day 14:</strong> First draft check</li><li><strong>Day 30:</strong> Check-in</li><li><strong>Day 60:</strong> Value-add article</li><li><strong>Day 90:</strong> Schedule annual review</li></ol>`},{id:'cb_3_2',title:'Saving Policies Before Lapse',icon:'\u26A0\uFE0F',duration:'15 min',content:`<p><strong>Within 24hrs of lapse notice &mdash; call.</strong> Changed banks: update on phone. Cannot afford: reduce, do not cancel. Want to cancel: What changed? <strong>40% of pending lapses saved with one call.</strong></p>`},{id:'cb_3_3',title:'Tracking Persistency',icon:'\uD83D\uDCCA',duration:'15 min',content:`<p>Weekly: first-year persistency (85%+), chargeback rate (under 5%), net AP, at-risk policies. If persistency drops below 80%, pause new business one week for retention calls.</p>`}]}]},
       {id:'compliance_cert',role:'financial_advisor',roleLabel:'Compliance Certification',icon:'\u2696\uFE0F',color:'#6ea8fe',isCourse:true,courseTag:'COMPLIANCE',description:'GLBA, HIPAA, suitability, E and O prevention. Required for every agent.',chapters:[{title:'Module 1 \u2014 GLBA and Data Protection',units:[{id:'comp_1_1',title:'GLBA Fundamentals',icon:'\uD83D\uDD12',duration:'20 min',content:`<h4>Three Obligations</h4><ol><li><strong>Privacy Rule:</strong> Notice of NPI collection and protection</li><li><strong>Safeguards Rule:</strong> Written security plan</li><li><strong>Pretexting:</strong> Verify identity before sharing</li></ol><p>NPI: SSN, bank accounts, income, policy numbers, health info. Penalties: up to $100K per violation.</p>`},{id:'comp_1_2',title:'Daily Data Protection',icon:'\uD83D\uDCBC',duration:'15 min',content:`<ul><li>Lock physical docs</li><li>Password manager + 2FA on all portals</li><li>Never email SSN or bank info unencrypted</li><li>Verify caller ID before discussing accounts</li><li>Shred NPI documents</li><li>VPN on public Wi-Fi</li></ul>`}]},{title:'Module 2 \u2014 HIPAA for Insurance',units:[{id:'comp_2_1',title:'When HIPAA Applies',icon:'\uD83C\uDFE5',duration:'15 min',content:`<p>Health, Medicare, LTC, disability = Business Associate handling PHI. Even life apps contain health data.</p><ul><li>Only access PHI necessary for transaction</li><li>Never discuss health outside underwriting chain</li><li>Never cross-sell using health data</li></ul>`},{id:'comp_2_2',title:'Breach Response',icon:'\u26A0\uFE0F',duration:'15 min',content:`<ol><li>Contain immediately</li><li>Report within 24hrs</li><li>Notify affected within 60 days</li><li>Document everything</li></ol><p>Penalties: $100 to $50K per violation, up to $1.5M per year.</p>`}]},{title:'Module 3 \u2014 Suitability and Best Interest',units:[{id:'comp_3_1',title:'Suitability Requirements',icon:'\u2705',duration:'20 min',content:`<p>Based on: financial situation, needs, risk tolerance, age, understanding. Document: needs, why this product, what explained, alternatives. <strong>Cannot articulate suitability in writing? Do not sell it.</strong></p>`},{id:'comp_3_2',title:'Annuity Best Interest',icon:'\uD83D\uDCDC',duration:'20 min',content:`<h4>4 Obligations</h4><ol><li><strong>Care:</strong> Know products and alternatives</li><li><strong>Disclosure:</strong> Carriers, compensation, conflicts</li><li><strong>Conflict:</strong> Client interest above your commission</li><li><strong>Documentation:</strong> Basis for every recommendation</li></ol>`}]},{title:'Module 4 \u2014 E and O Prevention',units:[{id:'comp_4_1',title:'Top E and O Claims',icon:'\uD83D\uDCCB',duration:'20 min',content:`<ol><li><strong>Failure to procure (35%)</strong> &mdash; written confirmation</li><li><strong>Failure to advise (25%)</strong> &mdash; document all advice</li><li><strong>Misrepresentation (20%)</strong> &mdash; carrier materials only</li><li><strong>Failure to notify (15%)</strong> &mdash; annual reviews</li></ol><p>Not documented = did not happen. Keep records 7+ years.</p>`},{id:'comp_4_2',title:'Compliance Checklist',icon:'\uD83D\uDCDD',duration:'15 min',content:`<h4>Pre-Sale</h4><p>Fact find signed, suitability done, privacy notice, features explained, understanding confirmed.</p><h4>Post-Sale</h4><p>App confirmed, client copy, policy delivered and reviewed, receipt signed, free-look explained, docs secured, follow-ups scheduled.</p>`}]}]}
 
-    // ─── Training Curriculum Renderer ───────────────────────────
+    ];
+    // ─── Training Curriculum Renderer (Gamified) ───────────────────────────
+    window.__R_completeTrainingUnit = window.completeTrainingUnit = function(unitId, btn) {
+      if (!LLFG_Gamification.data) LLFG_Gamification.init();
+      if (LLFG_Gamification.completeUnit(unitId)) {
+        if (btn) { btn.textContent = '\u2705 Completed'; btn.style.color = '#6ecf6e'; btn.style.borderColor = 'rgba(110,207,110,0.3)'; btn.style.background = 'rgba(110,207,110,0.1)'; btn.disabled = true; }
+        var courseMap = {'fa':'course_foundations','100k_blueprint':'course_100k','zero_chargeback':'course_chargeback','compliance_cert':'course_compliance'};
+        TRAINING_CURRICULUM.forEach(function(s) {
+          var p = LLFG_Gamification.getCourseProgress(s.id);
+          if (p.pct === 100 && courseMap[s.id]) LLFG_Gamification.awardBadge(courseMap[s.id]);
+        });
+        renderTrainingCurriculum();
+      }
+    };
+
     function renderTrainingCurriculum() {
       const el = document.getElementById('trainingCurriculum');
       if (!el) return;
-      const u       = currentUser || window._llfgCurrentUser;
-      const role    = u?.role || 'financial_advisor';
+      if (!LLFG_Gamification.data) LLFG_Gamification.init();
+      const u = currentUser || window._llfgCurrentUser;
+      const role = u?.role || 'financial_advisor';
       const isOwner = u?.isOwner || u?.email === 'lorenzoparenza\u0040llfg.us';
       const isAdmin = role === 'admin' || isOwner;
-
-      if (typeof TRAINING_CURRICULUM === 'undefined') {
-        el.innerHTML = '<p style="color:var(--gray);font-size:0.78rem;">Training content loading...</p>';
-        return;
-      }
+      if (typeof TRAINING_CURRICULUM === 'undefined') { el.innerHTML = '<p style="color:var(--gray);">Loading...</p>'; return; }
 
       const roleOrder = ['financial_advisor','agent','manager','executive','director','managing_partner','admin'];
       const userRoleIdx = roleOrder.indexOf(role === 'agent' ? 'financial_advisor' : role);
+      const overall = LLFG_Gamification.getOverallProgress();
+      const challenges = LLFG_Gamification.getDailyChallenges();
 
-      el.innerHTML = TRAINING_CURRICULUM.map(section => {
-        const sectionRoleIdx = roleOrder.indexOf(section.role);
-        const isUnlocked = isAdmin || userRoleIdx >= sectionRoleIdx;
-        const isCurrentTier = !isAdmin && (section.role === role || (section.role === 'financial_advisor' && (role === 'agent' || role === 'financial_advisor')));
+      const challengesHTML = challenges.map((c, i) => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="font-size:0.9rem;">' + (c.completed ? '\u2705' : c.icon) + '</span><span style="flex:1;font-size:0.68rem;color:' + (c.completed ? '#6ecf6e' : 'var(--cream)') + ';' + (c.completed ? 'text-decoration:line-through;opacity:0.6;' : '') + '">' + c.text + '</span><span style="font-size:0.55rem;color:' + (c.completed ? '#6ecf6e' : 'var(--gold)') + ';">' + (c.completed ? 'Done' : '+' + c.xp + ' XP') + '</span>' + (!c.completed ? '<button onclick="LLFG_Gamification.completeChallenge(' + i + ');renderTrainingCurriculum();" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.15rem 0.5rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Done</button>' : '') + '</div>').join('');
 
-        const tierBadge = isCurrentTier
-          ? `<span style="font-size:0.52rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.2);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Current Tier</span>`
-          : isAdmin
-          ? `<span style="font-size:0.52rem;background:rgba(201,168,76,0.06);color:var(--gold-dim);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.1);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>`
-          : isUnlocked
-          ? `<span style="font-size:0.52rem;background:rgba(110,207,110,0.1);color:#6ecf6e;padding:0.15rem 0.5rem;border:1px solid rgba(110,207,110,0.15);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Unlocked</span>`
-          : `<span style="font-size:0.52rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.15rem 0.5rem;border:1px solid rgba(255,255,255,0.08);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">&#128274; Locked</span>`;
+      const earnedBadges = LLFG_Gamification.BADGES.filter(b => LLFG_Gamification.hasBadge(b.id));
+      const badgesHTML = earnedBadges.length > 0 ? earnedBadges.map(b => '<span title="' + b.name + ': ' + b.desc + '" style="font-size:1.2rem;cursor:help;">' + b.icon + '</span>').join(' ') : '<span style="font-size:0.6rem;color:var(--gray);">Complete courses to earn badges</span>';
 
-        if (!isUnlocked) {
-          const totalUnits = section.chapters.reduce((s,c) => s+c.units.length, 0);
-          return `<div style="border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.15);padding:1.1rem 1.4rem;opacity:0.5;">
-            <div style="display:flex;align-items:center;gap:0.8rem;">
-              <div style="flex:1;">
-                <div style="font-size:0.86rem;color:var(--gray);">${section.roleLabel} Training ${tierBadge}</div>
-                <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:3px;">${totalUnits} units — Unlocked upon promotion to ${section.roleLabel}</div>
-              </div>
-              <div style="font-size:1.3rem;opacity:0.3;">&#128274;</div>
-            </div>
-          </div>`;
-        }
+      let html = LLFG_Gamification.renderXPBar();
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">';
+      html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.8rem;"><div style="font-size:0.7rem;color:var(--gold);font-weight:500;margin-bottom:0.4rem;">\uD83C\uDFAF Daily Challenges</div>' + challengesHTML + '</div>';
+      html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.8rem;"><div style="font-size:0.7rem;color:var(--gold);font-weight:500;margin-bottom:0.4rem;">\uD83C\uDFC5 Badges (' + earnedBadges.length + '/' + LLFG_Gamification.BADGES.length + ')</div><div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.6rem;">' + badgesHTML + '</div><div style="font-size:0.65rem;color:var(--cream);margin-top:0.4rem;">Overall: <strong>' + overall.completed + '/' + overall.total + '</strong> units (' + overall.pct + '%)</div><div style="background:rgba(255,255,255,0.06);height:6px;margin-top:0.3rem;"><div style="height:100%;background:var(--gold);width:' + overall.pct + '%;"></div></div></div>';
+      html += '</div>';
 
-        const chaptersHTML = section.chapters.map((ch, ci) => `
-          <div style="border:1px solid rgba(201,168,76,0.1);margin-bottom:0.5rem;overflow:hidden;">
-            <div onclick="toggleTrainingChapter(this)" style="display:flex;align-items:center;gap:0.8rem;padding:0.85rem 1.1rem;cursor:pointer;background:rgba(201,168,76,0.03);transition:background 0.15s;" onmouseover="this.style.background='rgba(201,168,76,0.06)'" onmouseout="this.style.background='rgba(201,168,76,0.03)'">
-              <div style="font-size:0.58rem;letter-spacing:0.08em;color:${section.color||'var(--gold)'};font-weight:700;min-width:28px;">Ch.${ci+1}</div>
-              <div style="flex:1;font-size:0.82rem;color:var(--cream);font-weight:500;">${ch.title}</div>
-              <div style="font-size:0.62rem;color:var(--gray);">${ch.units.length} units</div>
-              <div class="training-doc-chevron" style="color:var(--gold-dim);font-size:0.9rem;margin-left:0.4rem;">&#9662;</div>
-            </div>
-            <div class="training-chapter-body" style="display:none;border-top:1px solid rgba(255,255,255,0.04);">
-              ${ch.units.map(unit => `
-                <div style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                  <div onclick="toggleTrainingUnit(this)" style="display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.1rem 0.65rem 2rem;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
-                    <div style="flex:1;">
-                      <div style="font-size:0.77rem;color:var(--cream);">${unit.title}</div>
-                      <div style="font-size:0.58rem;color:var(--gray);margin-top:1px;">&#9201; ${unit.duration}</div>
-                    </div>
-                    <div class="training-doc-chevron" style="color:var(--gray);font-size:0.8rem;">&#9662;</div>
-                  </div>
-                  <div class="training-unit-body" style="display:none;padding:1.2rem 1.2rem 1.4rem 3rem;border-top:1px solid rgba(255,255,255,0.03);background:rgba(0,0,0,0.15);">
-                    <div class="training-doc-body" style="font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.8);">${unit.content}</div>
-                  </div>
-                </div>`).join('')}
-            </div>
-          </div>`).join('');
+      const courses = TRAINING_CURRICULUM.filter(s => s.isCourse);
+      const tiers = TRAINING_CURRICULUM.filter(s => !s.isCourse);
 
-        return `<div style="border:1px solid rgba(201,168,76,${isCurrentTier?'0.28':'0.12'});overflow:hidden;${isCurrentTier?'background:rgba(201,168,76,0.02);':''}">
-          <div style="display:flex;align-items:center;gap:0.8rem;padding:1rem 1.4rem;background:${isCurrentTier?'rgba(201,168,76,0.07)':'rgba(201,168,76,0.03)'};border-bottom:1px solid rgba(201,168,76,0.1);">
-            <div style="flex:1;">
-              <div style="font-size:0.9rem;font-weight:600;color:var(--cream);">${section.roleLabel} Training ${tierBadge}</div>
-              <div style="font-size:0.62rem;color:var(--gray);margin-top:2px;">${section.chapters.reduce((s,c)=>s+c.units.length,0)} units across ${section.chapters.length} chapter${section.chapters.length>1?'s':''}</div>
-            </div>
-          </div>
-          <div style="padding:0.8rem 1rem;">${chaptersHTML}</div>
-        </div>`;
+      if (courses.length > 0) {
+        html += '<div style="font-size:0.82rem;color:var(--gold);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(201,168,76,0.15);">\uD83D\uDCDA Specialized Courses</div>';
+        html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-bottom:1.5rem;">';
+        courses.forEach(function(s) {
+          var p = LLFG_Gamification.getCourseProgress(s.id);
+          html += '<div style="border:1px solid ' + s.color + '30;background:rgba(0,0,0,0.2);padding:0.9rem;transition:all 0.2s;" onmouseover="this.style.borderColor=\'' + s.color + '60\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.borderColor=\'' + s.color + '30\';this.style.transform=\'\'">';
+          html += '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;"><span style="font-size:1.2rem;">' + s.icon + '</span><span style="font-size:0.52rem;background:' + s.color + '20;color:' + s.color + ';padding:0.1rem 0.4rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid ' + s.color + '30;">' + s.courseTag + '</span></div>';
+          html += '<div style="font-size:0.78rem;color:var(--cream);font-weight:600;margin-bottom:0.2rem;">' + s.roleLabel + '</div>';
+          html += '<div style="font-size:0.55rem;color:var(--gray);line-height:1.4;margin-bottom:0.5rem;">' + s.description + '</div>';
+          html += '<div style="background:rgba(255,255,255,0.06);height:6px;margin-bottom:0.3rem;"><div style="height:100%;background:' + s.color + ';width:' + p.pct + '%;"></div></div>';
+          html += '<div style="display:flex;justify-content:space-between;font-size:0.5rem;color:var(--gray);"><span>' + p.completed + '/' + p.total + '</span><span style="color:' + (p.pct === 100 ? '#6ecf6e' : s.color) + ';">' + (p.pct === 100 ? '\u2705 Complete' : p.pct + '%') + '</span></div></div>';
+        });
+        html += '</div>';
+      }
+
+      if (tiers.length > 0) html += '<div style="font-size:0.82rem;color:var(--gold);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(201,168,76,0.15);">\uD83C\uDF93 Role Training</div>';
+
+      tiers.forEach(function(section) {
+        var sectionRoleIdx = roleOrder.indexOf(section.role);
+        var isUnlocked = isAdmin || userRoleIdx >= sectionRoleIdx;
+        var isCurr = !isAdmin && (section.role === role || (section.role === 'financial_advisor' && (role === 'agent' || role === 'financial_advisor')));
+        var p = LLFG_Gamification.getCourseProgress(section.id);
+        var badge = isCurr ? '<span style="font-size:0.52rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.2);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Current Tier</span>' : isAdmin ? '<span style="font-size:0.52rem;background:rgba(201,168,76,0.06);color:var(--gold-dim);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.1);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>' : isUnlocked ? '<span style="font-size:0.52rem;background:rgba(110,207,110,0.1);color:#6ecf6e;padding:0.15rem 0.5rem;border:1px solid rgba(110,207,110,0.15);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Unlocked</span>' : '<span style="font-size:0.52rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.15rem 0.5rem;border:1px solid rgba(255,255,255,0.08);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">&#128274; Locked</span>';
+        if (!isUnlocked) { var t = section.chapters.reduce(function(s,c){return s+c.units.length;},0); html += '<div style="border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.15);padding:1.1rem 1.4rem;opacity:0.5;margin-bottom:0.8rem;"><div style="display:flex;align-items:center;gap:0.8rem;"><div style="flex:1;"><div style="font-size:0.86rem;color:var(--gray);">' + section.roleLabel + ' Training ' + badge + '</div><div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:3px;">' + t + ' units \u2014 Unlocked upon promotion</div></div><div style="font-size:1.3rem;opacity:0.3;">&#128274;</div></div></div>'; return; }
+        html += _renderTrainingSection(section, isCurr, badge, p);
+      });
+
+      courses.forEach(function(section) {
+        var p = LLFG_Gamification.getCourseProgress(section.id);
+        var badge = '<span style="font-size:0.52rem;background:' + section.color + '20;color:' + section.color + ';padding:0.15rem 0.5rem;border:1px solid ' + section.color + '30;margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">' + section.courseTag + '</span>';
+        html += _renderTrainingSection(section, false, badge, p);
+      });
+
+      el.innerHTML = html;
+    }
+
+    function _renderTrainingSection(section, isCurrentTier, tierBadge, progress) {
+      var out = '';
+      var chaptersHTML = section.chapters.map(function(ch, ci) {
+        var chDone = ch.units.filter(function(u){return LLFG_Gamification.isUnitComplete(u.id);}).length;
+        var unitsHTML = ch.units.map(function(unit) {
+          var done = LLFG_Gamification.isUnitComplete(unit.id);
+          return '<div style="border-bottom:1px solid rgba(255,255,255,0.03);">'
+            + '<div onclick="toggleTrainingUnit(this)" style="display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.1rem 0.65rem 2rem;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.02)\'" onmouseout="this.style.background=\'\'">'
+            + '<span style="font-size:0.8rem;flex-shrink:0;">' + (done ? '\u2705' : (unit.icon || '\u25CB')) + '</span>'
+            + '<div style="flex:1;"><div style="font-size:0.77rem;color:' + (done ? '#6ecf6e' : 'var(--cream)') + ';">' + unit.title + '</div>'
+            + '<div style="font-size:0.58rem;color:var(--gray);margin-top:1px;">&#9201; ' + unit.duration + (done ? ' \u00b7 +50 XP earned' : '') + '</div></div>'
+            + '<div class="training-doc-chevron" style="color:var(--gray);font-size:0.8rem;">&#9662;</div></div>'
+            + '<div class="training-unit-body" style="display:none;padding:1.2rem 1.2rem 1.4rem 3rem;border-top:1px solid rgba(255,255,255,0.03);background:rgba(0,0,0,0.15);">'
+            + '<div class="training-doc-body" style="font-size:0.88rem;line-height:1.8;color:rgba(255,255,255,0.8);">' + unit.content + '</div>'
+            + '<div style="margin-top:1rem;text-align:right;">'
+            + '<button onclick="completeTrainingUnit(\'' + unit.id + '\',this)" ' + (done ? 'disabled' : '') + ' style="background:' + (done ? 'rgba(110,207,110,0.1)' : 'rgba(201,168,76,0.08)') + ';border:1px solid ' + (done ? 'rgba(110,207,110,0.3)' : 'rgba(201,168,76,0.2)') + ';color:' + (done ? '#6ecf6e' : 'var(--gold)') + ';padding:0.4rem 1.2rem;font-family:Raleway,sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:' + (done ? 'default' : 'pointer') + ';">' + (done ? '\u2705 Completed' : 'Mark Complete (+50 XP)') + '</button></div></div></div>';
+        }).join('');
+        return '<div style="border:1px solid rgba(201,168,76,0.1);margin-bottom:0.5rem;overflow:hidden;">'
+          + '<div onclick="toggleTrainingChapter(this)" style="display:flex;align-items:center;gap:0.8rem;padding:0.85rem 1.1rem;cursor:pointer;background:rgba(201,168,76,0.03);transition:background 0.15s;" onmouseover="this.style.background=\'rgba(201,168,76,0.06)\'" onmouseout="this.style.background=\'rgba(201,168,76,0.03)\'">'
+          + '<div style="font-size:0.58rem;letter-spacing:0.08em;color:' + (section.color || 'var(--gold)') + ';font-weight:700;min-width:28px;">' + (section.isCourse ? 'M' : 'Ch') + '.' + (ci + 1) + '</div>'
+          + '<div style="flex:1;font-size:0.82rem;color:var(--cream);font-weight:500;">' + ch.title + '</div>'
+          + '<div style="font-size:0.55rem;color:' + (chDone === ch.units.length ? '#6ecf6e' : 'var(--gray)') + ';">' + chDone + '/' + ch.units.length + '</div>'
+          + '<div class="training-doc-chevron" style="color:var(--gold-dim);font-size:0.9rem;margin-left:0.3rem;">&#9662;</div></div>'
+          + '<div class="training-chapter-body" style="display:none;border-top:1px solid rgba(255,255,255,0.04);">' + unitsHTML + '</div></div>';
       }).join('');
+
+      var bc = section.isCourse ? section.color : 'rgba(201,168,76,1)';
+      out += '<div style="border:1px solid ' + (isCurrentTier ? 'rgba(201,168,76,0.28)' : bc + '20') + ';overflow:hidden;margin-bottom:0.8rem;' + (isCurrentTier ? 'background:rgba(201,168,76,0.02);' : '') + '">';
+      out += '<div style="display:flex;align-items:center;gap:0.8rem;padding:1rem 1.4rem;background:' + (isCurrentTier ? 'rgba(201,168,76,0.07)' : 'rgba(201,168,76,0.03)') + ';border-bottom:1px solid rgba(201,168,76,0.1);">';
+      out += (section.icon ? '<span style="font-size:1.1rem;">' + section.icon + '</span>' : '');
+      out += '<div style="flex:1;"><div style="font-size:0.9rem;font-weight:600;color:var(--cream);">' + section.roleLabel + ' ' + tierBadge + '</div>';
+      out += '<div style="font-size:0.62rem;color:var(--gray);margin-top:2px;">' + section.chapters.reduce(function(s,c){return s+c.units.length;},0) + ' units \u00b7 ' + progress.completed + ' complete \u00b7 ' + progress.pct + '%</div></div>';
+      out += '<div style="width:60px;"><div style="background:rgba(255,255,255,0.06);height:6px;"><div style="height:100%;background:' + (section.color || 'var(--gold)') + ';width:' + progress.pct + '%;"></div></div></div></div>';
+      out += '<div style="padding:0.8rem 1rem;">' + chaptersHTML + '</div></div>';
+      return out;
     }
 
     // ─── Reports Tab ────────────────────────────────────────────
@@ -10790,15 +10851,18 @@ contact\u0040llfg.us`
     };
 
     window.__R_openDirectUplineChat = window.openDirectUplineChat = function() {
-      // Switch to chat tab, set filter to upline, select first contact
+      // Switch to chat tab and select first upline contact
       const chatTab = document.getElementById('msgtab-chat');
       switchMsgTab('chat', chatTab);
-      const filter = document.getElementById('msgContactFilter');
-      if (filter) filter.value = 'upline';
-      renderMsgContactList();
       setTimeout(() => {
-        const firstContact = document.querySelector('#msgContactList .msg-contact');
-        if (firstContact) firstContact.click();
+        // Find the upline section contact (skip pinned items)
+        const uplineContact = MSG_CONTACTS.upline && MSG_CONTACTS.upline[0];
+        if (uplineContact) {
+          const el = Array.from(document.querySelectorAll('#msgContactList .msg-contact')).find(
+            function(c){ return c.textContent.includes(uplineContact.name); }
+          );
+          if (el) el.click();
+        }
       }, 100);
     };
 
@@ -10937,18 +11001,27 @@ contact\u0040llfg.us`
     function renderMsgContactList() {
       const list = document.getElementById('msgContactList');
       if (!list) return;
-      // Use dropdown filter for contact type
-      const filter = document.getElementById('msgContactFilter');
-      const contactType = filter ? filter.value : 'team';
-      const contacts = MSG_CONTACTS[contactType] || [];
-      list.innerHTML = contacts.map(c => `
-        <div class="msg-contact" onclick="selectContact('${c.id}',this)">
-          <div class="msg-contact-av">${c.init}</div>
-          <div>
-            <div class="msg-contact-name">${c.name}</div>
-            <div class="msg-contact-role">${c.role}</div>
-          </div>
-        </div>`).join('');
+      const searchVal = (document.getElementById('msgSearchInput')?.value || '').toLowerCase();
+      let html = '';
+      // Pinned: Deal Bot + Team Broadcast
+      html += '<div style="padding:0.2rem 0.7rem 0.1rem;font-size:0.44rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(201,168,76,0.35);margin-top:0.25rem;">Pinned</div>';
+      [{id:'company_sales',name:'Sales Feed',role:'Live deal log',init:'🏆',bg:'linear-gradient(135deg,rgba(110,207,110,0.2),rgba(110,207,110,0.06))'},
+       {id:'team',name:'Team Broadcast',role:'Message all agents',init:'📢',bg:'linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.06))'}
+      ].forEach(function(c){
+        if(searchVal && !c.name.toLowerCase().includes(searchVal)) return;
+        html += '<div class="msg-contact" onclick="selectContact(\''+c.id+'\',this)"><div class="msg-contact-av" style="background:'+c.bg+';font-size:0.9rem;">'+c.init+'</div><div><div class="msg-contact-name">'+c.name+'</div><div class="msg-contact-role">'+c.role+'</div></div></div>';
+      });
+      // All contacts: Upline, Team, Downline
+      [{key:'upline',label:'Upline'},{key:'team',label:'Team'},{key:'downline',label:'Downline'}].forEach(function(sec){
+        var contacts = (MSG_CONTACTS[sec.key]||[]).filter(function(c){return c.id!=='team';});
+        if(searchVal) contacts = contacts.filter(function(c){return c.name.toLowerCase().includes(searchVal)||c.role.toLowerCase().includes(searchVal);});
+        if(!contacts.length) return;
+        html += '<div style="padding:0.2rem 0.7rem 0.1rem;font-size:0.44rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(201,168,76,0.35);margin-top:0.35rem;">'+sec.label+'</div>';
+        contacts.forEach(function(c){
+          html += '<div class="msg-contact" onclick="selectContact(\''+c.id+'\',this)"><div class="msg-contact-av">'+c.init+'</div><div><div class="msg-contact-name">'+c.name+'</div><div class="msg-contact-role">'+c.role+'</div></div></div>';
+        });
+      });
+      list.innerHTML = html;
     }
 
     function initMsgContacts(user) {
@@ -12909,6 +12982,9 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_NotificationsAgent());
         this.register(new LLFG_AnalyticsAgent());
         this.register(new LLFG_UIOptimizationAgent());
+        this.register(new LLFG_AIContentAgent());
+        this.register(new LLFG_GamificationAgent());
+        this.register(new LLFG_TrainingCoachAgent());
         this.register(new LLFG_PreflightAgent());
 
         // Alert listener for toast display
@@ -14400,7 +14476,77 @@ This request requires Managing Partner approval.`
       }
     }
 
-    // ─── 14. PREFLIGHT VERIFICATION AGENT ──────────────────────────────
+    // ─── 14. GAMIFICATION AGENT ──────────────────────────────────
+    class LLFG_GamificationAgent extends LLFG_AgentBase {
+      constructor() {
+        super('gamification', 'Gamification Agent', '\uD83C\uDFC6', 'XP tracking, level progression, badge awards, streak monitoring, daily challenge management');
+      }
+      onStart() {
+        if (!LLFG_Gamification.data) LLFG_Gamification.init();
+        this.schedule(() => this._tick(), 60000);
+        LLFG_EventBus.on('gamification:xpAwarded', (d) => { this.metrics.runs++; });
+        LLFG_EventBus.on('gamification:levelUp', (d) => { this.alert('Level Up! ' + d.newLevel.icon + ' ' + d.newLevel.name, 'info'); });
+        LLFG_EventBus.on('gamification:badgeEarned', (d) => { this.alert('Badge Earned: ' + d.badge.icon + ' ' + d.badge.name, 'info'); });
+      }
+      _tick() {
+        if (!LLFG_Gamification.data) return;
+        var d = LLFG_Gamification.data;
+        var level = LLFG_Gamification.getLevel();
+        LLFG_EventBus.emit('gamification:status', { xp: d.xp, level: level.level, levelName: level.name, streak: d.streak, badges: d.badges.length });
+      }
+      getSnapshot() {
+        if (!LLFG_Gamification.data) return {};
+        var d = LLFG_Gamification.data;
+        var l = LLFG_Gamification.getLevel();
+        return { xp: d.xp, level: l.level, name: l.name, streak: d.streak, badges: d.badges.length, totalBadges: LLFG_Gamification.BADGES.length, progress: LLFG_Gamification.getLevelProgress() + '%' };
+      }
+    }
+
+    // ─── 15. TRAINING COACH AGENT ──────────────────────────────────
+    class LLFG_TrainingCoachAgent extends LLFG_AgentBase {
+      constructor() {
+        super('trainingcoach', 'Training Coach Agent', '\uD83C\uDF93', 'Course progress tracking, completion monitoring, training recommendations, onboarding workflow');
+        this.recommendations = [];
+      }
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 120000);
+        LLFG_EventBus.on('gamification:unitCompleted', () => this._analyze());
+      }
+      _analyze() {
+        if (!LLFG_Gamification.data) LLFG_Gamification.init();
+        this.recommendations = [];
+        var overall = LLFG_Gamification.getOverallProgress();
+
+        // Check specialized courses first
+        var priority = ['compliance_cert', 'zero_chargeback', '100k_blueprint'];
+        var self = this;
+        priority.forEach(function(cid) {
+          var p = LLFG_Gamification.getCourseProgress(cid);
+          if (p.pct < 100 && p.total > 0) {
+            var course = TRAINING_CURRICULUM.find(function(c) { return c.id === cid; });
+            if (course) self.recommendations.push({ courseId: cid, name: course.roleLabel, pct: p.pct, remaining: p.total - p.completed });
+          }
+        });
+
+        // Alert if compliance not started
+        var compP = LLFG_Gamification.getCourseProgress('compliance_cert');
+        if (compP.pct === 0 && compP.total > 0) {
+          this.alert('Compliance Certification not started \u2014 required for all agents', 'warning');
+        }
+
+        // Alert on milestone completions
+        if (overall.pct === 100 && overall.total > 0) {
+          this.alert('All training complete! ' + overall.completed + ' units mastered.', 'info');
+        }
+
+        LLFG_EventBus.emit('trainingcoach:updated', { overall: overall, recommendations: this.recommendations });
+      }
+      getRecommendations() { return this.recommendations; }
+      getProgress() { return LLFG_Gamification.getOverallProgress(); }
+    }
+
+    // ─── 16. PREFLIGHT VERIFICATION AGENT ──────────────────────────────
     class LLFG_PreflightAgent extends LLFG_AgentBase {
       constructor() {
         super('preflight', 'Preflight Verification Agent', '✅', 'Cross-agent verification, dependency checks, data integrity validation, system readiness gating');
@@ -14703,6 +14849,142 @@ This request requires Managing Partner approval.`
       runPreflight() {
         this._runFullPreflight();
         return this.report;
+
+    // ─── 15. AI CONTENT GENERATION AGENT ─────────────────────────────
+    class LLFG_AIContentAgent extends LLFG_AgentBase {
+      constructor() {
+        super('aicontent', 'AI Content Agent', '\uD83E\uDD16', 'AI image generation via Pollinations.ai, prompt engineering, content pipeline, auto-apply to portal');
+        this._historyKey = 'llfg_ai_history';
+        this._queueKey = 'llfg_ai_queue';
+        this.queue = [];
+        this.history = [];
+        this.isGenerating = false;
+      }
+
+      onStart() {
+        this._loadState();
+        this.schedule(function() { this._processQueue(); }.bind(this), 15000);
+      }
+
+      _loadState() {
+        try { this.history = JSON.parse(localStorage.getItem(this._historyKey) || '[]'); } catch(e) { this.history = []; }
+        try { this.queue = JSON.parse(localStorage.getItem(this._queueKey) || '[]'); } catch(e) { this.queue = []; }
+      }
+
+      _saveState() {
+        try {
+          if (this.history.length > 50) this.history = this.history.slice(-50);
+          localStorage.setItem(this._historyKey, JSON.stringify(this.history));
+          localStorage.setItem(this._queueKey, JSON.stringify(this.queue.map(function(j) { return { id:j.id, promptKey:j.promptKey, status:j.status, filename:j.filename, createdAt:j.createdAt }; })));
+        } catch(e) {}
+      }
+
+      getPromptLibrary() {
+        return {
+          'hero-lion': 'Cinematic photorealistic nighttime photograph a powerful majestic male African lion walking confidently down the center of an empty Wall Street financial district hundred dollar bills flying and swirling through the air all around the lion caught in wind wet asphalt street reflecting warm golden light from towering glass skyscrapers on both sides money raining down dark moody dramatic atmosphere rich gold and black color palette volumetric fog neon reflections on wet ground shot on ARRI Alexa 65mm anamorphic lens cinematic color grading film grain hyperrealistic 8K UHD no people no text',
+          'hero-closeup': 'Extreme close-up photorealistic portrait of a majestic male lion face intense golden eyes staring directly at camera dramatic rim lighting in gold and amber tones dark city lights bokeh in background suggesting Wall Street at night shallow depth of field 85mm f/1.2 wet fur detail volumetric light rays cinematic color grading hyperrealistic RAW photo 8K',
+          'hero-walkcam': 'Cinematic low angle photograph of a majestic male lion walking directly toward the camera down the center of a dark empty city street at night Wall Street financial district hundred dollar bills scattered on wet ground and floating in air golden street lights towering dark skyscrapers wet reflective pavement 24mm wide angle anamorphic dramatic volumetric lighting hyperrealistic 8K no people no text',
+          'section-growth': 'Abstract dark background flowing streams of golden light particles forming an upward trending chart shape gold dust ember particles floating deep black background luxury minimal financial technology feel volumetric particles 8K no text ultra wide',
+          'section-skyline': 'Panoramic aerial photograph of Manhattan financial district skyline at night golden warm lights dark moody sky wet rooftops reflecting light cinematic color grading rich gold deep black drone shot 8K no text',
+          'carrier-network': 'Abstract dark background subtle golden geometric patterns connecting nodes network professional financial dark luxury minimal clean 8K',
+          'about-office': 'Dark luxury executive office interior gold accents floor to ceiling windows overlooking city skyline at night cinematic moody volumetric light 8K'
+        };
+      }
+
+      buildURL(prompt, options) {
+        options = options || {};
+        var w = options.width || 1920;
+        var h = options.height || 1080;
+        var seed = options.seed || Math.floor(Math.random() * 9999);
+        var model = options.model || 'flux';
+        return 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt) + '?width=' + w + '&height=' + h + '&seed=' + seed + '&model=' + model + '&nologo=true&enhance=true';
+      }
+
+      queueGeneration(promptKeyOrCustom, options) {
+        var library = this.getPromptLibrary();
+        var prompt = library[promptKeyOrCustom] || promptKeyOrCustom;
+        var key = library[promptKeyOrCustom] ? promptKeyOrCustom : 'custom';
+        options = options || {};
+        var job = {
+          id: 'gen_' + Date.now(),
+          prompt: prompt,
+          promptKey: key,
+          url: this.buildURL(prompt, options),
+          filename: options.filename || (key + '_' + Date.now()),
+          status: 'queued',
+          options: options,
+          createdAt: Date.now()
+        };
+        this.queue.push(job);
+        this._saveState();
+        this.alert('Queued: ' + key, 'info');
+        LLFG_EventBus.emit('aicontent:queued', job);
+        return job;
+      }
+
+      queueBatch(promptKey, count, options) {
+        var jobs = [];
+        for (var i = 0; i < (count || 3); i++) {
+          var opts = Object.assign({}, options || {}, { seed: Math.floor(Math.random() * 9999) });
+          jobs.push(this.queueGeneration(promptKey, opts));
+        }
+        return jobs;
+      }
+
+      _processQueue() {
+        if (this.isGenerating) return;
+        var pending = this.queue.filter(function(j) { return j.status === 'queued'; });
+        if (pending.length === 0) return;
+        var job = pending[0];
+        job.status = 'generating';
+        this.isGenerating = true;
+        this._saveState();
+        this.alert('Generating: ' + job.promptKey + '...', 'info');
+        LLFG_EventBus.emit('aicontent:generating', job);
+
+        var self = this;
+        fetch(job.url)
+          .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+          .then(function(blob) {
+            if (blob.size < 5000) throw new Error('File too small (' + blob.size + 'B)');
+            job.status = 'completed';
+            job.size = blob.size;
+            job.completedAt = Date.now();
+            job.blobUrl = URL.createObjectURL(blob);
+            self.isGenerating = false;
+            self.history.push({ id: job.id, promptKey: job.promptKey, filename: job.filename, size: blob.size, blobUrl: job.blobUrl, ts: Date.now() });
+            self._saveState();
+            self.alert('Generated: ' + job.promptKey + ' (' + Math.round(blob.size / 1024) + 'KB)', 'info');
+            LLFG_EventBus.emit('aicontent:completed', job);
+          })
+          .catch(function(err) {
+            job.status = 'failed';
+            job.error = err.message;
+            self.isGenerating = false;
+            self._saveState();
+            self.alert('Failed: ' + err.message, 'warning');
+            LLFG_EventBus.emit('aicontent:failed', job);
+          });
+      }
+
+      applyToHero(jobOrUrl) {
+        var src = typeof jobOrUrl === 'string' ? jobOrUrl : (jobOrUrl && jobOrUrl.blobUrl);
+        if (!src) return;
+        var heroImg = document.querySelector('.hero-bg-img');
+        if (heroImg) { heroImg.src = src; this.alert('Hero image updated', 'info'); }
+      }
+
+      getStats() {
+        return {
+          totalGenerated: this.history.length,
+          queuePending: this.queue.filter(function(j) { return j.status === 'queued'; }).length,
+          isGenerating: this.isGenerating,
+          recent: this.history.slice(-10),
+          prompts: Object.keys(this.getPromptLibrary()),
+          queue: this.queue
+        };
+      }
+    }
       }
     }
 
@@ -14907,6 +15189,42 @@ This request requires Managing Partner approval.`
         return html;
       })();
 
+      // AI Content Generation dashboard
+      const aiContentHTML = (() => {
+        var agent = LLFG_Brain.agents.aicontent;
+        if (!agent || agent.status !== 'running') return '';
+        var stats = agent.getStats ? agent.getStats() : {};
+        var prompts = stats.prompts || [];
+        var recent = stats.recent || [];
+        var html = '<div class="dash-section" style="margin-top:1.5rem;">'
+          + '<div class="dash-section-title">\uD83E\uDD16 AI Content Generation</div>'
+          + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1rem;">'
+          + '<div class="dash-card"><div class="dash-card-label">Generated</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">' + (stats.totalGenerated || 0) + '</div></div>'
+          + '<div class="dash-card"><div class="dash-card-label">In Queue</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">' + (stats.queuePending || 0) + '</div></div>'
+          + '<div class="dash-card"><div class="dash-card-label">Status</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;font-size:0.9rem;color:' + (stats.isGenerating ? '#ffa500' : '#6ecf6e') + ';">' + (stats.isGenerating ? 'Generating...' : 'Ready') + '</div></div>'
+          + '</div>';
+        // Quick generate buttons
+        html += '<div style="margin-bottom:1rem;"><div style="font-size:0.62rem;color:var(--gold);margin-bottom:0.5rem;font-weight:500;">Quick Generate</div>'
+          + '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">';
+        prompts.forEach(function(p) {
+          html += '<button onclick="LLFG_Brain.agents.aicontent.queueGeneration(\'' + p + '\');setTimeout(renderCommandCenter,2000);" style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.3rem 0.7rem;font-family:Raleway,sans-serif;font-size:0.55rem;cursor:pointer;">' + p + '</button>';
+        });
+        html += '</div></div>';
+        // Recent generations
+        if (recent.length > 0) {
+          html += '<div style="font-size:0.62rem;color:var(--gold);margin-bottom:0.4rem;font-weight:500;">Recent</div>';
+          recent.reverse().forEach(function(g) {
+            html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.03);">'
+              + '<span style="font-size:0.6rem;color:var(--cream);">' + g.promptKey + '</span>'
+              + '<span style="font-size:0.55rem;color:var(--gray);">' + Math.round((g.size||0)/1024) + 'KB</span>'
+              + (g.blobUrl ? '<button onclick="LLFG_Brain.agents.aicontent.applyToHero(\'' + g.blobUrl + '\');setTimeout(renderCommandCenter,500);" style="background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.2);color:#6ecf6e;padding:0.15rem 0.5rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;">Apply to Hero</button>' : '')
+              + '</div>';
+          });
+        }
+        html += '</div>';
+        return html;
+      })();
+
       // Preflight Verification dashboard
       const preflightHTML = (() => {
         const pf = LLFG_Brain.agents.preflight;
@@ -14984,7 +15302,7 @@ This request requires Managing Partner approval.`
         <div class="dash-body">
           <div class="dash-welcome">
             <h2 style="margin-bottom:0.2rem;">LLFG <em>Command Center</em></h2>
-            <p>AI-powered business automation — 14 agents monitoring KPIs, security, recruiting, compliance, verification, and more.</p>
+            <p>AI-powered business automation — 16 agents monitoring KPIs, security, recruiting, compliance, gamification, training, and more.</p>
           </div>
 
           <!-- Control bar -->
@@ -15036,6 +15354,7 @@ This request requires Managing Partner approval.`
           ${retentionHTML}
           ${analyticsHTML}
           ${uiOptHTML}
+          ${aiContentHTML}
           ${securityHTML}
         </div>`;
     };
