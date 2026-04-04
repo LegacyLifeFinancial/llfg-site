@@ -114,10 +114,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.4rem 4rem;
-      background: rgba(10,10,10,0.6);
-      backdrop-filter: blur(20px) saturate(1.5);
-      border-bottom: 1px solid rgba(201,168,76,0.08);
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+      background: rgba(10,10,10,0.7);
+      backdrop-filter: blur(24px) saturate(1.5);
+      border-bottom: 1px solid rgba(201,168,76,0.06);
+      border-image: linear-gradient(90deg, transparent, rgba(201,168,76,0.12), rgba(124,58,237,0.08), rgba(201,168,76,0.12), transparent) 1;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 1px 0 rgba(124,58,237,0.03);
     }
 
     .logo {
@@ -219,7 +220,7 @@
 
     /* Full-page section feel — scoped to landing page only */
     #hero, #about, #why, #carriers, #agency, #apply { min-height:100vh;display:flex;flex-direction:column;justify-content:center;position:relative; }
-    #about::before, #why::before, #carriers::before, #agency::before, #apply::before { content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.12),transparent); }
+    #about::before, #why::before, #carriers::before, #agency::before, #apply::before { content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.12),rgba(124,58,237,0.08),rgba(201,168,76,0.12),transparent); }
 
     /* Reduced motion */
     @media (prefers-reduced-motion:reduce) {
@@ -879,7 +880,7 @@
     .dashboard-overlay {
       position: fixed;
       inset: 0;
-      background: var(--black);
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d0b14 50%, #0a0a0a 100%);
       z-index: 998;
       display: none;
       flex-direction: column;
@@ -893,8 +894,10 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.2rem 3rem;
-      background: var(--black-soft);
-      border-bottom: 1px solid rgba(201,168,76,0.15);
+      background: rgba(17,17,17,0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      border-image: linear-gradient(90deg, rgba(201,168,76,0.15), rgba(124,58,237,0.08), rgba(201,168,76,0.15)) 1;
       flex-shrink: 0;
     }
 
@@ -969,13 +972,14 @@
     }
 
     .dash-card {
-      background: var(--black-card);
-      border: 1px solid rgba(201,168,76,0.12);
+      background: rgba(22,22,22,0.8);
+      border: 1px solid rgba(201,168,76,0.1);
       padding: 1.8rem;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+      backdrop-filter: blur(8px);
     }
 
-    .dash-card:hover { border-color: rgba(201,168,76,0.4); }
+    .dash-card:hover { border-color: rgba(201,168,76,0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 20px rgba(124,58,237,0.04); transform: translateY(-2px); }
 
     .dash-card-label {
       font-size: 0.62rem;
@@ -1146,8 +1150,9 @@
     .admin-tabs {
       display: flex;
       gap: 0;
-      background: var(--black-soft);
-      border-bottom: 1px solid rgba(201,168,76,0.15);
+      background: rgba(17,17,17,0.9);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      border-image: linear-gradient(90deg, rgba(201,168,76,0.12), rgba(124,58,237,0.06), rgba(201,168,76,0.12)) 1;
       padding: 0 3rem;
       flex-shrink: 0;
     }
@@ -1169,8 +1174,8 @@
       white-space: nowrap;
     }
 
-    .admin-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .admin-tab:hover { color: var(--cream); }
+    .admin-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); background: linear-gradient(to top, rgba(201,168,76,0.04), transparent); }
+    .admin-tab:hover { color: var(--cream); background: linear-gradient(to top, rgba(124,58,237,0.03), transparent); }
 
     /* ── Training Unit Content Styles ── */
     .training-unit-body h4 {
@@ -4111,7 +4116,7 @@
   <section id="income-stats" class="section-glow section-reveal">
     <div style="text-align:center;margin-bottom:3rem;">
       <div class="badge-pill" style="margin-bottom:1rem;"><span class="dot"></span> Real Producer Results</div>
-      <h2 style="max-width:500px;margin:0 auto;font-size:clamp(1.8rem, 3.5vw, 2.8rem);"><span class="gradient-text">What You Can Earn</span></h2>
+      <h2 style="max-width:500px;margin:0 auto;font-size:clamp(1.8rem, 3.5vw, 2.8rem);"><span class="gradient-text-dual">What You Can Earn</span></h2>
     </div>
     <div class="income-grid">
       <div class="income-card premium-card pulse-border">
@@ -4133,24 +4138,24 @@
   </section>
 
   <!-- STATS COUNTER BAR — Scroll Stop -->
-  <div style="background:linear-gradient(135deg,#0a0a0a,#111);border-top:1px solid rgba(201,168,76,0.08);border-bottom:1px solid rgba(201,168,76,0.08);padding:3rem 4rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;" id="statsBar">
+  <div style="background:linear-gradient(135deg,#0a0a0a,#0d0b14,#111);border-top:1px solid rgba(124,58,237,0.08);border-bottom:1px solid rgba(201,168,76,0.08);padding:3rem 4rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;" id="statsBar">
     <div style="text-align:center;" class="reveal-scale">
       <div data-counter data-target="35" data-suffix="+" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--gold);">0</div>
       <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Carrier Partners</div>
     </div>
-    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="width:1px;background:linear-gradient(to bottom,rgba(201,168,76,0.15),rgba(124,58,237,0.12),rgba(201,168,76,0.15));align-self:stretch;"></div>
     <div style="text-align:center;" class="reveal-scale">
       <div data-counter data-target="50" data-suffix=" States" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--cream);">0</div>
       <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Licensed Nationwide</div>
     </div>
-    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="width:1px;background:linear-gradient(to bottom,rgba(201,168,76,0.15),rgba(124,58,237,0.12),rgba(201,168,76,0.15));align-self:stretch;"></div>
     <div style="text-align:center;" class="reveal-scale">
       <div data-counter data-target="140" data-suffix="%" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--gold);">0</div>
       <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Max Commission</div>
     </div>
-    <div style="width:1px;background:rgba(201,168,76,0.15);align-self:stretch;"></div>
+    <div style="width:1px;background:linear-gradient(to bottom,rgba(201,168,76,0.15),rgba(124,58,237,0.12),rgba(201,168,76,0.15));align-self:stretch;"></div>
     <div style="text-align:center;" class="reveal-scale">
-      <div data-counter data-target="500" data-prefix="$" data-suffix="K+" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:#6ecf6e;">0</div>
+      <div data-counter data-target="500" data-prefix="$" data-suffix="K+" style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;color:var(--purple-light);">0</div>
       <div style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gray);">Top Producer Income</div>
     </div>
   </div>
@@ -8725,10 +8730,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
       agent:             ['commreq'],
-      manager:           ['commreq','reports','emailtemplates','creativestudio','commandcenter'],
-      executive:         ['commreq','teammetrics','reports','emailtemplates','creativestudio','commandcenter'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','commandcenter'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','commandcenter'],
+      manager:           ['commreq','reports','emailtemplates','commandcenter'],
+      executive:         ['commreq','teammetrics','reports','emailtemplates','commandcenter'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
       admin:             ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
@@ -19188,6 +19193,101 @@ This request requires Managing Partner approval.`
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
+    })();
+
+    // ─── HERO PARTICLE SYSTEM ────────────────────────────────────────
+    (function initHeroParticles() {
+      var canvas = document.getElementById('heroParticles');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      var w, h, dpr;
+
+      function resize() {
+        dpr = window.devicePixelRatio || 1;
+        w = canvas.parentElement ? canvas.parentElement.clientWidth : window.innerWidth;
+        h = canvas.parentElement ? canvas.parentElement.clientHeight : window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.scale(dpr, dpr);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Create particles
+      for (var i = 0; i < 120; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          r: 0.8 + Math.random() * 2,
+          a: 0.05 + Math.random() * 0.35,
+          gold: Math.random() > 0.3
+        });
+      }
+
+      var mouse = { x: -1000, y: -1000 };
+      canvas.parentElement.addEventListener('mousemove', function(e) {
+        var rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      canvas.parentElement.addEventListener('mouseleave', function() {
+        mouse.x = -1000; mouse.y = -1000;
+      });
+
+      var raf;
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+
+          // Mouse repel
+          var dx = p.x - mouse.x, dy = p.y - mouse.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            var force = (120 - dist) / 120 * 0.8;
+            p.x += (dx / dist) * force;
+            p.y += (dy / dist) * force;
+          }
+
+          // Draw particle
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.gold ? 'rgba(201,168,76,' + p.a + ')' : 'rgba(180,180,200,' + (p.a * 0.5) + ')';
+          ctx.fill();
+
+          // Draw connections
+          for (var j = i + 1; j < particles.length; j++) {
+            var q = particles[j];
+            var cx = p.x - q.x, cy = p.y - q.y;
+            var cd = Math.sqrt(cx * cx + cy * cy);
+            if (cd < 100) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(201,168,76,' + (0.06 * (1 - cd / 100)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        raf = requestAnimationFrame(draw);
+      }
+      draw();
+
+      // Pause when not visible
+      var heroObs = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) { if (!raf) draw(); }
+        else { cancelAnimationFrame(raf); raf = null; }
+      }, { threshold: 0.1 });
+      if (canvas.parentElement) heroObs.observe(canvas.parentElement);
     })();
   </script>
 </body>
