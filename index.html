@@ -3657,8 +3657,8 @@
     <div class="hero-sticky">
       <div class="hero-bg">
         <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85">
-          <source src="https://assets.mixkit.co/videos/44690/44690-720.mp4" type="video/mp4"/>
-          <source src="https://assets.mixkit.co/videos/42343/42343-1080.mp4" type="video/mp4"/>
+          <source src="https://assets.mixkit.co/videos/42342/42342-1080.mp4" type="video/mp4"/>
+          <source src="https://assets.mixkit.co/videos/41542/41542-1080.mp4" type="video/mp4"/>
         </video>
       </div>
 
@@ -4785,15 +4785,7 @@
                 Add to Apple Wallet
               </button>
               <p style="font-size:0.62rem;color:var(--gray);text-align:center;line-height:1.5;margin-top:0.4rem;">PDF: File → Print → Save as PDF<br>Wallet: Downloads .vcf contact card for iOS/Mac</p>
-              <!-- LinkedIn Logo Export -->
-              <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:0.5rem;padding-top:0.8rem;">
-                <div style="font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">LinkedIn Assets</div>
-                <button onclick="downloadLinkedInLogo()" class="modal-btn" style="width:100%;padding:0.75rem;background:rgba(10,102,194,0.15);border-color:rgba(10,102,194,0.3);color:#6ea8fe;display:flex;align-items:center;justify-content:center;gap:0.5rem;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#6ea8fe"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                  ⬇ Download LinkedIn Logo (SVG)
-                </button>
-                <p style="font-size:0.6rem;color:var(--gray);margin-top:0.4rem;line-height:1.5;text-align:center;">Open SVG in browser → screenshot or right-click → Save for LinkedIn profile.</p>
-              </div>
+              <!-- LinkedIn section removed -->
             </div>
           </div>
 
@@ -10257,17 +10249,65 @@ contact\u0040llfg.us`
       var ndaEl = document.getElementById('ndaSignedCount');
       var drEl = document.getElementById('debtRollupSignedCount');
 
-      if (totalEl) totalEl.textContent = agentAgreements.length;
-      if (ndaEl) ndaEl.textContent = agentAgreements.filter(function(a) { return a.ndaSigned; }).length;
-      if (drEl) drEl.textContent = agentAgreements.filter(function(a) { return a.debtRollupSigned; }).length;
+      // ── Role-based filtering: each role sees only their downline ──
+      var u = currentUser || window._llfgCurrentUser || {};
+      var role = u.role || 'financial_advisor';
+      var isOwner = u.isOwner || u.email === 'lorenzoparenza@llfg.us';
+      var isExecPlus = ['executive','director','managing_partner','admin'].indexOf(role) !== -1 || isOwner;
+      var isManager = role === 'manager';
+      var myEmail = (u.email || '').toLowerCase();
+      var myName = (u.name || '').toLowerCase();
+
+      // Build downline team member list from hierarchy data
+      var teamMemberNames = [];
+      if (typeof LEADERBOARD_TEAMS !== 'undefined' && typeof LEADERBOARD_AGENTS !== 'undefined') {
+        var myTeam = LEADERBOARD_TEAMS.find(function(t) {
+          return t.leader && t.leader.toLowerCase() === myName;
+        });
+        if (myTeam) {
+          teamMemberNames = LEADERBOARD_AGENTS
+            .filter(function(a) { return a.team === myTeam.name; })
+            .map(function(a) { return a.name.toLowerCase(); });
+        }
+      }
+
+      // Also check submitted agents for referral matches
+      var mySubmissions = (typeof mySubmittedAgents !== 'undefined' ? mySubmittedAgents : [])
+        .map(function(s) { return s.name.toLowerCase(); });
+
+      var filtered;
+      if (isExecPlus) {
+        // Executive, Director, Managing Partner, Admin, Owner — full agency view
+        filtered = agentAgreements;
+      } else if (isManager) {
+        // Manager — own submissions + team downline + referrals
+        filtered = agentAgreements.filter(function(a) {
+          var submitterMatch = a.signedByProxyEmail && a.signedByProxyEmail.toLowerCase() === myEmail;
+          var teamMatch = teamMemberNames.indexOf(a.agentName.toLowerCase()) !== -1;
+          var referralMatch = mySubmissions.indexOf(a.agentName.toLowerCase()) !== -1;
+          return submitterMatch || teamMatch || referralMatch;
+        });
+      } else {
+        // FA/Agent — only own submissions and referrals
+        filtered = agentAgreements.filter(function(a) {
+          var submitterMatch = a.signedByProxyEmail && a.signedByProxyEmail.toLowerCase() === myEmail;
+          var referralMatch = mySubmissions.indexOf(a.agentName.toLowerCase()) !== -1;
+          return submitterMatch || referralMatch;
+        });
+      }
+
+      if (totalEl) totalEl.textContent = filtered.length;
+      if (ndaEl) ndaEl.textContent = filtered.filter(function(a) { return a.ndaSigned; }).length;
+      if (drEl) drEl.textContent = filtered.filter(function(a) { return a.debtRollupSigned; }).length;
 
       if (!tbody) return;
-      if (!agentAgreements.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:1.5rem;font-size:0.75rem;">No agreements recorded yet. Agreements are created when new agents are submitted.</td></tr>';
+      if (!filtered.length) {
+        var msg = isExecPlus ? 'No agreements recorded yet.' : 'No agreements in your downline yet.';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:1.5rem;font-size:0.75rem;">' + msg + ' Agreements are created when new agents are submitted.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = agentAgreements.slice().reverse().map(function(a) {
+      tbody.innerHTML = filtered.slice().reverse().map(function(a) {
         var ndaStatus = a.ndaSigned ? '<span style="color:#6ecf6e;">Signed</span>' : '<span style="color:#e05555;">Pending</span>';
         var drStatus = a.debtRollupSigned ? '<span style="color:#6ecf6e;">Signed</span>' : '<span style="color:#e05555;">Pending</span>';
         var signedDate = '';
@@ -10563,64 +10603,91 @@ contact\u0040llfg.us`
     let gmailTokenClient = null;
     let gmailEmails = [];
     let gmailCurrentFolder = 'inbox';
+    let gmailConnectedEmail = null;
 
     function initGmailConnection() {
       const emailReadPanel = document.getElementById('msgEmailReadPanel');
       const emailList = document.getElementById('msgEmailList');
 
       if (gmailAccessToken) {
-        // Already authenticated — fetch emails
         fetchGmailEmails();
         return;
       }
 
       if (!GMAIL_CLIENT_ID) {
-        // No Client ID configured — show setup instructions
         if (emailReadPanel) emailReadPanel.innerHTML = `
           <div class="email-connect-prompt">
             <div style="font-size:2rem;">📧</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--cream);">Connect Gmail</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--cream);">Connect Email</div>
             <div style="font-size:0.72rem;color:var(--gray);line-height:1.7;max-width:400px;">
-              To connect your <strong style="color:var(--gold);">contact@llfg.us</strong> inbox, a Google Cloud OAuth Client ID is required.
-            </div>
-            <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:1rem;font-size:0.65rem;color:var(--gray);line-height:1.8;text-align:left;max-width:440px;">
-              <strong style="color:var(--cream);">Setup Steps:</strong><br/>
-              1. Go to <span style="color:var(--gold);">console.cloud.google.com</span><br/>
-              2. Create a project &amp; enable the Gmail API<br/>
-              3. Create OAuth 2.0 Web Client credentials<br/>
-              4. Add <span style="color:var(--gold);">https://llfg.us</span> to Authorized JS Origins<br/>
-              5. Paste the Client ID in the portal config
+              Gmail OAuth Client ID not configured. Contact admin.
             </div>
           </div>`;
-        if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Gmail not connected yet.</div>';
+        if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Email not connected.</div>';
         return;
       }
 
-      // Show connect button
+      // Show connect button — supports ANY Google / Gmail account
       if (emailReadPanel) emailReadPanel.innerHTML = `
         <div class="email-connect-prompt">
           <div style="font-size:2.5rem;">📧</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--cream);">Corporate Email</div>
-          <div style="font-size:0.75rem;color:var(--gray);margin-bottom:0.5rem;">Sign in with your <strong style="color:var(--gold);">@llfg.us</strong> Google Workspace account</div>
-          <button class="email-connect-btn" onclick="connectGmail()">Connect Gmail</button>
-          <div style="font-size:0.58rem;color:var(--gray);margin-top:0.5rem;">Read-only access — your credentials stay with Google</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--cream);">Connect Your Email</div>
+          <div style="font-size:0.75rem;color:var(--gray);margin-bottom:1rem;line-height:1.7;max-width:380px;">
+            Connect any Gmail or Google Workspace account to read and send emails directly from the portal.
+          </div>
+          <button class="email-connect-btn" onclick="connectGmail()" style="margin-bottom:0.6rem;">Connect @llfg.us Account</button>
+          <button class="email-connect-btn" onclick="connectGmail()" style="background:rgba(110,168,254,0.08);border-color:rgba(110,168,254,0.25);color:#6ea8fe;">Connect Personal Gmail</button>
+          <div style="font-size:0.58rem;color:var(--gray);margin-top:0.8rem;line-height:1.6;max-width:340px;">
+            Works with @llfg.us, @gmail.com, or any Google Workspace email.<br/>
+            Read-only + send access — your credentials stay with Google.
+          </div>
         </div>`;
-      if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Click <strong style="color:var(--gold);">Connect Gmail</strong> to get started.</div>';
+      if (emailList) emailList.innerHTML = '<div style="padding:1rem 0.8rem;font-size:0.68rem;color:var(--gray);text-align:center;">Click <strong style="color:var(--gold);">Connect</strong> to get started.</div>';
     }
 
     window.connectGmail = function() {
       if (!window.google || !window.google.accounts) {
-        alert('Google Identity Services failed to load. Check your internet connection and try again.');
+        alert('Google Identity Services failed to load. Check your internet connection or disable ad blockers and try again.');
         return;
       }
       if (!gmailTokenClient) {
         gmailTokenClient = google.accounts.oauth2.initTokenClient({
           client_id: GMAIL_CLIENT_ID,
           scope: GMAIL_SCOPES,
+          prompt: '',
           callback: function(tokenResponse) {
+            // Handle errors from Google
+            if (tokenResponse.error) {
+              console.error('Gmail OAuth error:', tokenResponse.error, tokenResponse.error_description);
+              var errMsg = 'Gmail connection failed: ' + (tokenResponse.error_description || tokenResponse.error);
+              if (tokenResponse.error === 'invalid_request') {
+                errMsg = 'OAuth configuration error. The admin needs to:\n\n'
+                  + '1. Go to console.cloud.google.com → APIs & Services → OAuth consent screen\n'
+                  + '2. Set User Type to "External" and publish the app (or add test users)\n'
+                  + '3. Under Authorized JavaScript Origins, add:\n'
+                  + '   • https://llfg.us\n'
+                  + '   • https://www.llfg.us\n'
+                  + '   • https://llfg.netlify.app (if using Netlify subdomain)\n'
+                  + '   • http://localhost (for testing)\n'
+                  + '4. Make sure Gmail API is enabled under APIs & Services → Library';
+              }
+              alert(errMsg);
+              return;
+            }
             if (tokenResponse && tokenResponse.access_token) {
               gmailAccessToken = tokenResponse.access_token;
               sessionStorage.setItem('gmail_token', gmailAccessToken);
+              // Fetch the connected email address
+              fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
+                headers: { 'Authorization': 'Bearer ' + gmailAccessToken }
+              }).then(function(r) { return r.json(); }).then(function(p) {
+                if (p.emailAddress) {
+                  gmailConnectedEmail = p.emailAddress;
+                  sessionStorage.setItem('gmail_email', p.emailAddress);
+                  var roleEl = document.querySelector('#msgHeader [style*="font-size:0.6"]') || document.getElementById('msgChatRole');
+                  if (roleEl) roleEl.textContent = p.emailAddress;
+                }
+              }).catch(function(){});
               fetchGmailEmails();
             }
           },
@@ -10629,10 +10696,25 @@ contact\u0040llfg.us`
       gmailTokenClient.requestAccessToken();
     };
 
+    window.disconnectGmail = function() {
+      if (gmailAccessToken && window.google && google.accounts && google.accounts.oauth2) {
+        google.accounts.oauth2.revoke(gmailAccessToken, function() {});
+      }
+      gmailAccessToken = null;
+      gmailConnectedEmail = null;
+      gmailTokenClient = null;
+      sessionStorage.removeItem('gmail_token');
+      sessionStorage.removeItem('gmail_email');
+      initGmailConnection();
+      if (typeof _toast === 'function') _toast('Email disconnected', '#e05555');
+    };
+
     // Try to restore token from session
     (function() {
       var saved = sessionStorage.getItem('gmail_token');
+      var savedEmail = sessionStorage.getItem('gmail_email');
       if (saved) gmailAccessToken = saved;
+      if (savedEmail) gmailConnectedEmail = savedEmail;
     })();
 
     function fetchGmailEmails() {
@@ -15376,7 +15458,7 @@ This request requires Managing Partner approval.`
         // Listen for recruiting and sales events to auto-nurture
         if (typeof LLFG_EventBus !== 'undefined') {
           LLFG_EventBus.on('recruiting:stageChanged', function(d){ this._autoNurture(d); }.bind(this));
-          LLFG_EventBus.on('sales:dealClosed', function(d){ this._celebrateDeal(d); }.bind(this));
+          // sales:dealClosed listener removed — no auto-post to social
         }
       }
 
@@ -15510,12 +15592,7 @@ This request requires Managing Partner approval.`
       }
 
       _celebrateDeal(data) {
-        // Auto-post deal celebration to social content queue
-        this.createContent('social_post', 'linkedin',
-          'Another deal closed!',
-          (data.agentName||'An LLFG agent') + ' just closed a $' + ((data.ap||0).toLocaleString()) + ' policy! The LLFG machine keeps winning.',
-          null
-        );
+        // Removed — no auto-post to social media
       }
 
       // ── Templates Library ──
