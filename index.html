@@ -18156,57 +18156,15 @@ This request requires Managing Partner approval.`
     function initGSAP() {
       gsap.registerPlugin(ScrollTrigger);
 
-      // ── HERO: 3D Lion Roar → Logo Morph (scroll-driven) ──
-      var lionScene = document.getElementById('lionScene');
-      var lionJaw = document.getElementById('lionJaw');
-      var heroLogoReveal = document.getElementById('heroLogoReveal');
-      var heroLogoLine = document.getElementById('heroLogoLine');
-      var heroTextOverlay = document.getElementById('heroTextOverlay');
-      var scrollIndicator = document.getElementById('scrollIndicator');
-      var roarParticles = document.getElementById('roarParticles');
 
-      // Generate roar particles
-      if (roarParticles) {
-        for (var i = 0; i < 20; i++) {
-          var p = document.createElement('div');
-          p.style.cssText = 'position:absolute;width:' + (2 + Math.random()*3) + 'px;height:' + (2 + Math.random()*3) + 'px;background:rgba(201,168,76,' + (0.3 + Math.random()*0.5) + ');border-radius:50%;top:58%;left:50%;';
-          roarParticles.appendChild(p);
-        }
+      // Hero parallax (particles handle visuals)
+      var heroBg = document.querySelector('#hero .hero-bg');
+      var heroContent = document.querySelector('#hero > .hero-sticky > div:nth-child(4)');
+      if (heroBg) {
+        gsap.to(heroBg, { y: 60, scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 } });
       }
-
-      if (lionScene) {
-        var heroTL = gsap.timeline({
-          scrollTrigger: {
-            trigger: '#hero',
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.5,
-            pin: false
-          }
-        });
-
-        // Phase 1 (0-30%): Lion breathes, text visible
-        heroTL.to(scrollIndicator, { opacity: 0, y: 20, duration: 0.1 }, 0);
-
-        // Phase 2 (30-60%): Lion roars — jaw opens, particles burst, glow intensifies
-        heroTL.to(lionJaw, { rotate: 18, y: 8, duration: 0.3 }, 0.15);
-        heroTL.to(heroTextOverlay, { opacity: 0, y: -40, duration: 0.2 }, 0.15);
-        if (roarParticles) {
-          heroTL.to(roarParticles, { opacity: 1, duration: 0.1 }, 0.25);
-            x: function() { return (Math.random() - 0.5) * 300; },
-            y: function() { return (Math.random() - 0.5) * 200 - 50; },
-            opacity: 0, scale: 0,
-            duration: 0.3, stagger: 0.01
-          }, 0.25);
-        }
-
-        // Phase 3 (60-90%): Lion fades, LLFG logo reveals
-        heroTL.to(lionScene, { opacity: 0, scale: 0.5, duration: 0.25 }, 0.5);
-        heroTL.to(heroLogoReveal, { opacity: 1, duration: 0.3 }, 0.55);
-        heroTL.to(heroLogoLine, { width: 80, duration: 0.2 }, 0.65);
-
-        // Phase 4 (90-100%): Hold logo, then section ends
-        heroTL.to(heroLogoReveal, { opacity: 1, duration: 0.15 }, 0.85);
+      if (heroContent) {
+        gsap.to(heroContent, { y: -80, opacity: 0, scrollTrigger: { trigger: '#hero', start: '30% top', end: 'bottom top', scrub: 1 } });
       }
 
       // ── INCOME STATS: Counter animation ──
