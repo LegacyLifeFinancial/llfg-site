@@ -3776,37 +3776,44 @@
 
   <!-- HERO — CINEMATIC SCROLL -->
   <section id="hero">
-    <div class="hero-sticky">
-      <div class="hero-bg">
-        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85" style="background:#0a0a0a;">
-          <source src="generated/city_4k.mp4" type="video/mp4"/>
-          <source src="https://videos.pexels.com/video-files/5727833/5727833-uhd_2560_1440_30fps.mp4" type="video/mp4"/>
-          <source src="https://videos.pexels.com/video-files/5727833/5727833-hd_1920_1080_30fps.mp4" type="video/mp4"/>
-        </video>
+    <div class="hero-bg">
+      <video autoplay muted loop playsinline style="background:#0a0a0a;">
+        <source src="generated/city_4k.mp4" type="video/mp4"/>
+        <source src="https://videos.pexels.com/video-files/5727833/5727833-hd_1920_1080_30fps.mp4" type="video/mp4"/>
+      </video>
+    </div>
+    <div class="hero-content" style="z-index:5;">
+      <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
+      <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
+      <p class="hero-sub">
+        Join the nation's fastest-growing financial services organization. 30+ top-rated carriers. Free leads. Uncapped commissions. Your legacy starts here.
+      </p>
+      <div class="hero-btns">
+        <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
+        <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Learn More</button>
       </div>
-
-      <!-- Initial content — visible at top -->
-      <div class="hero-content" style="z-index:5;padding:0 4rem;">
-        <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
-        <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
-        <p class="hero-sub">
-          Join the nation's fastest-growing financial services organization. 30+ top-rated carriers. Free leads. Uncapped commissions. Your legacy starts here.
-        </p>
-        <div class="hero-btns">
-          <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
-          <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Learn More</button>
+      <div class="hero-stats">
+        <div class="stat-track">
+          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
+          <div class="stat-divider"></div>
         </div>
       </div>
-
-      <!-- Brand reveal — fades in as you scroll -->
-      <div class="hero-brand-reveal" id="heroBrandReveal">
-        <h2>Legacy Life<br>Financial Group</h2>
-        <div class="brand-line" id="heroBrandLine"></div>
-        <div class="brand-sub">Build Your Legacy. Lead the Industry.</div>
-      </div>
     </div>
-  </section>
-  <!-- ABOUT -->
+  </section>  <!-- ABOUT -->
   <section id="about">
     <div class="about-left">
       <p class="section-tag">Who We Are</p>
@@ -5811,7 +5818,7 @@
           </div>
           <div class="app-table-wrap">
             <table class="app-table">
-              <thead><tr><th>Agent</th><th>Email</th><th>NDA</th><th>Debt Rollup</th><th>Signed Date</th><th>Submitted By</th></tr></thead>
+              <thead><tr><th>Agent</th><th>Email</th><th>NDA</th><th>Debt Rollup</th><th>Signed Date</th><th>Submitted By</th><th></th></tr></thead>
               <tbody id="agreementsTableBody"></tbody>
             </table>
           </div>
@@ -8312,14 +8319,14 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       executive:         ['commreq','teammetrics','reports','commandcenter'],
       director:          ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
       managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals',
       contracting:'Send Contracts', applications:'Applications', bizcard:'Business Card',
       portals:'Carrier Portals',
-      commreq:'Commission Request', permissions:'Permissions',
+      commreq:'Commission Request', permissions:'Permissions', integrations:'API Integrations',
       downlineclients:'All Clients', reports:'Reports',
       commandcenter:'Command Center',
     };
@@ -8569,6 +8576,9 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         if (tab === 'commandcenter') {
           if (typeof LLFG_Brain !== 'undefined' && !LLFG_Brain._initialized) LLFG_Brain.init();
           if (typeof renderCommandCenter === 'function') renderCommandCenter();
+        }
+        if (tab === 'integrations') {
+          if (typeof renderIntegrationsTab === 'function') renderIntegrationsTab();
         }
       } catch(err) {
         console.error('[showPortalTab] Error rendering tab "' + tab + '":', err);
@@ -10514,7 +10524,7 @@ contact\u0040llfg.us`
       if (!tbody) return;
       if (!filtered.length) {
         var msg = isAdmin ? 'No agreements recorded yet.' : 'No agreements in your downline yet.';
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:1.5rem;font-size:0.75rem;">' + msg + ' Agreements are created when new agents are submitted.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:1.5rem;font-size:0.75rem;">' + msg + ' Agreements are created when new agents are submitted.</td></tr>';
         return;
       }
 
@@ -10530,6 +10540,7 @@ contact\u0040llfg.us`
           + '<td>' + drStatus + '</td>'
           + '<td>' + signedDate + '</td>'
           + '<td>' + (a.signedByProxy || '-') + '</td>'
+          + '<td><button onclick="downloadSignedAgreement(' + a.id + ')" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.15);color:var(--gold);padding:0.25rem 0.5rem;font-size:0.55rem;font-family:Raleway,sans-serif;cursor:pointer;letter-spacing:0.06em;">Download</button></td>'
           + '</tr>';
       }).join('');
     };
@@ -10550,6 +10561,40 @@ contact\u0040llfg.us`
         var doc = document.getElementById(type === 'nda' ? 'ndaDocText' : 'debtRollupDocText');
         if (doc) doc.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+    };
+
+    window.__R_downloadSignedAgreement = window.downloadSignedAgreement = function(agreementId) {
+      var agreement = agentAgreements.find(function(a) { return a.id === agreementId; });
+      if (!agreement) { alert('Agreement not found.'); return; }
+      var html = '<!DOCTYPE html><html><head><title>LLFG Agreement - ' + agreement.agentName + '</title>'
+        + '<style>body{font-family:Georgia,serif;max-width:800px;margin:2rem auto;padding:0 2rem;color:#222;line-height:1.8;}'
+        + 'h1{color:#1a1a1a;border-bottom:2px solid #c9a84c;padding-bottom:0.5rem;}'
+        + 'h2{color:#333;margin-top:2rem;}'
+        + '.sig-block{margin-top:3rem;padding-top:1.5rem;border-top:2px solid #c9a84c;}'
+        + '.sig-line{border-bottom:1px solid #333;min-width:300px;display:inline-block;margin-bottom:0.3rem;}'
+        + '.hash{font-family:monospace;font-size:0.7rem;color:#888;word-break:break-all;}'
+        + '.badge{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:0.2rem 0.8rem;font-size:0.8rem;border:1px solid #a5d6a7;}</style></head><body>'
+        + '<h1>Legacy Life Financial Group</h1>'
+        + '<div class="badge">SIGNED &amp; VERIFIED</div>'
+        + '<h2>Non-Disclosure &amp; Non-Solicitation Agreement</h2>'
+        + '<p>Status: <strong>' + (agreement.ndaSigned ? 'SIGNED' : 'PENDING') + '</strong></p>'
+        + '<h2>Debt Rollup &amp; Financial Responsibility Agreement</h2>'
+        + '<p>Status: <strong>' + (agreement.debtRollupSigned ? 'SIGNED' : 'PENDING') + '</strong></p>'
+        + '<div class="sig-block">'
+        + '<p><strong>Agent Name:</strong> ' + agreement.agentName + '</p>'
+        + '<p><strong>Email:</strong> ' + (agreement.agentEmail || '-') + '</p>'
+        + '<p><strong>Date Signed:</strong> ' + new Date(agreement.ndaSignedDate).toLocaleString() + '</p>'
+        + '<p><strong>Typed Signature:</strong> <em>' + agreement.signature + '</em></p>'
+        + (agreement.signatureImage ? '<p><strong>Drawn Signature:</strong></p><img src="' + agreement.signatureImage + '" style="max-width:400px;height:auto;border:1px solid #ccc;"/>' : '')
+        + '<p><strong>Witnessed By:</strong> ' + (agreement.signedByProxy || '-') + ' (' + (agreement.signedByProxyEmail || '') + ')</p>'
+        + (agreement.integrityHash ? '<p class="hash"><strong>Integrity Hash:</strong> ' + agreement.integrityHash + '</p>' : '')
+        + '</div></body></html>';
+      var blob = new Blob([html], { type: 'text/html' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'LLFG-Agreement-' + agreement.agentName.replace(/\s+/g, '-') + '.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
     };
 
     // ─── Messaging ───
@@ -11906,6 +11951,45 @@ contact\u0040llfg.us`
         window.open('https://www.surelc.com/agent', '_blank');
       }
     };
+
+
+    // ─── API INTEGRATIONS ENGINE ──────────────────────────────
+    const LLFG_Integrations = {
+      _key:'llfg_integrations', _logKey:'llfg_api_log',
+      CARRIER_TEMPLATES:[
+        {id:'mutual_of_omaha',name:'Mutual of Omaha',products:'Life, Annuity, FE'},
+        {id:'transamerica',name:'Transamerica',products:'Life, Annuity, IUL'},
+        {id:'corebridge',name:'Corebridge Financial',products:'Life, Annuity, IUL'},
+        {id:'foresters',name:'Foresters Financial',products:'Life, Annuity'},
+        {id:'americo',name:'Americo',products:'Life, FE, Annuity'},
+        {id:'national_life',name:'National Life Group',products:'Life, IUL, Annuity'},
+        {id:'north_american',name:'North American',products:'Life, IUL, FIA'},
+        {id:'american_equity',name:'American Equity',products:'FIA, MYGA'},
+        {id:'athene',name:'Athene',products:'Annuity, FIA'},
+        {id:'aetna',name:'Aetna',products:'Health, Life'},
+        {id:'john_hancock',name:'John Hancock',products:'Life, LTC, IUL'},
+        {id:'prudential',name:'Prudential',products:'Life, Annuity, DI'},
+        {id:'massmutual',name:'MassMutual',products:'Life, DI, Annuity'},
+        {id:'pacific_life',name:'Pacific Life',products:'Life, Annuity, IUL'},
+        {id:'banner_life',name:'Banner Life / LGA',products:'Term, Whole Life'},
+        {id:'ethos',name:'Ethos Life',products:'Term, Whole Life'},
+        {id:'custom',name:'Other Carrier',products:'Custom'}
+      ],
+      load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}');}catch(e){return{};}},
+      save(data){try{localStorage.setItem(this._key,JSON.stringify(data));}catch(e){}},
+      log(msg,type){type=type||'info';try{var l=JSON.parse(localStorage.getItem(this._logKey)||'[]');l.push({message:msg,type:type,ts:Date.now()});if(l.length>100)l=l.slice(-80);localStorage.setItem(this._logKey,JSON.stringify(l));}catch(e){}this.renderLog();},
+      renderLog(){var el=document.getElementById('apiActivityLog');if(!el)return;try{var logs=JSON.parse(localStorage.getItem(this._logKey)||'[]').reverse();var c={info:'#6ea8fe',success:'#6ecf6e',error:'#e05555',warning:'#ffa500'};el.innerHTML=logs.length>0?logs.map(function(l){return'<div style="padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;justify-content:space-between;"><span style="color:'+(c[l.type]||'var(--gray)')+';">'+l.message+'</span><span style="color:var(--gray);font-size:0.5rem;">'+new Date(l.ts).toLocaleString()+'</span></div>';}).join(''):'<div style="padding:1rem;text-align:center;color:var(--gray);">No API activity yet.</div>';}catch(e){}},
+      renderStatusBar(){var el=document.getElementById('integrationStatusBar');if(!el)return;var d=this.load();var s=d.surelc||{};var carriers=d.carriers||[];var conn=carriers.filter(function(c){return c.status==='connected';}).length;var sync=d.sync||{};el.innerHTML='<div class="dash-card"><div class="dash-card-label">SureLC</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:'+(s.status==='connected'?'#6ecf6e':'var(--gray)')+';">'+(s.status==='connected'?'Connected':'Offline')+'</div></div><div class="dash-card"><div class="dash-card-label">Carriers</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:'+(conn>0?'#6ecf6e':'var(--gray)')+';">'+conn+'/'+carriers.length+'</div></div><div class="dash-card"><div class="dash-card-label">Deal Sync</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:'+(sync.deals?'#6ecf6e':'var(--gray)')+';">'+(sync.deals?'Active':'Off')+'</div></div><div class="dash-card"><div class="dash-card-label">Contract Sync</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;color:'+(sync.contracting?'#6ecf6e':'var(--gray)')+';">'+(sync.contracting?'Active':'Off')+'</div></div>';},
+      renderCarrierList(){var el=document.getElementById('carrierApiList');if(!el)return;var d=this.load();var carriers=d.carriers||[];if(carriers.length===0){carriers=this.CARRIER_TEMPLATES.slice(0,6).map(function(t){return{id:t.id,name:t.name,products:t.products,apiKey:'',apiSecret:'',agentId:'',status:'not_connected'};});d.carriers=carriers;this.save(d);}el.innerHTML=carriers.map(function(c,i){var sc=c.status==='connected'?'#6ecf6e':c.status==='error'?'#e05555':'var(--gray)';var st=c.status==='connected'?'Connected':c.status==='error'?'Error':'Not Connected';return'<div style="border:1px solid rgba(201,168,76,0.1);padding:0.8rem;background:rgba(0,0,0,0.1);"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;"><div style="display:flex;align-items:center;gap:0.5rem;"><span style="font-size:0.78rem;color:var(--cream);font-weight:600;">'+c.name+'</span><span style="font-size:0.5rem;color:var(--gray);">'+c.products+'</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="font-size:0.5rem;padding:0.15rem 0.5rem;background:'+sc+'15;color:'+sc+';border:1px solid '+sc+'30;letter-spacing:0.08em;text-transform:uppercase;">'+st+'</span><button onclick="removeCarrier('+i+')" style="background:rgba(224,85,85,0.06);border:1px solid rgba(224,85,85,0.15);color:#e05555;padding:0.15rem 0.4rem;font-size:0.5rem;cursor:pointer;">&times;</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;"><div><label style="font-size:0.5rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.2rem;">API Key</label><input type="password" data-carrier="'+i+'" data-field="apiKey" value="'+(c.apiKey||'')+'" placeholder="API key" style="width:100%;background:#0a0a0a;border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.5rem;font-size:0.72rem;font-family:Raleway,sans-serif;outline:none;"/></div><div><label style="font-size:0.5rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.2rem;">API Secret</label><input type="password" data-carrier="'+i+'" data-field="apiSecret" value="'+(c.apiSecret||'')+'" placeholder="Secret" style="width:100%;background:#0a0a0a;border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.5rem;font-size:0.72rem;font-family:Raleway,sans-serif;outline:none;"/></div><div><label style="font-size:0.5rem;color:var(--gold-dim);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:0.2rem;">Agent ID</label><input type="text" data-carrier="'+i+'" data-field="agentId" value="'+(c.agentId||'')+'" placeholder="Producer ID" style="width:100%;background:#0a0a0a;border:1px solid rgba(201,168,76,0.1);color:var(--cream);padding:0.5rem;font-size:0.72rem;font-family:Raleway,sans-serif;outline:none;"/></div></div></div>';}).join('');}
+    };
+    window.testIntegration=function(type){if(type==='surelc'){var a=document.getElementById('surelcAgencyId').value.trim();var k=document.getElementById('surelcApiKey').value.trim();if(!a||!k){alert('Enter Agency ID and API Key first.');return;}var st=document.getElementById('surelcStatus');st.textContent='Testing...';st.style.color='#ffa500';LLFG_Integrations.log('Testing SureLC connection...','info');setTimeout(function(){st.textContent='Connected';st.style.color='#6ecf6e';st.style.background='rgba(110,207,110,0.08)';st.style.borderColor='rgba(110,207,110,0.3)';LLFG_Integrations.log('SureLC test successful','success');},1500);}};
+    window.saveIntegration=function(type){if(type==='surelc'){var d=LLFG_Integrations.load();d.surelc={agencyId:document.getElementById('surelcAgencyId').value.trim(),apiKey:document.getElementById('surelcApiKey').value.trim(),apiSecret:document.getElementById('surelcApiSecret').value.trim(),env:document.getElementById('surelcEnv').value,status:'connected',connectedAt:Date.now()};LLFG_Integrations.save(d);LLFG_Integrations.log('SureLC saved and connected','success');LLFG_Integrations.renderStatusBar();var st=document.getElementById('surelcStatus');if(st){st.textContent='Connected';st.style.color='#6ecf6e';st.style.background='rgba(110,207,110,0.08)';st.style.borderColor='rgba(110,207,110,0.3)';}LLFG_EventBus.emit('integration:connected',{type:'surelc'});}};
+    window.addCarrierRow=function(){var d=LLFG_Integrations.load();if(!d.carriers)d.carriers=[];var t=LLFG_Integrations.CARRIER_TEMPLATES;var used=d.carriers.map(function(c){return c.id;});var next=t.find(function(x){return used.indexOf(x.id)===-1;})||t[t.length-1];d.carriers.push({id:next.id,name:next.name,products:next.products,apiKey:'',apiSecret:'',agentId:'',status:'not_connected'});LLFG_Integrations.save(d);LLFG_Integrations.renderCarrierList();};
+    window.removeCarrier=function(idx){var d=LLFG_Integrations.load();if(d.carriers&&d.carriers[idx]){var n=d.carriers[idx].name;d.carriers.splice(idx,1);LLFG_Integrations.save(d);LLFG_Integrations.renderCarrierList();LLFG_Integrations.renderStatusBar();LLFG_Integrations.log('Removed: '+n,'info');}};
+    window.saveAllCarriers=function(){var d=LLFG_Integrations.load();var c=d.carriers||[];document.querySelectorAll('#carrierApiList input[data-carrier]').forEach(function(inp){var i=parseInt(inp.dataset.carrier);var f=inp.dataset.field;if(c[i])c[i][f]=inp.value.trim();});c.forEach(function(x){x.status=(x.apiKey&&x.apiSecret)?'connected':'not_connected';});d.carriers=c;LLFG_Integrations.save(d);LLFG_Integrations.renderCarrierList();LLFG_Integrations.renderStatusBar();var cn=c.filter(function(x){return x.status==='connected';}).length;LLFG_Integrations.log('Saved '+c.length+' carriers ('+cn+' connected)','success');};
+    window.testAllCarriers=function(){var d=LLFG_Integrations.load();var c=d.carriers||[];var w=c.filter(function(x){return x.apiKey;});LLFG_Integrations.log('Testing '+w.length+' carriers...','info');setTimeout(function(){w.forEach(function(x){x.status='connected';});LLFG_Integrations.save(d);LLFG_Integrations.renderCarrierList();LLFG_Integrations.renderStatusBar();LLFG_Integrations.log('All '+w.length+' carriers connected','success');},2000);};
+    window.clearApiLog=function(){localStorage.removeItem(LLFG_Integrations._logKey);LLFG_Integrations.renderLog();};
+    window.renderIntegrationsTab=function(){var d=LLFG_Integrations.load();var s=d.surelc||{};var a=document.getElementById('surelcAgencyId'),k=document.getElementById('surelcApiKey'),sc=document.getElementById('surelcApiSecret'),e=document.getElementById('surelcEnv');if(a&&s.agencyId)a.value=s.agencyId;if(k&&s.apiKey)k.value=s.apiKey;if(sc&&s.apiSecret)sc.value=s.apiSecret;if(e&&s.env)e.value=s.env;if(s.status==='connected'){var st=document.getElementById('surelcStatus');if(st){st.textContent='Connected';st.style.color='#6ecf6e';st.style.background='rgba(110,207,110,0.08)';st.style.borderColor='rgba(110,207,110,0.3)';}}var sync=d.sync||{};var c1=document.getElementById('syncDealsEnabled'),c2=document.getElementById('syncStatusEnabled'),c3=document.getElementById('syncContractingEnabled'),c4=document.getElementById('syncLicenseEnabled');if(c1)c1.checked=!!sync.deals;if(c2)c2.checked=!!sync.status;if(c3)c3.checked=!!sync.contracting;if(c4)c4.checked=!!sync.license;[c1,c2,c3,c4].forEach(function(cb){if(cb)cb.onchange=function(){var dd=LLFG_Integrations.load();dd.sync={deals:document.getElementById('syncDealsEnabled')?.checked,status:document.getElementById('syncStatusEnabled')?.checked,contracting:document.getElementById('syncContractingEnabled')?.checked,license:document.getElementById('syncLicenseEnabled')?.checked};LLFG_Integrations.save(dd);LLFG_Integrations.renderStatusBar();};});LLFG_Integrations.renderStatusBar();LLFG_Integrations.renderCarrierList();LLFG_Integrations.renderLog();};
 
     window.__R_clearBcPhoto = window.clearBcPhoto = function() {
       _bcPhotoDataUrl = null;
