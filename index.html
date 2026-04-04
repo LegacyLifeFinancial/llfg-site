@@ -163,45 +163,37 @@
       overflow: hidden;
       padding: 8rem 4rem 4rem;
       background: var(--black);
-      /* Heropatterns.com "Topography" pattern as fallback when no video/image loads */
-      background-image:
-        radial-gradient(ellipse 80% 60% at 65% 40%, rgba(201,168,76,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 30% 70%, rgba(201,168,76,0.04) 0%, transparent 60%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600'%3E%3Cpath d='M74 75L50 49 26 75zM326 75l-24-26-24 26zM578 75l-24-26-24 26zM74 327l-24-26-24 26zM326 327l-24-26-24 26zM578 327l-24-26-24 26zM74 579l-24-26-24 26zM326 579l-24-26-24 26zM578 579l-24-26-24 26z' fill='none' stroke='rgba(201,168,76,0.04)' stroke-width='1'/%3E%3C/svg%3E");
     }
-
-    .hero-sticky { display: contents; }
-
     .hero-bg {
-      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 68% 42%, rgba(201,168,76,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 45% at 25% 75%, rgba(201,168,76,0.05) 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 40%),
+        linear-gradient(135deg, #0a0a0a 0%, #111 40%, #0d0d0d 100%);
+      animation: heroBgShift 12s ease-in-out infinite alternate;
     }
-    .hero-bg video, .hero-bg-img {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      object-fit: cover; z-index: 1;
-      animation: heroEntry 2s ease-out 0.3s both;
-      filter: saturate(1.1) contrast(1.05) brightness(0.65);
+    @keyframes heroBgShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    .hero-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='none'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='rgba(201,168,76,0.025)' stroke-width='0.5'/%3E%3C/svg%3E");
+      animation: gridDrift 20s linear infinite;
+    }
+    @keyframes gridDrift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(80px, 80px); }
     }
     .hero-bg::after {
-      content: ''; position: absolute; inset: 0; z-index: 2;
-      background:
-        linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.1) 30%, rgba(10,10,10,0.5) 70%, rgba(10,10,10,0.95) 100%),
-        linear-gradient(to right, rgba(10,10,10,0.85) 0%, transparent 45%, rgba(10,10,10,0.3) 100%);
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40%;
+      background: linear-gradient(to top, var(--black) 0%, transparent 100%);
     }
-    @keyframes heroEntry {
-      0% { opacity: 0; transform: scale(1.08); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    .hero-brand-reveal { display: none; }
-    .hero-brand-reveal h2 {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(1.8rem, 4vw, 3.6rem);
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--gold);
-      text-align: center;
-      text-shadow: 0 0 60px rgba(201,168,76,0.3), 0 0 120px rgba(201,168,76,0.1);
-      line-height: 1.3;
+    .hero-line {
+      position: absolute; top: 0; bottom: 0; left: 52%; width: 1px; z-index: 0;
+      background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.15) 30%, rgba(201,168,76,0.15) 70%, transparent);
     }
     .hero-brand-reveal .brand-sub {
       font-family: 'Raleway', sans-serif;
@@ -2662,7 +2654,7 @@
     }
     @media (max-width: 768px) {
       .tier-grid { grid-template-columns: repeat(2, 1fr) !important; }
-      #hero { min-height: 180vh; }
+      
       .hero-content { padding: 0 1.2rem !important; }
       .hero-brand-reveal h2 { font-size: clamp(1.4rem, 5vw, 2.2rem); letter-spacing: 0.15em; }
       .hero-brand-reveal .brand-sub { font-size: 0.55rem; letter-spacing: 0.2em; }
@@ -3864,17 +3856,13 @@
 
   <!-- HERO — CINEMATIC SCROLL -->
   <section id="hero">
-    <div class="hero-bg">
-      <video autoplay muted loop playsinline style="background:#0a0a0a;">
-        <source src="generated/city_4k.mp4" type="video/mp4"/>
-        <source src="https://videos.pexels.com/video-files/5727833/5727833-hd_1920_1080_30fps.mp4" type="video/mp4"/>
-      </video>
-    </div>
+    <div class="hero-bg"></div>
+    <div class="hero-line"></div>
     <div class="hero-content" style="z-index:5;">
       <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
-      <h1>Build a Business<br>You're <em class="shimmer-text">Proud</em><br>to Own</h1>
+      <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
       <p class="hero-sub">
-        Join the nation's fastest-growing financial services organization. 30+ top-rated carriers. Free leads. Uncapped commissions. Your legacy starts here.
+        Legacy Life Financial Group is seeking driven individuals ready to build a thriving financial services career — with industry-leading training, free leads, and a team that invests in your success from day one.
       </p>
       <div class="hero-btns">
         <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
@@ -3968,11 +3956,11 @@
   <section id="carriers" style="padding: 6rem 4rem; border-top: 1px solid rgba(201,168,76,0.1); background: var(--black-soft);">
     <div style="text-align:center; margin-bottom: 3.5rem;">
       <p class="section-tag" style="display:inline-block;">Our Network</p>
-      <h2 style="max-width:680px; margin: 0.6rem auto 1.2rem;">Partnered with the <em>Nation's Top Carriers</em></h2>
+      <h2 style="max-width:680px; margin: 0.6rem auto 1.2rem;">Partnered with the <em class="llfg-shimmer-text">Nation's Top Carriers</em></h2>
       <p class="body-text" style="max-width:600px; margin: 0 auto; text-align:center;">As a Field Marketing Organization, Legacy Life Financial Group provides agents direct access to over 30 of the most competitive, highly-rated carriers in the industry — giving you the products and commissions you need to build a thriving business.</p>
     </div>
 
-    <div class="carrier-grid">
+    <div class="carrier-grid llfg-stagger">
 
       <div class="carrier-card"><div class="c-logo-wrap"><span class="c-brand" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.95rem;color:var(--cream);">Mutual <span style="color:var(--gold);">of Omaha</span></span></div><div class="carrier-type">Life · Annuity</div></div>
 
@@ -4081,13 +4069,13 @@
         <p class="why-body">Our onboarding and ongoing training programs are built by top producers who've been where you are. From licensing to closing, we guide every step of your journey.</p>
       </div>
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">05</div>
         <h3 class="why-title">Uncapped Commissions</h3>
         <p class="why-body">There's no ceiling here. The harder you work, the more you earn. Our commission structure is among the most competitive in the industry, with performance bonuses on top.</p>
       </div>
 
-      <div class="why-card">
+      <div class="why-card llfg-tilt llfg-border-glow">
         <div class="why-num">06</div>
         <h3 class="why-title">Build & Lead a Team</h3>
         <p class="why-body">Ready to scale? Recruit and mentor your own agents, build a downline, and earn overrides. Legacy Life rewards leaders who lift others up.</p>
@@ -4100,11 +4088,11 @@
     <div style="max-width:1100px;margin:0 auto;">
       <div style="text-align:center;margin-bottom:3.5rem;">
         <p class="section-tag reveal" style="display:inline-block;">Partnership Tiers</p>
-        <h2 class="reveal" style="max-width:600px;margin:0.6rem auto 1rem;">Scale at Every Level —<br><em>Solo to Enterprise</em></h2>
+        <h2 class="reveal" style="max-width:600px;margin:0.6rem auto 1rem;">Scale at Every Level —<br><em class="llfg-shimmer-text">Solo to Enterprise</em></h2>
         <p class="body-text reveal" style="max-width:540px;margin:0 auto;text-align:center;">Whether you're an individual agent or running a 300+ person organization, LLFG has a dedicated partnership track built for your level.</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;" class="tier-grid">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;" class="tier-grid llfg-stagger">
         <!-- Tier 1 -->
         <div class="reveal-scale" style="border:1px solid rgba(201,168,76,0.12);padding:1.5rem 1.2rem;background:rgba(201,168,76,0.02);text-align:center;transition:border-color 0.3s,transform 0.3s;" onmouseover="this.style.borderColor='rgba(201,168,76,0.5)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.12)';this.style.transform=''">
           <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;">Solo</div>
@@ -4152,9 +4140,9 @@
   <!-- APPLY CTA -->
   <section id="apply" style="padding:5rem 4rem;border-top:1px solid rgba(201,168,76,0.1);text-align:center;background:var(--black-soft);">
     <p class="section-tag reveal" style="display:inline-block;">Start Your Journey</p>
-    <h2 class="reveal" style="max-width:560px;margin:0.6rem auto 1rem;">Ready to <em>Lead the Pack?</em></h2>
+    <h2 class="reveal" style="max-width:560px;margin:0.6rem auto 1rem;">Ready to <em class="llfg-shimmer-text">Lead the Pack?</em></h2>
     <p class="body-text reveal" style="max-width:480px;margin:0 auto 2rem;text-align:center;">Solo agent or 300+ person agency — we have a track built for you.</p>
-    <button onclick="openApplicationOverlay()" class="btn-primary reveal" style="padding:1rem 3rem;font-size:0.82rem;">Apply Now</button>
+    <button onclick="openApplicationOverlay()" class="btn-primary reveal llfg-anim-bounce" style="padding:1rem 3rem;font-size:0.82rem;">Apply Now</button>
   </section>
 
   <!-- APPLICATION OVERLAY -->
@@ -17214,7 +17202,7 @@ This request requires Managing Partner approval.`
 
     window.openApplicationOverlay = function() {
       var el = document.getElementById('applicationOverlay');
-      if (el) { el.style.display = ''; showAppStep('start'); }
+      if (el) { el.style.display = 'block'; showAppStep('start'); }
     };
 
     window.closeApplicationOverlay = function() {
