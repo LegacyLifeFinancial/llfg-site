@@ -129,6 +129,7 @@
       min-height: 200vh;
       position: relative;
       overflow: hidden;
+      background: var(--black);
     }
     .hero-sticky {
       position: sticky;
@@ -1170,6 +1171,81 @@
     .app-table tbody tr { transition: background 0.2s; }
     .app-table tbody tr:hover { background: rgba(201,168,76,0.03); }
     .app-table tbody tr.unread { border-left: 2px solid var(--gold); }
+
+    /* ── Report Download Cards ── */
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .report-card {
+      background: var(--black-card);
+      border: 1px solid rgba(201,168,76,0.1);
+      padding: 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .report-card:hover {
+      border-color: rgba(201,168,76,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    }
+    .report-card:hover::after { transform: scaleX(1); }
+    .report-card-icon {
+      font-size: 1.5rem;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(201,168,76,0.06);
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+    .report-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--cream);
+      font-weight: 400;
+    }
+    .report-card-desc {
+      font-size: 0.62rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    .report-card-action {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.6rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: auto;
+      padding-top: 0.6rem;
+    }
+    .report-card-action::after {
+      content: '\2192';
+      transition: transform 0.2s;
+    }
+    .report-card:hover .report-card-action::after {
+      transform: translateX(4px);
+    }
 
     .app-dot {
       width: 7px;
@@ -3642,6 +3718,7 @@
       <li><a href="#about" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'});return false;">Who We Are</a></li>
       <li><a href="#why" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'});return false;">Why Join</a></li>
       <li><a href="#agency" onclick="document.getElementById('agency').scrollIntoView({behavior:'smooth'});return false;">Agencies</a></li>
+      <li><a href="#" onclick="openLogin();return false;" style="opacity:0.7;">Agent Login</a></li>
       <li><a href="#apply" class="nav-cta" onclick="openApplicationOverlay();return false;">Join Our Team</a></li>
     </ul>
     <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
@@ -3653,7 +3730,8 @@
   <section id="hero">
     <div class="hero-sticky">
       <div class="hero-bg">
-        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85">
+        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85" style="background:#0a0a0a;">
+          <source src="generated/city_4k.mp4" type="video/mp4"/>
           <source src="https://videos.pexels.com/video-files/5727833/5727833-uhd_2560_1440_30fps.mp4" type="video/mp4"/>
           <source src="https://videos.pexels.com/video-files/5727833/5727833-hd_1920_1080_30fps.mp4" type="video/mp4"/>
         </video>
@@ -13407,6 +13485,9 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_AnalyticsAgent());
         this.register(new LLFG_UIOptimizationAgent());
         this.register(new LLFG_AIContentAgent());
+        this.register(new LLFG_DealPipelineAgent());
+        this.register(new LLFG_CalendarAgent());
+        this.register(new LLFG_ContractingAgent());
         this.register(new LLFG_GamificationAgent());
         this.register(new LLFG_TrainingCoachAgent());
         this.register(new LLFG_PreflightAgent());
@@ -14901,7 +14982,103 @@ This request requires Managing Partner approval.`
       }
     }
 
-    // ─── 14. GAMIFICATION AGENT ──────────────────────────────────
+    // ─── 14. DEAL PIPELINE AGENT ──��───────────────────────────────
+    class LLFG_DealPipelineAgent extends LLFG_AgentBase {
+      constructor() {
+        super('dealpipeline', 'Deal Pipeline Agent', '\uD83D\uDCB5', 'Deal flow monitoring, AP tracking, placement rate analysis, pipeline health');
+        this.snapshot = {};
+      }
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 60000);
+      }
+      _analyze() {
+        const deals = (typeof myDeals !== 'undefined') ? myDeals : [];
+        const now = new Date();
+        const thisMonth = deals.filter(d => {
+          const dt = new Date(d.date || d.dateLogged);
+          return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
+        });
+        const totalAP = thisMonth.reduce((s, d) => s + (parseFloat(d.ap || d.premium) || 0), 0);
+        const avgCase = thisMonth.length > 0 ? Math.round(totalAP / thisMonth.length) : 0;
+        this.snapshot = { totalDeals: deals.length, monthlyDeals: thisMonth.length, monthlyAP: totalAP, avgCaseSize: avgCase };
+        if (thisMonth.length === 0 && now.getDate() > 7) {
+          this.alert('No deals logged this month \u2014 check prospecting activity', 'warning');
+        }
+        if (avgCase > 0 && avgCase < 1500) {
+          this.alert('Average case size $' + avgCase + ' \u2014 consider moving up the product ladder', 'info');
+        }
+        LLFG_EventBus.emit('dealpipeline:updated', this.snapshot);
+      }
+      getSnapshot() { return this.snapshot; }
+    }
+
+    // ─── 15. CALENDAR AGENT ──────────────────────────────────
+    class LLFG_CalendarAgent extends LLFG_AgentBase {
+      constructor() {
+        super('calendar', 'Calendar Agent', '\uD83D\uDCC5', 'Appointment monitoring, follow-up reminders, scheduling gap detection, no-show tracking');
+        this.snapshot = {};
+      }
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 120000);
+      }
+      _analyze() {
+        const events = (typeof portalCalEvents !== 'undefined') ? portalCalEvents : [];
+        const now = Date.now();
+        const upcoming = events.filter(e => new Date(e.start || e.date).getTime() > now);
+        const thisWeek = upcoming.filter(e => {
+          const d = new Date(e.start || e.date).getTime();
+          return d < now + 7 * 86400000;
+        });
+        const overdue = events.filter(e => new Date(e.start || e.date).getTime() <= now && e.type === 'followup' && !e.completed);
+        this.snapshot = { total: events.length, upcoming: upcoming.length, thisWeek: thisWeek.length, overdue: overdue.length };
+        if (thisWeek.length === 0 && new Date().getDay() >= 1 && new Date().getDay() <= 5) {
+          this.alert('No appointments scheduled this week', 'warning');
+        }
+        if (overdue.length > 3) {
+          this.alert(overdue.length + ' overdue follow-ups need attention', 'warning');
+        }
+        LLFG_EventBus.emit('calendar:updated', this.snapshot);
+      }
+      getSnapshot() { return this.snapshot; }
+    }
+
+    // ─── 16. CONTRACTING AGENT ──────────��───────────────────────
+    class LLFG_ContractingAgent extends LLFG_AgentBase {
+      constructor() {
+        super('contracting', 'Contracting Agent', '\uD83D\uDCDD', 'Contracting queue monitoring, onboarding pipeline, license status, bottleneck detection');
+        this.snapshot = {};
+      }
+      onStart() {
+        this._analyze();
+        this.schedule(() => this._analyze(), 90000);
+        LLFG_EventBus.on('recruiting:stageChanged', () => this._analyze());
+      }
+      _analyze() {
+        const pending = (typeof pendingAgentQueue !== 'undefined') ? pendingAgentQueue : [];
+        const approved = (typeof approvedAgentQueue !== 'undefined') ? approvedAgentQueue : [];
+        const contracted = (typeof contractedAgents !== 'undefined') ? contractedAgents : [];
+        this.snapshot = { pending: pending.length, approved: approved.length, contracted: contracted.length, total: pending.length + approved.length + contracted.length };
+        if (pending.length > 5) {
+          this.alert(pending.length + ' agents pending review \u2014 contracting bottleneck', 'warning');
+        }
+        if (approved.length > 3) {
+          this.alert(approved.length + ' approved agents awaiting contracting', 'info');
+        }
+        var stale = pending.filter(function(a) {
+          var submitted = new Date(a.date || a.submittedDate || 0);
+          return (Date.now() - submitted.getTime()) > 7 * 86400000;
+        });
+        if (stale.length > 0) {
+          this.alert(stale.length + ' application(s) pending over 7 days', 'critical');
+        }
+        LLFG_EventBus.emit('contracting:updated', this.snapshot);
+      }
+      getSnapshot() { return this.snapshot; }
+    }
+
+    // ─��─ 17. GAMIFICATION AGENT ─��────────────────────────────────
     class LLFG_GamificationAgent extends LLFG_AgentBase {
       constructor() {
         super('gamification', 'Gamification Agent', '\uD83C\uDFC6', 'XP tracking, level progression, badge awards, streak monitoring, daily challenge management');
@@ -15976,7 +16153,7 @@ This request requires Managing Partner approval.`
         <div class="dash-body">
           <div class="dash-welcome">
             <h2 style="margin-bottom:0.2rem;">LLFG <em>Command Center</em></h2>
-            <p>AI-powered business automation — 16 agents monitoring KPIs, security, recruiting, compliance, gamification, training, and more.</p>
+            <p>AI-powered business automation — 21 agents monitoring deals, calendar, contracting, KPIs, security, compliance, gamification, and more.</p>
           </div>
 
           <!-- Control bar -->
