@@ -124,45 +124,75 @@
       color: var(--black) !important;
     }
 
-    /* ─── HERO ─── */
+    /* ─── HERO — CINEMATIC SCROLL ─── */
     #hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      justify-content: center;
+      min-height: 200vh;
       position: relative;
       overflow: hidden;
-      padding: 8rem 4rem 4rem;
+    }
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
     .hero-bg {
       position: absolute; inset: 0; z-index: 0; overflow: hidden;
     }
-    .hero-bg-img {
+    .hero-bg-img, .hero-bg video {
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: cover; z-index: 1;
-      transform-origin: center 60%;
-      transform: scale(1.12);
-      animation: heroZoomIn 1.8s ease-out 0.2s forwards;
-      filter: saturate(1.1) contrast(1.05);
+      transform-origin: 50% 45%;
+      transform: scale(1.6);
+      animation: heroEntry 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s forwards;
+      filter: saturate(1.1) contrast(1.05) brightness(0.85);
     }
-    @keyframes heroZoomIn {
-      0% { transform: scale(1.25); opacity: 0; }
-      100% { transform: scale(1.12); opacity: 1; }
+    @keyframes heroEntry {
+      0% { transform: scale(2.0); opacity: 0; filter: saturate(0.5) contrast(1.0) brightness(0.4); }
+      100% { transform: scale(1.6); opacity: 1; filter: saturate(1.1) contrast(1.05) brightness(0.85); }
     }
     .hero-bg::after {
       content: ''; position: absolute; inset: 0; z-index: 2;
       background:
-        linear-gradient(to bottom, rgba(10,10,10,0.25) 0%, rgba(10,10,10,0.05) 25%, rgba(10,10,10,0.3) 60%, rgba(10,10,10,0.95) 100%),
-        linear-gradient(to right, rgba(10,10,10,0.8) 0%, transparent 40%, rgba(10,10,10,0.3) 100%);
+        radial-gradient(ellipse 80% 60% at 50% 50%, transparent 20%, rgba(10,10,10,0.4) 70%),
+        linear-gradient(to bottom, rgba(10,10,10,0.15) 0%, transparent 30%, rgba(10,10,10,0.6) 85%, rgba(10,10,10,0.98) 100%);
     }
-    .hero-glow {
-      position: absolute; inset: 0; z-index: 3;
-      background: radial-gradient(ellipse 50% 40% at 55% 50%, rgba(201,168,76,0.06) 0%, transparent 70%);
-      animation: glowPulse 4s ease-in-out infinite alternate;
+
+    /* Brand reveal layer */
+    .hero-brand-reveal {
+      position: absolute; inset: 0; z-index: 4;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
     }
-    @keyframes glowPulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+    .hero-brand-reveal h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 4vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      text-shadow: 0 0 60px rgba(201,168,76,0.3), 0 0 120px rgba(201,168,76,0.1);
+      line-height: 1.3;
+    }
+    .hero-brand-reveal .brand-sub {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(0.6rem, 1.2vw, 0.85rem);
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.6);
+      margin-top: 1rem;
+    }
+    .hero-brand-reveal .brand-line {
+      width: 0; height: 1px;
+      background: var(--gold);
+      margin: 1.2rem auto;
+      transition: width 0.8s ease;
+    }
 
     .hero-lion-wrap { display: none; }
     .hero-line { display: none; }
@@ -2540,15 +2570,16 @@
       .calc-wrap { margin: 1.5rem 1rem 0; }
       #floatingCTA { bottom: 1rem; right: 1rem; padding: 0.7rem 1.2rem; font-size: 0.65rem; }
       #agency > div > div:last-child { display: flex; flex-direction: column; gap: 1rem; }
-      .hero-lion-wrap { width: 200px; height: 200px; right: 3%; top: 10%; transform: translateY(0) !important; }
-      @keyframes lionReveal { 0%{opacity:0;transform:scale(0.9)} 100%{opacity:0.7;transform:scale(1)} }
-      .hero-skyline { height: 200px; }
+      #hero { min-height: 180vh; }
+      .hero-content { padding: 0 1.2rem !important; }
+      .hero-brand-reveal h2 { font-size: clamp(1.4rem, 5vw, 2.2rem); letter-spacing: 0.15em; }
+      .hero-brand-reveal .brand-sub { font-size: 0.55rem; letter-spacing: 0.2em; }
       #applicationOverlay > div { margin: 1rem; padding: 1.5rem 1rem; }
       #appStep1 > div:last-child { grid-template-columns: 1fr !important; }
       #appStepSolo form, #appStepAgency form { grid-template-columns: 1fr !important; }
     }
     @media (max-width: 480px) {
-      .hero-lion-wrap { display: none; }
+      .hero-brand-reveal h2 { font-size: clamp(1.2rem, 6vw, 1.8rem); }
     }
 
     /* ══════════════════════════════════════════════
@@ -3131,6 +3162,26 @@
     .llfg-tab-btn.active { background: rgba(201,168,76,0.1); color: var(--gold); }
     .llfg-tab-btn:hover  { background: rgba(201,168,76,0.06); color: var(--cream); }
 
+    /* ── Agreement Documents ── */
+    .agreement-doc {
+      max-height:250px;overflow-y:auto;padding:1rem;background:#0a0a0a;
+      border:1px solid rgba(255,255,255,0.06);font-size:0.72rem;color:var(--gray);line-height:1.8;margin-bottom:1rem;
+    }
+    .agreement-doc h4 { color:var(--cream);font-size:0.82rem;margin:0.8rem 0 0.4rem;font-family:'Cormorant Garamond',serif; }
+    .agreement-doc h4:first-child { margin-top:0; }
+    .agreement-doc p { margin-bottom:0.5rem; }
+    .agreement-doc ol, .agreement-doc ul { padding-left:1.2rem;margin-bottom:0.5rem; }
+    .agreement-doc li { margin-bottom:0.3rem; }
+    .agreement-checkbox { display:flex;align-items:flex-start;gap:0.6rem;padding:0.5rem 0; }
+    .agreement-checkbox input[type="checkbox"] { margin-top:0.2rem;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0; }
+    .agreement-checkbox label { font-size:0.72rem;color:var(--cream);line-height:1.5;cursor:pointer; }
+    .agreement-signature {
+      background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);border-bottom:2px solid var(--gold);
+      color:var(--cream);padding:0.75rem 1rem;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;
+      width:100%;outline:none;
+    }
+    .agreement-signature::placeholder { color:var(--gray);font-style:italic; }
+
     /* ─── Toast Upgrade ─── */
     .llfg-toast {
       position: fixed;
@@ -3283,7 +3334,7 @@
       overview:'Overview', mydeals:'My Deals ▾', tools:'Tools ▾', management:'Management ▾',
       deals:'Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', recruiting:'Recruiting', bizcard:'Business Card',
-      addagents:'Add Agents', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
+      addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
       applications:'Applications', calendar:'Calendar',
       messages:'Message Center',
       commreq:'Commission Request', permissions:'Permissions',
@@ -3601,43 +3652,34 @@
     </div>
   </nav>
 
-  <!-- HERO -->
+  <!-- HERO — CINEMATIC SCROLL -->
   <section id="hero">
-    <div class="hero-bg">
-      <img class="hero-bg-img" src="generated/hero_v88.jpg" alt="Lion walking through Wall Street financial district at night"/>
-      <div class="hero-glow"></div>
-    </div>
-
-    <div class="hero-content">
-      <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
-      <h1>Lead the<br><em>Pack.</em></h1>
-      <p class="hero-sub">
-        Build a financial empire backed by 30+ top-rated carriers, free leads from day one, uncapped commissions, and a team that turns driven individuals into six-figure earners.
-      </p>
-      <div class="hero-btns">
-        <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
-        <button onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Learn More</button>
+    <div class="hero-sticky">
+      <div class="hero-bg">
+        <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=85">
+          <source src="https://assets.mixkit.co/videos/44690/44690-720.mp4" type="video/mp4"/>
+          <source src="https://assets.mixkit.co/videos/42343/42343-1080.mp4" type="video/mp4"/>
+        </video>
       </div>
 
-      <div class="hero-stats">
-        <div class="stat-track">
-          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">$10K – $15K</div><div class="stat-label">Average · First Month</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num">30+ Carriers</div><div class="stat-label">A-Rated · Nationwide</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num highlight">Uncapped</div><div class="stat-label dim">Commissions · No Ceiling</div></div>
-          <div class="stat-divider"></div>
-          <div class="stat-item"><div class="stat-num special">Build Your Legacy</div><div class="stat-label">Your Business. Your Terms.</div></div>
-          <div class="stat-divider"></div>
+      <!-- Initial content — visible at top -->
+      <div class="hero-content" style="z-index:5;padding:0 4rem;">
+        <p class="hero-tag">Career Opportunity &amp; Agent Recruitment</p>
+        <h1>Build a Business<br>You're <em>Proud</em><br>to Own</h1>
+        <p class="hero-sub">
+          Join the nation's fastest-growing financial services organization. 30+ top-rated carriers. Free leads. Uncapped commissions. Your legacy starts here.
+        </p>
+        <div class="hero-btns">
+          <button onclick="openApplicationOverlay()" class="btn-primary">Join Our Team</button>
+          <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})" class="btn-ghost">Learn More</button>
         </div>
+      </div>
+
+      <!-- Brand reveal — fades in as you scroll -->
+      <div class="hero-brand-reveal" id="heroBrandReveal">
+        <h2>Legacy Life<br>Financial Group</h2>
+        <div class="brand-line" id="heroBrandLine"></div>
+        <div class="brand-sub">Build Your Legacy. Lead the Industry.</div>
       </div>
     </div>
   </section>
@@ -4273,6 +4315,124 @@
           <button class="modal-btn" onclick="submitAccountRequest()">Submit Request</button>
           <p id="reqSuccess" style="display:none;color:#6ecf6e;font-size:0.75rem;text-align:center;margin-top:0.5rem;">✓ Request submitted! An admin will review and approve your account.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AGREEMENT SIGNING MODAL ── -->
+  <div class="modal-overlay" id="agreementModal" style="display:none;z-index:999;">
+    <div class="modal" style="max-width:700px;max-height:85vh;overflow-y:auto;">
+      <button class="modal-close" onclick="closeAgreementModal()">&times;</button>
+      <div class="modal-title" style="font-size:1.3rem;">Agent Onboarding Agreements</div>
+      <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1.2rem;">
+        The following agreements must be acknowledged before submitting <strong id="agreementAgentName" style="color:var(--gold);"></strong> to the onboarding pipeline.
+      </p>
+
+      <div style="margin-bottom:0.3rem;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--cream);">1. Non-Disclosure &amp; Non-Solicitation Agreement</div>
+      <div class="agreement-doc" id="ndaDocText">
+        <h4>LEGACY LIFE FINANCIAL GROUP — NON-DISCLOSURE &amp; NON-SOLICITATION AGREEMENT</h4>
+        <p>This Non-Disclosure and Non-Solicitation Agreement ("Agreement") is entered into as of the date signed below, by and between Legacy Life Financial Group, LLC ("LLFG" or "the Company") and the undersigned independent agent ("Agent").</p>
+        <h4>1. Confidential Information</h4>
+        <p>Agent acknowledges that during the course of their relationship with LLFG, they will have access to confidential and proprietary information, including but not limited to:</p>
+        <ol>
+          <li>Client leads, prospect lists, and customer data (names, contact information, policy details, financial information)</li>
+          <li>Proprietary sales processes, scripts, training materials, and methodologies</li>
+          <li>Commission structures, compensation plans, override schedules, and bonus programs</li>
+          <li>Internal business systems, CRM data, portal access credentials, and technology platforms</li>
+          <li>Team structures, agent rosters, hierarchy data, and organizational information</li>
+          <li>Marketing strategies, carrier relationships, and partnership agreements</li>
+          <li>Financial records, production reports, and internal performance metrics</li>
+        </ol>
+        <h4>2. Non-Disclosure Obligations</h4>
+        <p>Agent agrees to hold all Confidential Information in strict confidence and shall not, without prior written consent of LLFG:</p>
+        <ol>
+          <li>Disclose any Confidential Information to any third party</li>
+          <li>Use any Confidential Information for any purpose other than performing duties for LLFG</li>
+          <li>Copy, reproduce, or distribute any Confidential Information</li>
+          <li>Remove or transfer any Confidential Information from LLFG systems upon departure</li>
+        </ol>
+        <h4>3. Non-Solicitation of Agents</h4>
+        <p>For a period of <strong style="color:var(--gold);">twenty-four (24) months</strong> following the termination of Agent's relationship with LLFG, for any reason, Agent shall not directly or indirectly:</p>
+        <ol>
+          <li>Solicit, recruit, or attempt to recruit any current LLFG agent, manager, executive, or independent contractor to leave LLFG or join another organization</li>
+          <li>Encourage, induce, or facilitate the departure of any LLFG team member</li>
+          <li>Hire or engage any individual who was an LLFG agent within the 12 months preceding Agent's departure</li>
+          <li>Contact LLFG agents for the purpose of offering competing business opportunities</li>
+        </ol>
+        <h4>4. Non-Solicitation of Clients</h4>
+        <p>For a period of <strong style="color:var(--gold);">twenty-four (24) months</strong> following departure, Agent shall not:</p>
+        <ol>
+          <li>Solicit, contact, or service any client whose relationship originated through LLFG</li>
+          <li>Use LLFG client data to generate business for any competing organization</li>
+          <li>Interfere with any existing LLFG client relationships</li>
+        </ol>
+        <h4>5. Regulatory Compliance</h4>
+        <p>Agent agrees to comply with all applicable federal, state, and local laws, regulations, and licensing requirements, including insurance licensing regulations, anti-fraud statutes, privacy laws, and all carrier compliance guidelines.</p>
+        <h4>6. Return of Materials</h4>
+        <p>Upon termination, Agent shall immediately return all LLFG property, including documents, electronic files, portal credentials, marketing materials, and any copies thereof.</p>
+        <h4>7. Remedies</h4>
+        <p>Agent acknowledges that a breach would cause irreparable harm. LLFG shall be entitled to seek injunctive relief, specific performance, and monetary damages, including reasonable attorney's fees and legal costs.</p>
+        <h4>8. Survival</h4>
+        <p>The obligations set forth in this Agreement shall survive termination for the applicable periods specified herein.</p>
+      </div>
+      <div class="agreement-checkbox">
+        <input type="checkbox" id="agreeNDA"/>
+        <label for="agreeNDA">I confirm that the above-named agent has read, understands, and agrees to the Non-Disclosure &amp; Non-Solicitation Agreement.</label>
+      </div>
+
+      <div style="margin:1.2rem 0 0.3rem;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--cream);">2. Debt Rollup &amp; Financial Responsibility Agreement</div>
+      <div class="agreement-doc" id="debtRollupDocText">
+        <h4>LEGACY LIFE FINANCIAL GROUP — DEBT ROLLUP &amp; FINANCIAL RESPONSIBILITY AGREEMENT</h4>
+        <p>This Debt Rollup and Financial Responsibility Agreement ("Agreement") is entered into as of the date signed below, by and between Legacy Life Financial Group, LLC ("LLFG") and the undersigned independent agent ("Agent").</p>
+        <h4>1. Chargeback Responsibility</h4>
+        <p>Agent acknowledges and agrees that they are personally responsible for all chargebacks resulting from policies written by Agent that lapse, cancel, or are returned within the applicable chargeback window (typically 9-12 months, as determined by each carrier). When an advanced commission is paid on a policy that subsequently lapses, the corresponding chargeback amount becomes a debt owed by the Agent to LLFG.</p>
+        <h4>2. Debt Rollup Mechanism</h4>
+        <p>Any unpaid chargeback balances will be aggregated into a "Debt Rollup" balance. This balance:</p>
+        <ol>
+          <li>Accrues from the date of each individual chargeback</li>
+          <li>Will be deducted from future commission payments until fully repaid</li>
+          <li>Must be repaid in full before any commission advances are resumed</li>
+          <li>Carries forward across commission periods until resolved</li>
+        </ol>
+        <h4>3. Team-Level Debt Responsibility</h4>
+        <p>For Agents holding a Manager role or above, the Debt Rollup balance may include chargebacks attributed to their downline agents when those agents are unable to cover their own chargeback obligations. The upline Manager's override commissions will be applied to cover any shortfall.</p>
+        <h4>4. Obligation Upon Departure</h4>
+        <p><strong style="color:var(--gold);">Agent must resolve all outstanding Debt Rollup balances in full prior to or upon termination of their relationship with LLFG.</strong> Specifically:</p>
+        <ol>
+          <li>All outstanding chargeback debt must be paid in full before the Agent's final separation from LLFG</li>
+          <li>LLFG reserves the right to withhold any final commission payments to offset outstanding debt</li>
+          <li>If outstanding debt exceeds final commission payments, Agent agrees to remit the remaining balance within thirty (30) days of departure</li>
+        </ol>
+        <h4>5. Legal Repercussions for Unpaid Debt</h4>
+        <p><strong style="color:var(--gold);">Failure to satisfy outstanding Debt Rollup obligations will result in legal action.</strong> Agent acknowledges and agrees that:</p>
+        <ol>
+          <li>LLFG may pursue civil litigation to recover all unpaid debt balances</li>
+          <li>Agent will be responsible for the full debt amount plus all reasonable attorney's fees, court costs, collection costs, and related legal expenses incurred by LLFG</li>
+          <li>LLFG may report unpaid debts to collections agencies and credit bureaus</li>
+          <li>Interest may accrue on unpaid balances at the maximum rate permitted by applicable law</li>
+          <li>Agent waives any right to contest the validity of the debt arising from verified chargebacks</li>
+        </ol>
+        <h4>6. Acknowledgment of Financial Risk</h4>
+        <p>Agent acknowledges that the insurance business involves inherent financial risk, including the possibility of policy lapses and resulting chargebacks. Agent accepts this risk and agrees to manage their book of business responsibly to minimize chargeback exposure.</p>
+        <h4>7. Governing Law</h4>
+        <p>This Agreement shall be governed by the laws of the state in which the Agent is primarily licensed. Any disputes shall be resolved through binding arbitration or in the appropriate court of jurisdiction.</p>
+      </div>
+      <div class="agreement-checkbox">
+        <input type="checkbox" id="agreeDebtRollup"/>
+        <label for="agreeDebtRollup">I confirm that the above-named agent has read, understands, and agrees to the Debt Rollup &amp; Financial Responsibility Agreement.</label>
+      </div>
+
+      <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid rgba(201,168,76,0.1);">
+        <div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Electronic Signature</div>
+        <input type="text" class="agreement-signature" id="agreementSignature" placeholder="Type agent's full legal name as signature"/>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.6rem;">
+          <div style="font-size:0.62rem;color:var(--gray);">Date: <span id="agreementDate" style="color:var(--cream);"></span></div>
+          <div style="font-size:0.58rem;color:var(--gray);">Witnessed by: <span id="agreementWitness" style="color:var(--cream);"></span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;">
+        <button onclick="closeAgreementModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.65rem 1.5rem;font-family:'Raleway',sans-serif;font-size:0.72rem;cursor:pointer;">Cancel</button>
+        <button onclick="confirmAgreementAndSubmit()" class="modal-btn" style="width:auto;padding:0.65rem 2rem;">Confirm &amp; Submit Agent</button>
       </div>
     </div>
   </div>
@@ -5584,6 +5744,50 @@
 
   <!-- COMMAND CENTER TAB -->
   <div class="admin-tab-content" id="ptab-commandcenter" style="display:none;padding:1.5rem;"></div>
+
+    <!-- TAB: AGREEMENTS -->
+    <div class="admin-tab-content" id="ptab-agreements">
+      <div class="dash-body">
+        <div class="dash-welcome">
+          <h2>Agent <em>Agreements</em></h2>
+          <p>Track NDA and Debt Rollup agreement status for all onboarded agents.</p>
+        </div>
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+          <div class="dash-card">
+            <div class="dash-card-label">Total Agreements</div>
+            <div class="dash-card-value" id="totalAgreementsCount">0</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">NDA Signed</div>
+            <div class="dash-card-value" id="ndaSignedCount" style="color:#6ecf6e;">0</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Debt Rollup Signed</div>
+            <div class="dash-card-value" id="debtRollupSignedCount" style="color:#6ecf6e;">0</div>
+          </div>
+        </div>
+        <div class="dash-section">
+          <div class="dash-section-title" style="justify-content:space-between;">
+            <span>Agreement Records</span>
+            <input type="text" placeholder="Search by name..." oninput="filterAgreements(this.value)" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.12);color:var(--cream);padding:0.35rem 0.7rem;font-size:0.7rem;outline:none;font-family:'Raleway',sans-serif;width:200px;"/>
+          </div>
+          <div class="app-table-wrap">
+            <table class="app-table">
+              <thead><tr><th>Agent</th><th>Email</th><th>NDA</th><th>Debt Rollup</th><th>Signed Date</th><th>Submitted By</th></tr></thead>
+              <tbody id="agreementsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="dash-section" style="margin-top:1.5rem;">
+          <div class="dash-section-title">Agreement Templates</div>
+          <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;">View the current agreement text used during agent onboarding.</p>
+          <div style="display:flex;gap:0.8rem;">
+            <button class="modal-btn" style="width:auto;padding:0.7rem 1.5rem;" onclick="viewAgreementTemplate('nda')">View NDA Template</button>
+            <button class="modal-btn" style="width:auto;padding:0.7rem 1.5rem;" onclick="viewAgreementTemplate('debtrollup')">View Debt Rollup Template</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div><!-- close agentDash -->
 
@@ -7227,7 +7431,7 @@ Legacy Life Financial Group`
       overview:'Overview', mydeals:'My Deals ▾', tools:'Tools ▾', management:'Management ▾',
       deals:'Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', recruiting:'Recruiting', bizcard:'Business Card',
-      addagents:'Add Agents', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
+      addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
       applications:'Applications', calendar:'Calendar',
       messages:'Message Center',
       commreq:'Commission Request', permissions:'Permissions',
@@ -8026,22 +8230,22 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       admin:             ['deals','commissions','teammetrics'],
     };
     const TOOLS_TABS = {
-      financial_advisor: ['training','addagents','bizcard','portals'],
-      agent:             ['training','addagents','bizcard','portals'],
-      manager:           ['training','addagents','agentapprovals','bizcard','portals'],
-      executive:         ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
-      director:          ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
-      managing_partner:  ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
-      admin:             ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
+      financial_advisor: ['training','addagents','agreements','bizcard','portals'],
+      agent:             ['training','addagents','agreements','bizcard','portals'],
+      manager:           ['training','addagents','agreements','agentapprovals','bizcard','portals'],
+      executive:         ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
+      director:          ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
+      managing_partner:  ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
+      admin:             ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
     };
     const RECRUITING_TABS = {
-      financial_advisor: ['addagents'],
-      agent:             ['addagents'],
-      manager:           ['addagents','agentapprovals'],
-      executive:         ['addagents','agentapprovals','contracting','applications'],
-      director:          ['addagents','agentapprovals','contracting','applications'],
-      managing_partner:  ['addagents','agentapprovals','contracting','applications'],
-      admin:             ['addagents','agentapprovals','contracting','applications'],
+      financial_advisor: ['addagents','agreements'],
+      agent:             ['addagents','agreements'],
+      manager:           ['addagents','agreements','agentapprovals'],
+      executive:         ['addagents','agreements','agentapprovals','contracting','applications'],
+      director:          ['addagents','agreements','agentapprovals','contracting','applications'],
+      managing_partner:  ['addagents','agreements','agentapprovals','contracting','applications'],
+      admin:             ['addagents','agreements','agentapprovals','contracting','applications'],
     };
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
@@ -8054,7 +8258,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
-      training:'Training', addagents:'Add Agents', agentapprovals:'Agent Approvals',
+      training:'Training', addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals',
       contracting:'Send Contracts', applications:'Applications', bizcard:'Business Card',
       portals:'Carrier Portals',
       commreq:'Commission Request', permissions:'Permissions',
@@ -8166,7 +8370,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         // Find which parent group this tab belongs to and highlight it
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
-          tools:      ['training','addagents','agentapprovals','contracting','applications','bizcard','portals'],
+          tools:      ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
           management: ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
@@ -8202,6 +8406,9 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         if (tab === 'teammetrics')     { if (typeof renderTeamHierarchy === 'function') renderTeamHierarchy(); }
         if (tab === 'training')        { renderTrainingCurriculum(); }
         if (tab === 'addagents')       { if (typeof renderMyAgentList === 'function') renderMyAgentList(); }
+        if (tab === 'agreements') {
+          if (typeof renderAgreementsTab === 'function') renderAgreementsTab();
+        }
         if (tab === 'agentapprovals')  { renderAgentApprovals(); if (typeof renderPromotionRequests === 'function') renderPromotionRequests(); }
         if (tab === 'contracting')     { if (typeof renderContractingQueue === 'function') renderContractingQueue(); }
         if (tab === 'applications')    {
@@ -9489,35 +9696,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         status: 'pending_manager'
       };
 
-      mySubmittedAgents.push(submission);
-      pendingAgentQueue.push(submission);
-
-      // Notify manager via email
-      const subj = encodeURIComponent(`New Agent Submission for Approval — ${first} ${last} (NPN: ${npn})`);
-      const body = encodeURIComponent(
-`A new agent has been submitted for your approval:
-
-Agent: ${first} ${last}
-Email: ${email}
-Phone: ${phone || 'Not provided'}
-State: ${state || 'Not provided'}
-NPN #: ${npn}
-Experience: ${exp}
-Carriers Requested: ${carriers || 'Not specified'}
-
-Submitted by: ${currentUser?.name || 'Agent'} (${currentUser?.email || ''})
-Date: ${new Date().toLocaleDateString()}
-
-Please log into the Legacy Life portal to approve or deny this submission.`
-      );
-      window.location.href = `mailto:contact\u0040llfg.us?subject=${subj}&body=${body}`;
-
-      succEl.textContent = `✓ ${first} ${last} (NPN: ${npn}) submitted for manager approval. Your manager will review shortly.`;
-      succEl.style.display = 'block';
-      setTimeout(() => succEl.style.display = 'none', 6000);
-
-      ['naFirst','naLast','naEmail','naPhone','naState','naNPN','naCarriers'].forEach(id => document.getElementById(id).value = '');
-      renderMyAgentList();
+      openAgreementModal(submission);
+      return;
     }
 
     function renderMyAgentList() {
@@ -9932,6 +10112,150 @@ contact\u0040llfg.us`
       renderAgentApprovals();
       renderMyAgentList();
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ── AGENT AGREEMENTS — NDA & DEBT ROLLUP ────────────────────────
+    // ═══════════════════════════════════════════════════════════════════
+
+    let agentAgreements = [];
+    const AGREEMENTS_STORAGE_KEY = 'llfg_agent_agreements';
+    try { agentAgreements = JSON.parse(localStorage.getItem(AGREEMENTS_STORAGE_KEY) || '[]'); } catch(e) { agentAgreements = []; }
+    function saveAgreements() { try { localStorage.setItem(AGREEMENTS_STORAGE_KEY, JSON.stringify(agentAgreements)); } catch(e) {} }
+
+    window._pendingAgentSubmission = null;
+
+    window.__R_openAgreementModal = window.openAgreementModal = function(submissionData) {
+      window._pendingAgentSubmission = submissionData;
+      var modal = document.getElementById('agreementModal');
+      var nameEl = document.getElementById('agreementAgentName');
+      var dateEl = document.getElementById('agreementDate');
+      var witnessEl = document.getElementById('agreementWitness');
+      if (nameEl) nameEl.textContent = submissionData.name;
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      if (witnessEl) witnessEl.textContent = (currentUser || window._llfgCurrentUser)?.name || 'Agent';
+      var nda = document.getElementById('agreeNDA');
+      var dr = document.getElementById('agreeDebtRollup');
+      var sig = document.getElementById('agreementSignature');
+      if (nda) nda.checked = false;
+      if (dr) dr.checked = false;
+      if (sig) sig.value = '';
+      if (modal) modal.style.display = 'flex';
+    };
+
+    window.__R_closeAgreementModal = window.closeAgreementModal = function() {
+      var modal = document.getElementById('agreementModal');
+      if (modal) modal.style.display = 'none';
+      window._pendingAgentSubmission = null;
+    };
+
+    window.__R_confirmAgreementAndSubmit = window.confirmAgreementAndSubmit = function() {
+      var ndaChecked = document.getElementById('agreeNDA')?.checked;
+      var drChecked = document.getElementById('agreeDebtRollup')?.checked;
+      var signature = document.getElementById('agreementSignature')?.value?.trim();
+      var pending = window._pendingAgentSubmission;
+
+      if (!pending) { alert('No pending submission found. Please try again.'); return; }
+      if (!ndaChecked) { alert('Please acknowledge the Non-Disclosure & Non-Solicitation Agreement.'); return; }
+      if (!drChecked) { alert('Please acknowledge the Debt Rollup & Financial Responsibility Agreement.'); return; }
+      if (!signature) { alert('Please type the agent\'s full legal name as electronic signature.'); return; }
+      if (signature.toLowerCase() !== pending.name.toLowerCase()) {
+        alert('Signature must match the agent\'s full name: ' + pending.name);
+        return;
+      }
+
+      var agreementRecord = {
+        id: Date.now(),
+        agentName: pending.name,
+        agentEmail: pending.email,
+        agentPhone: pending.phone || '',
+        agentState: pending.state || '',
+        ndaSigned: true,
+        ndaSignedDate: new Date().toISOString(),
+        debtRollupSigned: true,
+        debtRollupSignedDate: new Date().toISOString(),
+        signature: signature,
+        signedByProxy: (currentUser || window._llfgCurrentUser)?.name || 'Agent',
+        signedByProxyEmail: (currentUser || window._llfgCurrentUser)?.email || '',
+        submissionId: pending.id
+      };
+      agentAgreements.push(agreementRecord);
+      saveAgreements();
+
+      pending.ndaSigned = true;
+      pending.debtRollupSigned = true;
+      pending.agreementDate = new Date().toLocaleDateString();
+
+      if (typeof mySubmittedAgents !== 'undefined') mySubmittedAgents.push(pending);
+      if (typeof pendingAgentQueue !== 'undefined') pendingAgentQueue.push(pending);
+
+      var countEl = document.getElementById('myAgentCount');
+      if (countEl) countEl.textContent = mySubmittedAgents.length;
+      if (typeof renderMyAgentList === 'function') renderMyAgentList();
+
+      var successEl = document.getElementById('addAgentSuccess');
+      if (successEl) {
+        successEl.textContent = pending.name + ' submitted with NDA & Debt Rollup agreements signed.';
+        successEl.style.display = 'block';
+        setTimeout(function() { successEl.style.display = 'none'; }, 5000);
+      }
+
+      ['naFirst','naLast','naEmail','naPhone','naState','naNPN','naExp','naCarriers'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      closeAgreementModal();
+    };
+
+    window.__R_renderAgreementsTab = window.renderAgreementsTab = function() {
+      var tbody = document.getElementById('agreementsTableBody');
+      var totalEl = document.getElementById('totalAgreementsCount');
+      var ndaEl = document.getElementById('ndaSignedCount');
+      var drEl = document.getElementById('debtRollupSignedCount');
+
+      if (totalEl) totalEl.textContent = agentAgreements.length;
+      if (ndaEl) ndaEl.textContent = agentAgreements.filter(function(a) { return a.ndaSigned; }).length;
+      if (drEl) drEl.textContent = agentAgreements.filter(function(a) { return a.debtRollupSigned; }).length;
+
+      if (!tbody) return;
+      if (!agentAgreements.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:1.5rem;font-size:0.75rem;">No agreements recorded yet. Agreements are created when new agents are submitted.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = agentAgreements.slice().reverse().map(function(a) {
+        var ndaStatus = a.ndaSigned ? '<span style="color:#6ecf6e;">Signed</span>' : '<span style="color:#e05555;">Pending</span>';
+        var drStatus = a.debtRollupSigned ? '<span style="color:#6ecf6e;">Signed</span>' : '<span style="color:#e05555;">Pending</span>';
+        var signedDate = '';
+        try { signedDate = new Date(a.ndaSignedDate).toLocaleDateString(); } catch(e) {}
+        return '<tr>'
+          + '<td style="font-weight:500;">' + a.agentName + '</td>'
+          + '<td>' + (a.agentEmail || '-') + '</td>'
+          + '<td>' + ndaStatus + '</td>'
+          + '<td>' + drStatus + '</td>'
+          + '<td>' + signedDate + '</td>'
+          + '<td>' + (a.signedByProxy || '-') + '</td>'
+          + '</tr>';
+      }).join('');
+    };
+
+    window.__R_filterAgreements = window.filterAgreements = function(query) {
+      var q = query.toLowerCase();
+      document.querySelectorAll('#agreementsTableBody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+      });
+    };
+
+    window.__R_viewAgreementTemplate = window.viewAgreementTemplate = function(type) {
+      var modal = document.getElementById('agreementModal');
+      var nameEl = document.getElementById('agreementAgentName');
+      if (nameEl) nameEl.textContent = '[Agent Name]';
+      if (modal) modal.style.display = 'flex';
+      setTimeout(function() {
+        var doc = document.getElementById(type === 'nda' ? 'ndaDocText' : 'debtRollupDocText');
+        if (doc) doc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    };
 
     // ─── Messaging ───
     // ─── Messaging ───
@@ -12986,6 +13310,7 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_GamificationAgent());
         this.register(new LLFG_TrainingCoachAgent());
         this.register(new LLFG_PreflightAgent());
+        this.register(new LLFG_MarketingAgent());
 
         // Alert listener for toast display
         LLFG_EventBus.on('agent:alert', (d) => {
@@ -14988,6 +15313,260 @@ This request requires Managing Partner approval.`
       }
     }
 
+    // ─── 18. MARKETING AUTOMATION AGENT ────────────────────────────────
+    class LLFG_MarketingAgent extends LLFG_AgentBase {
+      constructor() {
+        super('marketing', 'Marketing Agent', '📢', 'Content creation, campaign automation, social scheduling, LinkedIn recruiting, lead nurture, ad copy generation');
+        this._campaignsKey = 'llfg_mkt_campaigns';
+        this._contentKey = 'llfg_mkt_content';
+        this._analyticsKey = 'llfg_mkt_analytics';
+        this.campaigns = [];
+        this.contentQueue = [];
+        this.analytics = { totalSent:0, totalPublished:0, leadsGenerated:0, topChannel:'email' };
+      }
+
+      onStart() {
+        this._loadState();
+        this.schedule(function(){ this._processContentQueue(); }.bind(this), 60000);
+        this.schedule(function(){ this._advanceCampaigns(); }.bind(this), 120000);
+        // Listen for recruiting and sales events to auto-nurture
+        if (typeof LLFG_EventBus !== 'undefined') {
+          LLFG_EventBus.on('recruiting:stageChanged', function(d){ this._autoNurture(d); }.bind(this));
+          LLFG_EventBus.on('sales:dealClosed', function(d){ this._celebrateDeal(d); }.bind(this));
+        }
+      }
+
+      _loadState() {
+        try { this.campaigns = JSON.parse(localStorage.getItem(this._campaignsKey)||'[]'); } catch(e){ this.campaigns=[]; }
+        try { this.contentQueue = JSON.parse(localStorage.getItem(this._contentKey)||'[]'); } catch(e){ this.contentQueue=[]; }
+        try { this.analytics = JSON.parse(localStorage.getItem(this._analyticsKey)||'{}'); } catch(e){}
+        if (!this.analytics.totalSent) this.analytics = { totalSent:0, totalPublished:0, leadsGenerated:0, topChannel:'email' };
+      }
+
+      _saveState() {
+        try {
+          localStorage.setItem(this._campaignsKey, JSON.stringify(this.campaigns.slice(-50)));
+          localStorage.setItem(this._contentKey, JSON.stringify(this.contentQueue.slice(-100)));
+          localStorage.setItem(this._analyticsKey, JSON.stringify(this.analytics));
+        } catch(e){}
+      }
+
+      // ── Campaign Management ──
+      createCampaign(name, type, channels, audience, steps) {
+        var camp = {
+          id: 'mkt_camp_'+Date.now(),
+          name: name, type: type||'email', channels: channels||['email'],
+          audience: audience||'prospects', status: 'draft',
+          steps: steps||[], enrollees: [],
+          metrics: { sent:0, opened:0, clicked:0, converted:0 },
+          createdAt: Date.now()
+        };
+        this.campaigns.push(camp);
+        this._saveState();
+        this.alert('Campaign created: '+name, 'info');
+        if (typeof LLFG_EventBus!=='undefined') LLFG_EventBus.emit('marketing:campaignCreated', camp);
+        return camp;
+      }
+
+      activateCampaign(campaignId) {
+        var c = this.campaigns.find(function(x){return x.id===campaignId;});
+        if (c) { c.status = 'active'; this._saveState(); this.alert('Campaign activated: '+c.name,'info'); }
+      }
+
+      pauseCampaign(campaignId) {
+        var c = this.campaigns.find(function(x){return x.id===campaignId;});
+        if (c) { c.status = 'paused'; this._saveState(); }
+      }
+
+      enrollInCampaign(campaignId, email, name, vars) {
+        var c = this.campaigns.find(function(x){return x.id===campaignId;});
+        if (!c || c.status !== 'active') return;
+        if (c.enrollees.find(function(e){return e.email===email;})) return; // already enrolled
+        c.enrollees.push({ email:email, name:name, variables:vars||{}, currentStep:0, enrolledAt:Date.now(), lastSentAt:null });
+        this._saveState();
+      }
+
+      _advanceCampaigns() {
+        var self = this;
+        this.campaigns.filter(function(c){return c.status==='active';}).forEach(function(camp) {
+          camp.enrollees.forEach(function(enrollee) {
+            if (enrollee.currentStep >= camp.steps.length) return; // completed
+            var step = camp.steps[enrollee.currentStep];
+            var delay = (step.delayHours||0) * 3600000;
+            var since = enrollee.lastSentAt || enrollee.enrolledAt;
+            if (Date.now() - since >= delay) {
+              self._executeStep(camp, enrollee, step);
+              enrollee.currentStep++;
+              enrollee.lastSentAt = Date.now();
+              camp.metrics.sent++;
+              self.analytics.totalSent++;
+            }
+          });
+        });
+        this._saveState();
+      }
+
+      _executeStep(campaign, enrollee, step) {
+        if (step.type === 'email') {
+          // Delegate to Email Agent
+          if (typeof LLFG_Brain !== 'undefined' && LLFG_Brain.agents && LLFG_Brain.agents.email) {
+            LLFG_Brain.agents.email.scheduleEmail(step.templateId, enrollee.email, enrollee.name, new Date(), enrollee.variables);
+          }
+        } else if (step.type === 'social') {
+          this.scheduleContent({
+            type: 'social_post', platform: step.platform||'linkedin',
+            title: campaign.name + ' - Step ' + (enrollee.currentStep+1),
+            body: step.content||'', status: 'scheduled', scheduledAt: Date.now()
+          });
+        }
+        if (typeof LLFG_EventBus!=='undefined') LLFG_EventBus.emit('marketing:stepExecuted', { campaignId:campaign.id, step:step, enrollee:enrollee.email });
+      }
+
+      // ── Content Creation & Scheduling ──
+      createContent(type, platform, title, body, imageUrl) {
+        var item = {
+          id: 'mkt_c_'+Date.now(), type: type||'social_post', platform: platform||'linkedin',
+          title: title, body: body, imageUrl: imageUrl||null,
+          status: 'draft', scheduledAt: null, createdAt: Date.now()
+        };
+        this.contentQueue.push(item);
+        this._saveState();
+        return item;
+      }
+
+      scheduleContent(item) {
+        if (typeof item === 'string') item = this.contentQueue.find(function(c){return c.id===item;});
+        if (!item) return;
+        item.status = 'scheduled';
+        if (!item.scheduledAt) item.scheduledAt = Date.now() + 3600000;
+        this._saveState();
+      }
+
+      _processContentQueue() {
+        var now = Date.now();
+        var self = this;
+        this.contentQueue.filter(function(c){return c.status==='scheduled' && c.scheduledAt <= now;}).forEach(function(item) {
+          item.status = 'published';
+          self.analytics.totalPublished++;
+          self.alert('Content published: ' + item.title, 'info');
+          if (typeof LLFG_EventBus!=='undefined') LLFG_EventBus.emit('marketing:contentPublished', item);
+        });
+        this._saveState();
+      }
+
+      // ── Lead Generation ──
+      _autoNurture(data) {
+        // When a prospect moves to 'contacted' stage, auto-enroll in nurture campaign
+        var nurtureCamp = this.campaigns.find(function(c){return c.status==='active' && c.type==='email' && c.audience==='prospects';});
+        if (nurtureCamp && data.email) {
+          this.enrollInCampaign(nurtureCamp.id, data.email, data.name, data.variables||{});
+          this.analytics.leadsGenerated++;
+          this._saveState();
+        }
+      }
+
+      _celebrateDeal(data) {
+        // Auto-post deal celebration to social content queue
+        this.createContent('social_post', 'linkedin',
+          'Another deal closed!',
+          (data.agentName||'An LLFG agent') + ' just closed a $' + ((data.ap||0).toLocaleString()) + ' policy! The LLFG machine keeps winning.',
+          null
+        );
+      }
+
+      // ── Templates Library ──
+      getTemplates() {
+        return MKT_TEMPLATES || [];
+      }
+
+      getTemplate(id) {
+        return (MKT_TEMPLATES||[]).find(function(t){return t.id===id;});
+      }
+
+      // ── Analytics ──
+      getAnalytics() {
+        return {
+          campaigns: this.campaigns.length,
+          activeCampaigns: this.campaigns.filter(function(c){return c.status==='active';}).length,
+          contentCreated: this.contentQueue.length,
+          contentPublished: this.contentQueue.filter(function(c){return c.status==='published';}).length,
+          totalSent: this.analytics.totalSent,
+          leadsGenerated: this.analytics.leadsGenerated,
+          topChannel: this.analytics.topChannel
+        };
+      }
+
+      getState() {
+        var base = LLFG_AgentBase.prototype.getState.call(this);
+        base.campaigns = this.campaigns.length;
+        base.activeCampaigns = this.campaigns.filter(function(c){return c.status==='active';}).length;
+        base.contentQueue = this.contentQueue.filter(function(c){return c.status==='scheduled';}).length;
+        base.leadsGenerated = this.analytics.leadsGenerated;
+        return base;
+      }
+    }
+
+    // ── Marketing Templates Library ──
+    const MKT_TEMPLATES = [
+      // LinkedIn
+      { id:'mkt_li_connect', category:'linkedin', icon:'🔗', platform:'linkedin', type:'message',
+        name:'LinkedIn Connection Request',
+        body:'Hi {{name}}, I came across your profile and was impressed by your background. I work with Legacy Life Financial Group — we help professionals build six-figure income in the insurance industry. Would love to connect and share how. — {{sender}}' },
+      { id:'mkt_li_opportunity', category:'linkedin', icon:'💼', platform:'linkedin', type:'post',
+        name:'LinkedIn Post: Income Opportunity',
+        body:'What if you could earn $10K-$15K in your first month?\n\nAt Legacy Life Financial Group, we make it possible. No cold calling. No door knocking. Full training from day one.\n\nWe are actively looking for motivated individuals ready to build a legacy.\n\nDM me "OPPORTUNITY" or comment below to learn more.\n\n#LifeInsurance #FinancialFreedom #Hiring #LLFG #RemoteWork' },
+      { id:'mkt_li_success', category:'linkedin', icon:'🏆', platform:'linkedin', type:'post',
+        name:'LinkedIn Post: Success Story',
+        body:'3 months ago, {{name}} had zero insurance experience.\n\nToday? $42,000 earned. Licensed in 3 states. Building their own team.\n\nThat is the LLFG difference. We don not just recruit — we develop leaders.\n\nReady to write your own success story? Link in bio.\n\n#InsuranceCareer #SuccessStory #LLFG #FinancialAdvisor' },
+      { id:'mkt_li_recruit_dm', category:'linkedin', icon:'📩', platform:'linkedin', type:'message',
+        name:'LinkedIn Recruiting DM',
+        body:'Hey {{name}}! I noticed your experience in {{industry}} — that skill set translates incredibly well to what we do at Legacy Life Financial Group.\n\nWe are a national insurance distribution organization and we help people earn $10K+ in their first month. No experience needed, full training provided.\n\nWould you be open to a quick 10-minute call this week? I think you would be a great fit.' },
+
+      // Facebook / Meta Ads
+      { id:'mkt_fb_join', category:'facebook', icon:'📘', platform:'facebook', type:'ad',
+        name:'Facebook Ad: Join Our Team',
+        body:'HEADLINE: Earn $10K-$15K Your First Month — No Experience Required\n\nBODY: Legacy Life Financial Group is hiring motivated individuals nationwide. Work from anywhere. Full training. 35+ carrier partners. Build a team and earn overrides.\n\nCTA: Apply Now\nAUDIENCE: Ages 21-55, interested in entrepreneurship, side hustles, financial services, insurance careers' },
+      { id:'mkt_fb_freedom', category:'facebook', icon:'💰', platform:'facebook', type:'ad',
+        name:'Facebook Ad: Financial Freedom',
+        body:'HEADLINE: Stop Trading Time for Money\n\nBODY: What if your income had no ceiling? At LLFG, our agents earn 65%-140% commission selling life insurance to families who need it. We train you from scratch and provide the leads.\n\nCTA: Learn More\nAUDIENCE: Ages 25-50, interested in work from home, financial planning, passive income' },
+      { id:'mkt_fb_testimonial', category:'facebook', icon:'⭐', platform:'facebook', type:'ad',
+        name:'Facebook Ad: Agent Testimonial',
+        body:'HEADLINE: "I Made $15K My First Month" — Real LLFG Agent\n\nBODY: Hear from real agents who changed their lives with Legacy Life Financial Group. No experience required. Full mentorship. Unlimited earning potential.\n\nCTA: Watch Their Story\nAUDIENCE: Ages 22-45, lookalike of page followers, interested in insurance, entrepreneurship' },
+
+      // Email Campaigns
+      { id:'mkt_email_cold', category:'email', icon:'📧', platform:'email', type:'email',
+        name:'Cold Outreach to Prospect',
+        subject:'Quick question about your career goals, {{name}}',
+        body:'Hi {{name}},\n\nI came across your profile and wanted to reach out. I work with Legacy Life Financial Group — a national insurance distribution org that helps people build six-figure income.\n\nWe are actively expanding and I think your background could be a great fit.\n\nWould you be open to a quick 10-minute call this week? No pressure — just want to share what we are doing.\n\n{{sender}}\nLegacy Life Financial Group\n{{phone}}' },
+      { id:'mkt_email_warmup', category:'email', icon:'🔥', platform:'email', type:'email',
+        name:'Warm Follow-Up Email',
+        subject:'Following up — Legacy Life Financial Group',
+        body:'Hi {{name}},\n\nJust wanted to follow up on my previous message. I know your time is valuable, so I will keep this brief.\n\nAt LLFG, new agents are earning $10K-$15K in their first month. We provide:\n\n- Full training (no experience needed)\n- 35+ carrier partners\n- Remote flexibility\n- Team-building income (overrides)\n\nIf the timing is right, I would love to set up a quick call. What does your schedule look like this week?\n\n{{sender}}\n{{phone}}' },
+      { id:'mkt_email_testimonial', category:'email', icon:'🌟', platform:'email', type:'email',
+        name:'Success Testimonial Email',
+        subject:'How {{testimonialName}} went from $0 to $42K in 90 days',
+        body:'Hi {{name}},\n\nI wanted to share a quick story.\n\n{{testimonialName}} joined Legacy Life Financial Group 3 months ago with zero insurance experience. Today, they have earned over $42,000, gotten licensed in 3 states, and are building their own team.\n\nThis is not the exception — it is the blueprint. LLFG provides the training, the carriers, and the support system. You provide the drive.\n\nInterested in learning more? Reply to this email or book a call: {{calendarLink}}\n\n{{sender}}\nLegacy Life Financial Group' },
+      { id:'mkt_email_nurture1', category:'email', icon:'📨', platform:'email', type:'email',
+        name:'Nurture Drip #1: Introduction',
+        subject:'Welcome to Legacy Life Financial Group, {{name}}',
+        body:'Hi {{name}},\n\nThank you for your interest in LLFG! I am excited to share more about this opportunity.\n\nOver the next few days, I will send you some key info about:\n- How our compensation structure works\n- What training looks like\n- Real agent success stories\n- How to get started\n\nIn the meantime, feel free to reply with any questions.\n\n{{sender}}\nLegacy Life Financial Group' },
+      { id:'mkt_email_nurture2', category:'email', icon:'📨', platform:'email', type:'email',
+        name:'Nurture Drip #2: Compensation',
+        subject:'This is how LLFG agents earn $10K+ monthly',
+        body:'Hi {{name}},\n\nLet me break down the numbers:\n\n- Average policy AP: $3,600\n- Commission: 65%-140% (based on level)\n- Advance rate: 75% paid upfront\n- Just 3-4 policies per week = $10K-$15K/month\n\nAs you grow, you can build a team and earn override commissions on every sale they make.\n\nTop producers at LLFG earn $500K+/year. And it all starts with your first policy.\n\nReady to take the next step? Let me know.\n\n{{sender}}' },
+
+      // Brochures & Flyers
+      { id:'mkt_brochure_overview', category:'brochure', icon:'📄', platform:'print', type:'brochure',
+        name:'LLFG Company Overview',
+        body:'LEGACY LIFE FINANCIAL GROUP\n\nWho We Are:\nA national insurance distribution organization partnered with 35+ A-rated carriers. We provide life insurance, annuities, IULs, and final expense coverage to families nationwide.\n\nWhat We Offer Agents:\n- 65%-140% commission structure\n- Full training from day one\n- Remote work flexibility\n- Team-building income (overrides)\n- 35+ carrier partners\n- Dedicated upline support\n\nIncome Potential:\n- Month 1: $10,000-$15,000\n- Month 3-6: $30,000-$50,000\n- Top Producers: $500,000+/year\n\nApply: llfg.us\nEmail: info@llfg.us' },
+      { id:'mkt_brochure_comp', category:'brochure', icon:'💵', platform:'print', type:'brochure',
+        name:'Compensation Plan Overview',
+        body:'LLFG COMPENSATION STRUCTURE\n\nFinancial Advisor: 65%-90%\nManager (100%+ comm): Earn overrides on your team\nExecutive (120%+ comm): Expanded carrier access + leadership bonuses\nManaging Partner (140%+ comm): Full org override + equity participation\n\nHow It Works:\n1. Sell life insurance policies to clients\n2. Earn commission on Annual Premium (AP)\n3. 75% advanced upfront, remainder on issue\n4. Build a team to earn override commissions\n5. Hit milestones to advance to higher tiers\n\nNo caps. No limits. Your income = your effort.' },
+      { id:'mkt_flyer_event', category:'brochure', icon:'🎪', platform:'print', type:'flyer',
+        name:'Local Recruiting Event Flyer',
+        body:'YOU ARE INVITED\n\nLegacy Life Financial Group\nCareer Opportunity Event\n\nDate: {{date}}\nTime: {{time}}\nLocation: {{location}}\n\nLearn how to earn $10K-$15K in your first month in the insurance industry.\n\n- No experience required\n- Full training provided\n- Work from anywhere\n- Unlimited income potential\n\nRSVP: {{sender}} | {{phone}}\nApply online: llfg.us\n\nRefreshments provided. Bring a friend!' },
+    ];
+
     // ─── COMMAND CENTER UI RENDERER ──────────────────────────────────
     window.__R_renderCommandCenter = window.renderCommandCenter = function() {
       const el = document.getElementById('ptab-commandcenter');
@@ -15355,9 +15934,20 @@ This request requires Managing Partner approval.`
           ${analyticsHTML}
           ${uiOptHTML}
           ${aiContentHTML}
+
+          <!-- Marketing Hub -->
+          <div class="dash-section" style="margin-top:1.5rem;"><div class="dash-section-title">📢 Marketing Hub</div>${(()=>{const m=LLFG_Brain.agents.marketing;if(!m)return'<div style="font-size:0.65rem;color:var(--gray);">Start Marketing Agent to activate.</div>';const a=m.getAnalytics?m.getAnalytics():{};return'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:1rem;"><div class="dash-card"><div class="dash-card-label">Campaigns</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">'+(a.campaigns||0)+'</div><div class="dash-card-sub">'+(a.activeCampaigns||0)+' active</div></div><div class="dash-card"><div class="dash-card-label">Content</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">'+(a.contentCreated||0)+'</div><div class="dash-card-sub">'+(a.contentPublished||0)+' published</div></div><div class="dash-card"><div class="dash-card-label">Emails Sent</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">'+(a.totalSent||0)+'</div></div><div class="dash-card"><div class="dash-card-label">Leads</div><div class="dash-card-value" style="font-family:Cormorant Garamond,serif;">'+(a.leadsGenerated||0)+'</div></div></div>';})()}<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;"><button onclick="mktCreateCampaignUI()" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.4rem 0.8rem;font-family:Raleway,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;">+ New Campaign</button><button onclick="var e=document.getElementById('mktTplArea');e.style.display=e.style.display==='none'?'block':'none';document.getElementById('mktCompArea').style.display='none'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--cream);padding:0.4rem 0.8rem;font-family:Raleway,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;">Templates</button><button onclick="var e=document.getElementById('mktCompArea');e.style.display=e.style.display==='none'?'block':'none';document.getElementById('mktTplArea').style.display='none'" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--cream);padding:0.4rem 0.8rem;font-family:Raleway,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;">Content Studio</button></div><div id="mktTplArea" style="display:none;">${(()=>{const t=typeof MKT_TEMPLATES!=='undefined'?MKT_TEMPLATES:[];const c={};t.forEach(x=>{if(!c[x.category])c[x.category]=[];c[x.category].push(x);});const l={linkedin:'🔗 LinkedIn',facebook:'📘 Facebook / Meta',email:'📧 Email Campaigns',brochure:'📄 Brochures & Flyers'};let h='';Object.entries(c).forEach(([k,v])=>{h+='<div style="margin-bottom:0.5rem;"><div style="font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.2rem;">'+(l[k]||k)+'</div>';v.forEach(t=>{h+='<div style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0.4rem;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02);border-radius:6px;" onmouseover="this.style.background=\'rgba(201,168,76,0.04)\'" onmouseout="this.style.background=\'\'" onclick="mktPreviewTemplate(\''+t.id+'\')"><span style="font-size:0.7rem;">'+t.icon+'</span><div style="flex:1;"><div style="font-size:0.68rem;color:var(--cream);">'+t.name+'</div><div style="font-size:0.48rem;color:var(--gray);">'+t.platform+' · '+t.type+'</div></div></div>';});h+='</div>';});return h;})()}</div><div id="mktCompArea" style="display:none;"><div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"><div class="cal-field"><label>Type</label><select id="mktType" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.5rem;font-family:Raleway,sans-serif;font-size:0.78rem;outline:none;width:100%;border-radius:6px;"><option value="social_post">Social Post</option><option value="ad_copy">Ad Copy</option><option value="email_blast">Email</option><option value="brochure">Brochure/Flyer</option></select></div><div class="cal-field"><label>Platform</label><select id="mktPlatform" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.5rem;font-family:Raleway,sans-serif;font-size:0.78rem;outline:none;width:100%;border-radius:6px;"><option value="linkedin">LinkedIn</option><option value="facebook">Facebook / Meta</option><option value="instagram">Instagram</option><option value="email">Email</option><option value="print">Print</option></select></div></div><div class="cal-field" style="margin-top:0.4rem;"><label>Title</label><input type="text" id="mktTitle" placeholder="Post title or headline..." style="border-radius:6px;"/></div><div class="cal-field" style="margin-top:0.4rem;"><label>Content</label><textarea id="mktBody" style="width:100%;height:100px;background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.76rem;outline:none;resize:vertical;line-height:1.6;border-radius:6px;" placeholder="Write your content..."></textarea></div><div style="display:flex;gap:0.4rem;margin-top:0.4rem;"><button onclick="mktSaveContent(false)" style="background:var(--gold);color:#000;border:none;padding:0.4rem 1rem;font-family:Raleway,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;font-weight:600;">Save Draft</button><button onclick="mktSaveContent(true)" style="background:rgba(110,207,110,0.1);border:1px solid rgba(110,207,110,0.3);color:#6ecf6e;padding:0.4rem 1rem;font-family:Raleway,sans-serif;font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;">Schedule</button></div><div id="mktSaveSuccess" style="display:none;margin-top:0.4rem;padding:0.4rem;background:rgba(42,92,42,0.15);border:1px solid rgba(110,207,110,0.25);color:#6ecf6e;font-size:0.65rem;border-radius:6px;"></div></div><div id="mktPreviewArea" style="display:none;margin-top:0.5rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:0.8rem;"></div></div>
+
           ${securityHTML}
         </div>`;
     };
+
+    // ── Marketing UI Helpers ──
+    window.__R_mktCreateCampaignUI = window.mktCreateCampaignUI = function(){var name=prompt('Campaign name (e.g. "Spring Recruiting Push"):');if(!name)return;var mkt=LLFG_Brain.agents.marketing;if(!mkt){alert('Start the Marketing Agent first.');return;}mkt.createCampaign(name,'multi-channel',['email','linkedin'],'prospects',[{type:'email',templateId:'mkt_email_cold',delayHours:0},{type:'email',templateId:'mkt_email_warmup',delayHours:48},{type:'social',platform:'linkedin',content:'Sharing opportunity...',delayHours:72},{type:'email',templateId:'mkt_email_nurture1',delayHours:120}]);setTimeout(renderCommandCenter,200);};
+    window.__R_mktPreviewTemplate = window.mktPreviewTemplate = function(id){var tpls=typeof MKT_TEMPLATES!=='undefined'?MKT_TEMPLATES:[];var tpl=tpls.find(function(t){return t.id===id;});if(!tpl)return;var area=document.getElementById('mktPreviewArea');if(!area)return;var u=currentUser||window._llfgCurrentUser;var body=(tpl.body||'').replace(/\{\{sender\}\}/g,u?.name||'Agent').replace(/\{\{phone\}\}/g,'').replace(/\{\{name\}\}/g,'[Recipient]');area.style.display='block';area.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;"><div><div style="font-size:0.8rem;color:var(--cream);font-weight:600;">'+tpl.icon+' '+tpl.name+'</div><div style="font-size:0.52rem;color:var(--gray);margin-top:0.1rem;">'+tpl.platform+' · '+tpl.type+'</div></div><button onclick="document.getElementById(\'mktPreviewArea\').style.display=\'none\'" style="background:none;border:none;color:var(--gray);font-size:1rem;cursor:pointer;">×</button></div>'+(tpl.subject?'<div style="font-size:0.62rem;color:var(--gold);margin-bottom:0.3rem;">Subject: '+tpl.subject.replace(/\{\{name\}\}/g,'[Name]')+'</div>':'')+'<pre style="font-family:Raleway,sans-serif;font-size:0.7rem;color:var(--cream);white-space:pre-wrap;line-height:1.7;margin:0;background:rgba(0,0,0,0.2);padding:0.7rem;border-radius:8px;">'+body+'</pre><div style="display:flex;gap:0.4rem;margin-top:0.5rem;"><button onclick="mktUseTemplate(\''+id+'\')" style="background:var(--gold);color:#000;border:none;padding:0.4rem 1rem;font-family:Raleway,sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;font-weight:600;">Use Template</button><button onclick="mktCopyTemplate(\''+id+'\')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--cream);padding:0.4rem 1rem;font-family:Raleway,sans-serif;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border-radius:6px;">Copy Text</button></div>';};
+    window.__R_mktUseTemplate = window.mktUseTemplate = function(id){var tpls=typeof MKT_TEMPLATES!=='undefined'?MKT_TEMPLATES:[];var tpl=tpls.find(function(t){return t.id===id;});if(!tpl)return;document.getElementById('mktTplArea').style.display='none';document.getElementById('mktPreviewArea').style.display='none';document.getElementById('mktCompArea').style.display='block';var u=currentUser||window._llfgCurrentUser;var e;e=document.getElementById('mktType');if(e)e.value=tpl.type==='post'?'social_post':tpl.type==='ad'?'ad_copy':tpl.type==='email'?'email_blast':'social_post';e=document.getElementById('mktPlatform');if(e)e.value=tpl.platform||'linkedin';e=document.getElementById('mktTitle');if(e)e.value=tpl.name;e=document.getElementById('mktBody');if(e)e.value=(tpl.body||'').replace(/\{\{sender\}\}/g,u?.name||'Agent').replace(/\{\{phone\}\}/g,'');};
+    window.__R_mktCopyTemplate = window.mktCopyTemplate = function(id){var tpls=typeof MKT_TEMPLATES!=='undefined'?MKT_TEMPLATES:[];var tpl=tpls.find(function(t){return t.id===id;});if(!tpl)return;var u=currentUser||window._llfgCurrentUser;var text=(tpl.body||'').replace(/\{\{sender\}\}/g,u?.name||'Agent').replace(/\{\{phone\}\}/g,'').replace(/\{\{name\}\}/g,'[Name]');if(navigator.clipboard)navigator.clipboard.writeText(text).then(function(){alert('Copied to clipboard!');});};
+    window.__R_mktSaveContent = window.mktSaveContent = function(schedule){var mkt=LLFG_Brain.agents.marketing;if(!mkt){alert('Start the Marketing Agent first.');return;}var title=document.getElementById('mktTitle')?.value?.trim();var body=document.getElementById('mktBody')?.value?.trim();if(!title||!body){alert('Title and content are required.');return;}var item=mkt.createContent(document.getElementById('mktType')?.value||'social_post',document.getElementById('mktPlatform')?.value||'linkedin',title,body,null);if(schedule)mkt.scheduleContent(item);var s=document.getElementById('mktSaveSuccess');if(s){s.textContent=(schedule?'Scheduled':'Saved')+': '+title;s.style.display='block';setTimeout(function(){s.style.display='none';},4000);}document.getElementById('mktTitle').value='';document.getElementById('mktBody').value='';};
 
     // Make Brain globally accessible
     window.LLFG_Brain = LLFG_Brain;
@@ -15730,34 +16320,58 @@ This request requires Managing Partner approval.`
       }, 1200);
     };
 
-    // ─── CINEMATIC HERO SCROLL CAMERA ──────────────────────────────
+    // ─── CINEMATIC HERO SCROLL — ZOOM OUT + BRAND REVEAL ───────────
     (function initHeroCinematic() {
-      var heroImg = document.querySelector('.hero-bg-img');
-      var heroContent = document.querySelector('.hero-content');
-      var heroGlow = document.querySelector('.hero-glow');
-      if (!heroImg) return;
+      var heroImg = document.querySelector('.hero-bg video') || document.querySelector('.hero-bg-img');
+      var heroContent = document.querySelector('#hero .hero-content');
+      var brandReveal = document.getElementById('heroBrandReveal');
+      var brandLine = document.getElementById('heroBrandLine');
+      var heroSection = document.getElementById('hero');
+      if (!heroImg || !heroSection) return;
 
       window.addEventListener('scroll', function() {
         var scrollY = window.scrollY || window.pageYOffset;
         var vh = window.innerHeight;
-        if (scrollY > vh * 1.3) return;
+        // hero is 200vh tall, so pct goes 0 to 1 over 100vh of scroll
         var pct = Math.min(scrollY / vh, 1);
 
-        // Image: zooms out from 1.12 to 1.0, slight rotation — camera pulling back
-        var scale = 1.12 - (pct * 0.12);
-        var rotate = pct * 1.2;
-        heroImg.style.transform = 'scale(' + scale + ') rotate(' + rotate + 'deg)';
+        // Phase 1 (0-0.4): City zooms out from 1.6x to 1.0x — dramatic camera pullback
+        var scale = 1.6 - (pct * 0.6);
+        heroImg.style.transform = 'scale(' + Math.max(scale, 1.0) + ')';
 
-        // Content: parallax up and fade
+        // Phase 1 (0-0.35): Text fades out and rises
         if (heroContent) {
-          heroContent.style.transform = 'translateY(' + (-pct * 100) + 'px)';
-          heroContent.style.opacity = Math.max(0, 1 - (pct * 1.6));
+          var textFade = Math.max(0, 1 - (pct * 2.8));
+          heroContent.style.opacity = textFade;
+          heroContent.style.transform = 'translateY(' + (-pct * 120) + 'px)';
         }
 
-        // Glow pulse fades
-        if (heroGlow) {
-          heroGlow.style.opacity = Math.max(0, 1 - (pct * 2));
+        // Phase 2 (0.4-0.9): Brand name fades in as city is fully zoomed out
+        if (brandReveal) {
+          var brandStart = 0.4;
+          var brandEnd = 0.75;
+          if (pct < brandStart) {
+            brandReveal.style.opacity = '0';
+          } else if (pct > brandEnd) {
+            brandReveal.style.opacity = '1';
+          } else {
+            var brandPct = (pct - brandStart) / (brandEnd - brandStart);
+            brandReveal.style.opacity = brandPct;
+          }
+          // Scale brand text from 0.85 to 1.0
+          var brandScale = 0.85 + (Math.min(pct, 1) * 0.15);
+          brandReveal.style.transform = 'scale(' + brandScale + ')';
         }
+
+        // Animate the gold line width
+        if (brandLine) {
+          var linePct = Math.max(0, (pct - 0.5) / 0.3);
+          brandLine.style.width = Math.min(linePct * 80, 80) + 'px';
+        }
+
+        // Darken overlay as we zoom out for contrast with brand text
+        var overlay = heroSection.querySelector('.hero-bg::after');
+
       }, { passive: true });
     })();
 
