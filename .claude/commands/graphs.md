@@ -68,6 +68,41 @@ const apData = Object.values(TEAM_DATA).map(t => t.totalAP);
 - Every `<canvas>` should be self-closing or properly closed
 - After adding chart markup, verify the agentDash div balance hasn't changed
 
+## 9. Live Data Sources (Supabase + PostHog)
+
+### Supabase Real-Time Charts
+Replace static TEAM_DATA with live Postgres subscriptions:
+```javascript
+// Real-time AP updates push to charts automatically
+supabase.channel('deals').on('postgres_changes',
+  { event: '*', schema: 'public', table: 'deals' },
+  (payload) => {
+    updateChartData(payload.new); // Re-render affected chart
+  }
+).subscribe();
+```
+
+### PostHog Analytics as Chart Data Source
+Pull aggregated analytics from PostHog for trend charts:
+```javascript
+// PostHog insight API via Netlify Function proxy
+// Returns time-series data perfect for Chart.js line charts
+const response = await fetch('/.netlify/functions/posthog-insights', {
+  method: 'POST',
+  body: JSON.stringify({ event: 'deal_placed', date_from: '-90d', interval: 'week' })
+});
+const trendData = await response.json();
+// trendData.result → array of { date, count } perfect for Chart.js
+```
+
+### Chart Type Recommendations by Data Source
+| Data Source | Best Chart | Why |
+|------------|-----------|-----|
+| TEAM_DATA (static) | Bar/Doughnut | Snapshot comparison |
+| Supabase real-time | Line chart | Live trend updates |
+| PostHog funnels | Funnel/Horizontal bar | Conversion visualization |
+| PostHog trends | Line/Area chart | Time-series patterns |
+
 ## Output
 After implementation:
 1. Show which charts were added and where

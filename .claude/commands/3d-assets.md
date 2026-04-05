@@ -30,10 +30,18 @@ Pure CSS 3D transforms for lightweight interactive elements:
 ```
 
 ### 2. Three.js 3D Scenes (CDN — No Install)
-For rich interactive 3D in the portal, load Three.js from CDN:
+For rich interactive 3D in the portal, use ES module import maps (modern, tree-shakeable):
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@v0.172.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.172.0/examples/jsm/"
+  }
+}
+</script>
 ```
+**Fallback (legacy, simpler):** `<script src="https://cdn.jsdelivr.net/npm/three@v0.172.0/build/three.min.js"></script>`
 
 #### Scene Types
 - **Rotating LLFG Logo** — Gold hexagon with metallic material, auto-rotates
@@ -51,13 +59,76 @@ function init3DScene(containerId, type) {
   const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for GPU performance
   container.appendChild(renderer.domElement);
   // ... add geometry based on type
   camera.position.z = 5;
   function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
   animate();
 }
+```
+
+### 2b. Advanced Three.js Techniques (from Three.js GitHub)
+
+#### Particle Systems (Single Draw Call — Thousands of Points)
+Ultra-lightweight floating particles behind hero or dashboard sections:
+```javascript
+function createGoldParticles(scene, count) {
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 10;
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.05, transparent: true, opacity: 0.8 });
+  scene.add(new THREE.Points(geo, mat));
+}
+```
+
+#### GLTF Model Loading (Compressed .glb — <50KB)
+Load detailed 3D models (lion, shield, trophy) with Draco compression:
+```javascript
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@v0.172.0/examples/jsm/libs/draco/');
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
+gltfLoader.load('assets/llfg-lion.glb', (gltf) => { scene.add(gltf.scene); });
+```
+
+#### Post-Processing (Cinematic Bloom/Glow)
+Add UnrealBloomPass for cinematic glow on 3D elements:
+```javascript
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(w, h), 1.5, 0.4, 0.85)); // strength, radius, threshold
+// In animate loop: composer.render() instead of renderer.render()
+```
+
+#### GSAP + Three.js Scroll Integration
+Drive Three.js camera/particles from GSAP ScrollTrigger (already loaded in portal):
+```javascript
+gsap.to(camera.position, {
+  z: 2,
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+});
+// Or drive shader uniforms for distortion effects
+gsap.to(shaderMaterial.uniforms.uProgress, {
+  value: 1.0,
+  scrollTrigger: { trigger: '#stats-section', scrub: true }
+});
+```
+
+#### Hero Canvas Pattern (Layer Behind Existing CSS 3D)
+```html
+<div id="hero" style="position:relative;">
+  <canvas id="hero-3d" style="position:absolute;inset:0;z-index:0;"></canvas>
+  <!-- Existing hero content sits on top at z-index:1+ -->
+</div>
 ```
 
 ### 3. AI-Generated Textures (Pollinations.ai — Free)

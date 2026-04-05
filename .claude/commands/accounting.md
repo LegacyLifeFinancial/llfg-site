@@ -147,12 +147,99 @@ Monthly financial milestones:
 - **Admin**: Everything + can modify ledger entries + export all reports
 
 ## 10. Data Persistence
-- **localStorage**: Quick implementation for demo/MVP
-  ```javascript
-  localStorage.setItem('llfg_ledger', JSON.stringify(LEDGER));
-  ```
-- **Netlify Function + Database**: For production (Supabase, FaunaDB, or Airtable)
+
+### localStorage (Demo/MVP)
+```javascript
+localStorage.setItem('llfg_ledger', JSON.stringify(LEDGER));
+```
+
+### Supabase (Production — Recommended)
+Replace localStorage with durable Postgres. CDN-compatible, no build step:
+```html
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+```
+```javascript
+const supabase = supabase.createClient('https://your-project.supabase.co', 'anon-key');
+
+// Write ledger entry
+await supabase.from('ledger_entries').insert({
+  date: '2026-04-01', type: 'credit', category: 'commission',
+  agent_id: 'john-smith', amount: 4500, account: 'commission_expense', contra: 'cash'
+});
+
+// Real-time commission updates
+supabase.channel('ledger').on('postgres_changes',
+  { event: 'INSERT', schema: 'public', table: 'ledger_entries' },
+  (payload) => { updateDashboard(payload.new); }
+).subscribe();
+```
+
+#### Row Level Security (RLS) for Financial Data
+Enforce role-based access at the database level — FAs see only their own data:
+```sql
+CREATE POLICY "agents_own_data" ON ledger_entries
+  FOR SELECT USING (agent_id = auth.uid());
+CREATE POLICY "managers_team_data" ON ledger_entries
+  FOR SELECT USING (agent_id IN (SELECT id FROM agents WHERE team_lead = auth.uid()));
+```
+
+### Netlify Function + Database: For sensitive calculations (commission math, advance pay) that should not run client-side
 - Separate financial data from operational data for security
+
+## 10b. Double-Entry Architecture (from Firefly III / Akaunting)
+
+### Why Double-Entry for Insurance Commissions
+Patterns from open-source accounting systems (Firefly III, Akaunting) confirm that double-entry bookkeeping with nested accounts is the correct architecture for:
+- **Override hierarchies**: Parent accounts (RVP) contain child accounts (managers, agents). Override percentages become allocation rules on each deposit.
+- **Advance vs earned**: Model advances as liability accounts. As policies earn, transfer from liability to revenue — clean audit trail.
+- **Chargebacks**: Each commission is a credit to agent + debit to agency pool. Chargebacks reverse the entry cleanly.
+
+### Nested Account Hierarchy (from Akaunting pattern)
+```javascript
+const CHART_OF_ACCOUNTS = {
+  assets: {
+    cash: { name: 'Operating Cash', balance: 0 },
+    advance_receivable: {
+      name: 'Advance Pay Receivable',
+      children: {
+        // One sub-account per agent — mirrors org hierarchy
+        'agent-001': { name: 'John Smith Advance', balance: 0 },
+        'agent-002': { name: 'Jane Doe Advance', balance: 0 }
+      }
+    }
+  },
+  liabilities: {
+    unearned_commission: { name: 'Unearned Commission', balance: 0 }
+  },
+  revenue: {
+    premium_income: { name: 'Premium Revenue', balance: 0 },
+    override_income: { name: 'Override Revenue', balance: 0 }
+  },
+  expenses: {
+    commission_paid: { name: 'Commission Expense', balance: 0 },
+    chargebacks: { name: 'Chargeback Expense', balance: 0 }
+  }
+};
+```
+
+### P&L Report Template (from Akaunting)
+Maps directly to LLFG commission statements:
+```
+Revenue:
+  Total Premium Written          $XXX,XXX
+  Override Income                $XX,XXX
+  ─────────────────────────────────────
+  Total Revenue                  $XXX,XXX
+
+Expenses:
+  Commission Payouts             ($XX,XXX)
+  Advance Pay Outstanding        ($X,XXX)
+  Chargebacks / Clawbacks        ($X,XXX)
+  ─────────────────────────────────────
+  Total Expenses                 ($XX,XXX)
+
+Net Income                       $XX,XXX
+```
 
 ## 11. Tax & Compliance Helpers
 - 1099 tracking: Flag agents earning > $600/year for 1099 reporting

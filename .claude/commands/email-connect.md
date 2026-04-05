@@ -77,6 +77,25 @@ Connect the existing stub to sync sent/received emails.
 - Sanitize template variables (prevent XSS)
 - Rate limit sending, log all activity for audit
 
+## 10. n8n Webhook Email Automation
+Use n8n workflows to orchestrate complex email sequences without building custom scheduling logic:
+
+### Architecture
+```
+Portal event → Netlify Function → n8n webhook → n8n workflow → SendGrid/Gmail/Mailchimp
+```
+
+### Workflow Examples
+- **Onboarding drip**: Agent approved → n8n receives webhook → sends Welcome email (day 0), Getting Started (day 1), Training reminder (day 3), Check-in (day 7)
+- **Follow-up sequences**: Deal submitted → n8n → confirmation email → underwriting update (when status changes) → placement congratulations
+- **Re-engagement**: Agent inactive 14 days → n8n scheduled check → nudge email + manager notification
+
+### Benefits Over Custom Scheduling
+- n8n handles delays, retries, and error handling
+- Visual workflow editor for non-developers to modify sequences
+- 400+ integrations (SendGrid, Mailchimp, Gmail, Slack, SMS providers)
+- No custom cron/scheduler code needed in the portal
+
 ## Output
 After implementation:
 1. Which sending method was chosen and why

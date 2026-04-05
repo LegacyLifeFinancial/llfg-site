@@ -53,6 +53,31 @@ Present as executive summary with:
 4. Agent-level production breakdown table
 5. 90-day forecast chart data
 
+## Enhanced Analytics & Persistence
+
+### PostHog for Revenue Funnel Tracking
+Track the full lead-to-close pipeline with event analytics:
+```javascript
+// Track each revenue event
+posthog.capture('lead_created', { source: 'recruiting', agent_id: id });
+posthog.capture('deal_submitted', { agent_id: id, ap: amount, product: type });
+posthog.capture('deal_placed', { agent_id: id, ap: amount, commission: rate });
+posthog.capture('chargeback', { agent_id: id, ap: amount, reason: reason });
+```
+Define funnels in PostHog: Lead → Submitted → Placed → Earned. Automatically calculates conversion rates and time-between-steps.
+
+### Supabase for Durable Revenue Data
+Replace localStorage with Postgres for revenue forecasting:
+```javascript
+// 90-day rolling forecast query
+const { data } = await supabase.from('deals')
+  .select('ap, status, placed_date')
+  .gte('placed_date', ninetyDaysAgo)
+  .order('placed_date', { ascending: false });
+```
+
+Row Level Security ensures managers see only their team's revenue data.
+
 Wire findings into Analytics Agent via EventBus.
 
 Read index.html before making any changes.

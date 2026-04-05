@@ -6369,6 +6369,111 @@
     </div>
   </div>
 
+  <!-- TAB: AI STUDIO — Gemini-Powered Intelligence -->
+  <div class="admin-tab-content" id="ptab-aistudio" style="display:none;">
+    <div class="dash-body">
+      <div class="dash-welcome">
+        <h2><em class="gradient-text-purple">Google AI Studio</em> Intelligence</h2>
+        <p>Gemini-powered analysis, reorganization, and insights for your portal and CRM.</p>
+      </div>
+
+      <!-- AI Sub-Navigation -->
+      <div style="display:flex;gap:0;border-bottom:1px solid rgba(124,58,237,0.15);margin-bottom:1.5rem;" id="aiSubTabs">
+        <button class="admin-tab active" onclick="showAITab('reorganize',this)">Reorganize</button>
+        <button class="admin-tab" onclick="showAITab('crm-intel',this)">CRM Intelligence</button>
+        <button class="admin-tab" onclick="showAITab('insights',this)">Business Insights</button>
+        <button class="admin-tab" onclick="showAITab('assistant',this)">AI Assistant</button>
+      </div>
+
+      <!-- AI: Reorganize -->
+      <div id="ai-reorganize" class="ai-panel">
+        <div class="dash-grid" style="grid-template-columns:1fr 1fr;gap:1.5rem;">
+          <!-- Website Reorganizer -->
+          <div class="dash-section" style="border:1px solid rgba(124,58,237,0.12);">
+            <div class="dash-section-title" style="display:flex;align-items:center;gap:0.5rem;">
+              <span style="color:var(--purple-light);">🌐</span> Website Reorganizer
+            </div>
+            <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.7;">Gemini analyzes your landing page structure, content flow, and CTAs — then suggests a conversion-optimized reorganization.</p>
+            <button onclick="runAIReorganize('web')" class="modal-btn glow-purple" style="width:100%;padding:0.8rem;" id="aiWebBtn">
+              Analyze & Reorganize Website
+            </button>
+            <div id="aiWebResult" style="margin-top:1rem;display:none;"></div>
+          </div>
+
+          <!-- CRM Reorganizer -->
+          <div class="dash-section" style="border:1px solid rgba(201,168,76,0.12);">
+            <div class="dash-section-title" style="display:flex;align-items:center;gap:0.5rem;">
+              <span style="color:var(--gold);">📊</span> CRM Reorganizer
+            </div>
+            <p style="font-size:0.72rem;color:var(--gray);margin-bottom:1rem;line-height:1.7;">Gemini analyzes your contacts, pipeline, deals, and automations — then suggests optimal CRM structure and workflows.</p>
+            <button onclick="runAIReorganize('crm')" class="modal-btn glow-gold" style="width:100%;padding:0.8rem;" id="aiCrmBtn">
+              Analyze & Reorganize CRM
+            </button>
+            <div id="aiCrmResult" style="margin-top:1rem;display:none;"></div>
+          </div>
+        </div>
+
+        <!-- AI Action Queue -->
+        <div class="dash-section" style="margin-top:1.5rem;">
+          <div class="dash-section-title">AI-Suggested Actions</div>
+          <div id="aiActionQueue" style="font-size:0.72rem;color:var(--gray);padding:1rem;text-align:center;">
+            Run an analysis above to get AI-powered reorganization suggestions.
+          </div>
+        </div>
+      </div>
+
+      <!-- AI: CRM Intelligence -->
+      <div id="ai-crm-intel" class="ai-panel" style="display:none;">
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+          <div class="dash-card glass-purple" style="cursor:pointer;" onclick="runAILeadScore()">
+            <div class="dash-card-label">AI Lead Scoring</div>
+            <div class="dash-card-value" style="color:var(--purple-light);font-size:1.2rem;">Score All Leads</div>
+            <div class="dash-card-sub">Gemini scores every lead by conversion probability</div>
+          </div>
+          <div class="dash-card glass-gold" style="cursor:pointer;" onclick="runAISummarize()">
+            <div class="dash-card-label">Contact Summaries</div>
+            <div class="dash-card-value" style="color:var(--gold);font-size:1.2rem;">Summarize Top 10</div>
+            <div class="dash-card-sub">AI-generated executive brief per contact</div>
+          </div>
+          <div class="dash-card" style="cursor:pointer;border-color:rgba(110,207,110,0.15);" onclick="runAIDealInsights()">
+            <div class="dash-card-label">Deal Intelligence</div>
+            <div class="dash-card-value" style="color:#6ecf6e;font-size:1.2rem;">Analyze Deals</div>
+            <div class="dash-card-sub">Win/loss patterns, optimal pricing, carrier fit</div>
+          </div>
+        </div>
+        <div class="dash-section">
+          <div class="dash-section-title">AI Analysis Results</div>
+          <div id="aiCrmIntelResult" style="min-height:200px;font-size:0.75rem;color:var(--cream);line-height:1.8;white-space:pre-wrap;"></div>
+        </div>
+      </div>
+
+      <!-- AI: Business Insights -->
+      <div id="ai-insights" class="ai-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Gemini Business Intelligence</span>
+            <button onclick="runAIInsights()" class="modal-btn" style="width:auto;padding:0.5rem 1.5rem;font-size:0.65rem;">Generate Insights</button>
+          </div>
+          <div id="aiInsightsResult" style="min-height:300px;padding:1rem;">
+            <p style="color:var(--gray);text-align:center;font-size:0.78rem;">Click "Generate Insights" to analyze your entire business data with Gemini AI.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI: Assistant -->
+      <div id="ai-assistant" class="ai-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title">Gemini AI Assistant</div>
+          <div id="aiChatHistory" style="min-height:300px;max-height:500px;overflow-y:auto;margin-bottom:1rem;padding:0.5rem;"></div>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="aiChatInput" placeholder="Ask Gemini anything about your portal, CRM, or business..." style="flex:1;background:#0e0e0e;border:1px solid rgba(124,58,237,0.2);color:var(--cream);padding:0.8rem 1rem;font-family:'Raleway',sans-serif;font-size:0.8rem;outline:none;" onkeydown="if(event.key==='Enter')sendAIChat()"/>
+            <button onclick="sendAIChat()" class="modal-btn" style="width:auto;padding:0.8rem 1.5rem;background:var(--purple);border-color:var(--purple);">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div><!-- close agentDash -->
 
   <!-- ADMIN DASHBOARD -->
@@ -20069,6 +20174,269 @@ This request requires Managing Partner approval.`
 
       if(typeof LLFG_EventBus!=='undefined'){LLFG_EventBus.on('crm:contactCreated',function(){updateKPIs();});LLFG_EventBus.on('crm:dealWon',function(){updateKPIs();});}
       console.log('[CRM] '+crmData.contacts.length+' contacts, '+crmData.deals.length+' deals loaded');
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  GOOGLE AI STUDIO — Gemini Integration Engine
+    // ═══════════════════════════════════════════════════════════════════
+    (function(){
+      var GEMINI_FN='/.netlify/functions/gemini';
+
+      // Utility: call Gemini via Netlify Function
+      function callGemini(action, data, context) {
+        return fetch(GEMINI_FN, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({action:action, data:data, context:context, prompt:typeof data==='string'?data:undefined})
+        }).then(function(r){return r.json();}).then(function(j){
+          if(j.error) throw new Error(j.error);
+          return j.result;
+        });
+      }
+
+      // Parse AI response into styled HTML
+      function formatAIResponse(text) {
+        if(!text) return '<span style="color:var(--gray);">No response</span>';
+        // Try parsing as JSON first
+        try {
+          var json = JSON.parse(text.replace(/```json\n?/g,'').replace(/```\n?/g,''));
+          return renderAIJSON(json);
+        } catch(e) {}
+        // Fallback: format markdown-style text
+        return text
+          .replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--gold);">$1</strong>')
+          .replace(/\n## (.*)/g,'<h3 style="color:var(--purple-light);font-family:Cormorant Garamond,serif;font-size:1.1rem;margin:1.2rem 0 0.5rem;">$1</h3>')
+          .replace(/\n### (.*)/g,'<h4 style="color:var(--cream);font-size:0.82rem;margin:1rem 0 0.4rem;">$1</h4>')
+          .replace(/\n- (.*)/g,'<div style="padding:0.2rem 0 0.2rem 1rem;border-left:2px solid rgba(124,58,237,0.3);margin:0.3rem 0;font-size:0.72rem;">$1</div>')
+          .replace(/\n\d+\. (.*)/g,'<div style="padding:0.2rem 0 0.2rem 1rem;border-left:2px solid rgba(201,168,76,0.3);margin:0.3rem 0;font-size:0.72rem;">$1</div>')
+          .replace(/\n/g,'<br>');
+      }
+
+      function renderAIJSON(obj) {
+        var html = '';
+        Object.keys(obj).forEach(function(key) {
+          var val = obj[key];
+          var label = key.replace(/([A-Z])/g,' $1').replace(/_/g,' ');
+          label = label.charAt(0).toUpperCase() + label.slice(1);
+          html += '<div style="margin-bottom:1.2rem;">';
+          html += '<div style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--purple-light);margin-bottom:0.5rem;">'+label+'</div>';
+          if(Array.isArray(val)) {
+            val.forEach(function(item,i) {
+              if(typeof item === 'object') {
+                html += '<div class="premium-card" style="padding:0.8rem;margin-bottom:0.5rem;">';
+                Object.keys(item).forEach(function(k) {
+                  html += '<div style="font-size:0.7rem;margin-bottom:0.2rem;"><span style="color:var(--gold);">'+k+':</span> <span style="color:var(--cream);">'+item[k]+'</span></div>';
+                });
+                html += '</div>';
+              } else {
+                html += '<div style="padding:0.3rem 0 0.3rem 1rem;border-left:2px solid rgba(201,168,76,0.2);font-size:0.72rem;color:var(--cream);margin:0.2rem 0;">'+(i+1)+'. '+item+'</div>';
+              }
+            });
+          } else if(typeof val === 'object') {
+            html += renderAIJSON(val);
+          } else {
+            html += '<div style="font-size:0.78rem;color:var(--cream);line-height:1.7;">'+val+'</div>';
+          }
+          html += '</div>';
+        });
+        return html;
+      }
+
+      function showLoading(elId, msg) {
+        var el = document.getElementById(elId);
+        if(el) { el.style.display=''; el.innerHTML='<div style="display:flex;align-items:center;gap:0.8rem;padding:1rem;"><div style="width:20px;height:20px;border:2px solid var(--purple);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div><span style="font-size:0.75rem;color:var(--purple-light);">'+(msg||'Gemini is analyzing...')+'</span></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>'; }
+      }
+
+      // ── AI Tab Navigation ──
+      window.showAITab = function(tab, el) {
+        document.querySelectorAll('.ai-panel').forEach(function(p){p.style.display='none';});
+        var pn = document.getElementById('ai-'+tab);
+        if(pn) pn.style.display='';
+        document.querySelectorAll('#aiSubTabs .admin-tab').forEach(function(t){t.classList.remove('active');});
+        if(el) el.classList.add('active');
+      };
+
+      // ── Website Reorganizer ──
+      window.runAIReorganize = function(type) {
+        var resultId = type==='web' ? 'aiWebResult' : 'aiCrmResult';
+        var btnId = type==='web' ? 'aiWebBtn' : 'aiCrmBtn';
+        var btn = document.getElementById(btnId);
+        if(btn) btn.disabled = true;
+        showLoading(resultId, 'Gemini is analyzing your '+type+'...');
+
+        var data;
+        if(type==='web') {
+          // Gather website structure
+          var sections = [];
+          document.querySelectorAll('#hero, #income-stats, #about, #why, #carriers, #agency, #apply').forEach(function(s) {
+            var h = s.querySelector('h1,h2');
+            sections.push({ id:s.id, heading:h?h.textContent.trim():'', hasImages:s.querySelectorAll('img').length, hasCTA:s.querySelectorAll('.btn-primary').length, hasAnimation:s.classList.contains('section-glow') });
+          });
+          data = { sections:sections, totalSections:sections.length, hasForms:!!document.querySelector('#apply form, .application-form'), hasVideo:!!document.querySelector('video'), carriers: document.querySelectorAll('.carrier-card').length };
+        } else {
+          // Gather CRM data
+          var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+          data = {
+            totalContacts: (crm.contacts||[]).length,
+            contactsByType: {}, contactsByStage: {},
+            totalDeals: (crm.deals||[]).length,
+            totalPipelineAP: 0, automationCount: (crm.automations||[]).length,
+            sampleContacts: (crm.contacts||[]).slice(0,5).map(function(c){return{name:c.fn+' '+c.ln,type:c.tp,stage:c.stage,score:c.score,source:c.src};}),
+            sampleDeals: (crm.deals||[]).slice(0,5).map(function(d){return{name:d.name,product:d.product,ap:d.ap,stage:d.stage,prob:d.prob};})
+          };
+          (crm.contacts||[]).forEach(function(c) {
+            data.contactsByType[c.tp] = (data.contactsByType[c.tp]||0)+1;
+            data.contactsByStage[c.stage] = (data.contactsByStage[c.stage]||0)+1;
+          });
+          (crm.deals||[]).forEach(function(d) { if(d.stage!=='won'&&d.stage!=='lost') data.totalPipelineAP += d.ap; });
+        }
+
+        callGemini(type==='web'?'reorganize-web':'reorganize-crm', data)
+          .then(function(result) {
+            var el = document.getElementById(resultId);
+            if(el) { el.style.display=''; el.innerHTML = formatAIResponse(result); }
+            // Populate action queue
+            populateActionQueue(result);
+            if(btn) btn.disabled = false;
+            if(typeof LLFG_Brain!=='undefined') LLFG_Brain._showToast('Gemini analysis complete','#7c3aed');
+          })
+          .catch(function(err) {
+            var el = document.getElementById(resultId);
+            if(el) { el.style.display=''; el.innerHTML='<div style="color:#e05555;font-size:0.75rem;padding:1rem;">Error: '+err.message+'<br><br><span style="color:var(--gray);">Make sure GEMINI_API_KEY is set in Netlify environment variables.<br>Get your key at <strong>aistudio.google.com</strong></span></div>'; }
+            if(btn) btn.disabled = false;
+          });
+      };
+
+      function populateActionQueue(result) {
+        var queue = document.getElementById('aiActionQueue');
+        if(!queue) return;
+        try {
+          var json = JSON.parse(result.replace(/```json\n?/g,'').replace(/```\n?/g,''));
+          var actions = json.priorityActions || json.actionItems || json.ctaImprovements || [];
+          if(!actions.length) { queue.innerHTML = formatAIResponse(result); return; }
+          queue.innerHTML = '<div style="font-size:0.72rem;">' + actions.map(function(a, i) {
+            var text = typeof a === 'string' ? a : (a.action || a.name || a.description || JSON.stringify(a));
+            return '<div class="premium-card" style="padding:0.8rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.8rem;">'
+              + '<div style="width:28px;height:28px;border-radius:50%;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;color:var(--purple-light);font-weight:700;font-size:0.7rem;flex-shrink:0;">'+(i+1)+'</div>'
+              + '<div style="flex:1;color:var(--cream);">'+text+'</div>'
+              + '<button onclick="this.parentElement.style.opacity=0.3;this.textContent=\'Done\'" style="background:rgba(110,207,110,0.08);border:1px solid rgba(110,207,110,0.2);color:#6ecf6e;padding:0.25rem 0.6rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;flex-shrink:0;">Apply</button>'
+              + '</div>';
+          }).join('') + '</div>';
+        } catch(e) { queue.innerHTML = formatAIResponse(result); }
+      }
+
+      // ── CRM Intelligence ──
+      window.runAILeadScore = function() {
+        var el = document.getElementById('aiCrmIntelResult');
+        showLoading('aiCrmIntelResult', 'Scoring all leads with Gemini...');
+        var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+        var leads = (crm.contacts||[]).filter(function(c){return c.tp==='lead';}).slice(0,20);
+        if(!leads.length) { el.innerHTML='<span style="color:var(--gray);">No leads in CRM. Add contacts first.</span>'; return; }
+        callGemini('score-lead', leads.map(function(l){return{name:l.fn+' '+l.ln,source:l.src,stage:l.stage,score:l.score};}))
+          .then(function(r){ el.innerHTML = formatAIResponse(r); })
+          .catch(function(e){ el.innerHTML='<span style="color:#e05555;">'+e.message+'</span>'; });
+      };
+
+      window.runAISummarize = function() {
+        showLoading('aiCrmIntelResult', 'Generating contact summaries...');
+        var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+        var top = (crm.contacts||[]).sort(function(a,b){return(b.score||0)-(a.score||0);}).slice(0,10);
+        if(!top.length) { document.getElementById('aiCrmIntelResult').innerHTML='<span style="color:var(--gray);">No contacts yet.</span>'; return; }
+        var deals = crm.deals||[];
+        var data = top.map(function(c) {
+          var cd = deals.filter(function(d){return d.cid===c.id;});
+          return {name:c.fn+' '+c.ln, type:c.tp, stage:c.stage, score:c.score, source:c.src, deals:cd.length, totalAP:cd.reduce(function(s,d){return s+d.ap;},0)};
+        });
+        callGemini('summarize', data)
+          .then(function(r){ document.getElementById('aiCrmIntelResult').innerHTML = formatAIResponse(r); })
+          .catch(function(e){ document.getElementById('aiCrmIntelResult').innerHTML='<span style="color:#e05555;">'+e.message+'</span>'; });
+      };
+
+      window.runAIDealInsights = function() {
+        showLoading('aiCrmIntelResult', 'Analyzing deal patterns...');
+        var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+        var deals = crm.deals||[];
+        if(!deals.length) { document.getElementById('aiCrmIntelResult').innerHTML='<span style="color:var(--gray);">No deals yet.</span>'; return; }
+        var data = {
+          totalDeals: deals.length,
+          byStage: {}, byProduct: {}, byCarrier: {},
+          avgAP: Math.round(deals.reduce(function(s,d){return s+d.ap;},0)/deals.length),
+          wonDeals: deals.filter(function(d){return d.stage==='won';}).length,
+          lostDeals: deals.filter(function(d){return d.stage==='lost';}).length
+        };
+        deals.forEach(function(d) {
+          data.byStage[d.stage]=(data.byStage[d.stage]||0)+1;
+          data.byProduct[d.product]=(data.byProduct[d.product]||0)+1;
+          data.byCarrier[d.carrier]=(data.byCarrier[d.carrier]||0)+1;
+        });
+        callGemini('insights', data)
+          .then(function(r){ document.getElementById('aiCrmIntelResult').innerHTML = formatAIResponse(r); })
+          .catch(function(e){ document.getElementById('aiCrmIntelResult').innerHTML='<span style="color:#e05555;">'+e.message+'</span>'; });
+      };
+
+      // ── Business Insights ──
+      window.runAIInsights = function() {
+        showLoading('aiInsightsResult', 'Generating business intelligence...');
+        var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+        var teamData = typeof TEAM_DATA !== 'undefined' ? TEAM_DATA : {};
+        var data = {
+          crm: { contacts:(crm.contacts||[]).length, deals:(crm.deals||[]).length, automations:(crm.automations||[]).length },
+          agents: Object.keys(typeof LLFG_Brain!=='undefined'&&LLFG_Brain.agents?LLFG_Brain.agents:{}).length,
+          factoryAgents: typeof LLFG_AgentFactory!=='undefined'?LLFG_AgentFactory.getStatus():{},
+          teams: Object.keys(teamData).length,
+          teamSummary: Object.keys(teamData).map(function(k){var t=teamData[k];return{name:k,ap:t.totalAP,agents:(t.agents||[]).length,persist:t.persistency,cb:t.chargeback};})
+        };
+        callGemini('insights', data)
+          .then(function(r){ document.getElementById('aiInsightsResult').innerHTML = formatAIResponse(r); })
+          .catch(function(e){ document.getElementById('aiInsightsResult').innerHTML='<span style="color:#e05555;">'+e.message+'</span>'; });
+      };
+
+      // ── AI Chat Assistant ──
+      var chatHistory = [];
+      window.sendAIChat = function() {
+        var input = document.getElementById('aiChatInput');
+        var feed = document.getElementById('aiChatHistory');
+        if(!input||!feed) return;
+        var msg = input.value.trim();
+        if(!msg) return;
+        input.value = '';
+
+        // Add user message
+        feed.innerHTML += '<div style="display:flex;gap:0.6rem;margin-bottom:1rem;justify-content:flex-end;">'
+          + '<div style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.2);padding:0.6rem 1rem;max-width:70%;font-size:0.75rem;color:var(--cream);line-height:1.6;">'+msg+'</div>'
+          + '<div style="width:28px;height:28px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;">You</div></div>';
+
+        // Add loading
+        var loadId = 'aiLoad'+Date.now();
+        feed.innerHTML += '<div id="'+loadId+'" style="display:flex;gap:0.6rem;margin-bottom:1rem;">'
+          + '<div style="width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;">AI</div>'
+          + '<div style="padding:0.6rem;font-size:0.7rem;color:var(--gray);">Thinking...</div></div>';
+        feed.scrollTop = feed.scrollHeight;
+
+        // Build context
+        var crm = JSON.parse(localStorage.getItem('llfg_crm_data')||'{}');
+        var context = 'LLFG portal context: '+((crm.contacts||[]).length)+' contacts, '+((crm.deals||[]).length)+' deals, '
+          + (typeof LLFG_AgentFactory!=='undefined'?Object.keys(LLFG_AgentFactory.getAll()).length:0)+' factory agents running. '
+          + 'User role: '+(window.currentUser||{}).role||'agent';
+
+        chatHistory.push({role:'user',content:msg});
+        var fullPrompt = 'Context: '+context+'\n\nConversation:\n'+chatHistory.map(function(m){return m.role+': '+m.content;}).join('\n')+'\n\nRespond helpfully and concisely.';
+
+        callGemini('generate', fullPrompt)
+          .then(function(r) {
+            chatHistory.push({role:'assistant',content:r});
+            var loader = document.getElementById(loadId);
+            if(loader) loader.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;">AI</div>'
+              + '<div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);padding:0.6rem 1rem;max-width:70%;font-size:0.75rem;color:var(--cream);line-height:1.6;">'+formatAIResponse(r)+'</div>';
+            feed.scrollTop = feed.scrollHeight;
+          })
+          .catch(function(e) {
+            var loader = document.getElementById(loadId);
+            if(loader) loader.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;background:rgba(224,85,85,0.2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;">!</div>'
+              + '<div style="padding:0.6rem;font-size:0.7rem;color:#e05555;">'+e.message+'</div>';
+          });
+      };
+
+      console.log('[Gemini] AI Studio engine initialized');
     })();
   </script>
 </body>

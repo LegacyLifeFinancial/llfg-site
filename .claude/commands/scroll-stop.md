@@ -292,6 +292,56 @@ Use these classes directly — no extra CSS needed:
 | `.llfg-tilt` | 3D mouse-tracking tilt (needs JS) |
 | `.llfg-flip-card` | Full flip card container |
 
+## Three.js WebGL Scroll Stops (Advanced)
+
+For maximum visual impact, layer a Three.js `<canvas>` behind sections. These run at 60fps with minimal CPU because they offload to the GPU.
+
+### Particle Field Behind Hero
+A sea of gold particles that drift with scroll position — single draw call, thousands of points:
+```javascript
+// Embed <canvas id="hero-gl" style="position:absolute;inset:0;z-index:0;pointer-events:none;"> behind hero
+// In <script type="module">:
+import * as THREE from 'three';
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-gl'), alpha: true });
+renderer.setSize(innerWidth, innerHeight);
+const geo = new THREE.BufferGeometry();
+const pos = new Float32Array(2000 * 3);
+for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - 0.5) * 20;
+geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.06, transparent: true }));
+scene.add(pts);
+cam.position.z = 8;
+// Drive rotation from scroll via GSAP (already loaded)
+gsap.to(pts.rotation, { y: Math.PI, scrollTrigger: { trigger: '#hero', scrub: true } });
+(function animate() { requestAnimationFrame(animate); renderer.render(scene, cam); })();
+```
+
+### Shader Distortion on Section Enter
+Custom WebGL shader that warps a section background on scroll:
+```javascript
+const shaderMat = new THREE.ShaderMaterial({
+  uniforms: { uProgress: { value: 0.0 }, uTime: { value: 0.0 } },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `uniform float uProgress; uniform float uTime; varying vec2 vUv;
+    void main(){ float d=length(vUv-0.5); float wave=sin(d*10.0-uTime*2.0)*0.05*uProgress;
+    vec3 gold=mix(vec3(0.1,0.08,0.02),vec3(0.79,0.66,0.3),vUv.y+wave);
+    gl_FragColor=vec4(gold,1.0-d*uProgress); }`
+});
+gsap.to(shaderMat.uniforms.uProgress, { value: 1, scrollTrigger: { trigger: '#stats-bar', scrub: true } });
+```
+
+### When to Use WebGL vs CSS 3D
+| Effect | Use CSS 3D | Use Three.js WebGL |
+|--------|-----------|-------------------|
+| Card flips/tilts | Yes | Overkill |
+| Floating logo | Yes | Overkill |
+| Particle fields (100+) | No (DOM perf) | Yes (single draw call) |
+| 3D model (lion/trophy) | No | Yes (GLTF loader) |
+| Shader distortions | No | Yes |
+| Post-processing bloom | No | Yes (EffectComposer) |
+
 ## Auto-Optimizer Integration
 The `Auto-Optimizer` agent (runs every 5 min) automatically:
 - Reduces animations on low-end devices (<4 cores)

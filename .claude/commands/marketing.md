@@ -125,6 +125,61 @@ this.schedule(() => this._updateAnalytics(), 300000);        // Refresh metrics
 7. Add campaign wizard (multi-step setup flow)
 8. Add analytics dashboard
 
+## External Automation Integration (n8n + Mautic)
+
+### n8n Webhook Workflows (via Netlify Functions)
+n8n is a workflow automation platform with 400+ integrations. It cannot run on Netlify, but connects via webhooks through Netlify Functions as a secure proxy.
+
+#### Architecture
+```
+Portal (index.html) → Netlify Function → n8n Webhook → Automation Workflow
+```
+
+#### Key Workflow Patterns
+1. **Lead Routing**: Form submit → Netlify Function → n8n webhook → score lead → route to CRM + assign agent + send welcome email
+2. **Drip Campaign Orchestration**: Recruiting stage change → n8n webhook → multi-step sequence (email day 0, SMS day 3, follow-up day 7)
+3. **Social Scheduling**: Content Studio publish → n8n webhook → post to LinkedIn API + Facebook API + schedule follow-up
+4. **Event-Driven Nurture**: `recruiting:stageChanged` event → Netlify Function → n8n → auto-enroll in nurture sequence via SendGrid/Mailchimp
+
+#### Netlify Function Proxy Pattern
+```javascript
+// netlify/functions/marketing-webhook.js
+exports.handler = async (event) => {
+  const payload = JSON.parse(event.body);
+  const response = await fetch('https://your-n8n.example.com/webhook/marketing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return { statusCode: 200, body: JSON.stringify({ success: true }) };
+};
+```
+
+### Mautic Integration (Marketing Automation API)
+Mautic provides contact management, lead scoring, campaign automation, and email marketing via REST API (OAuth2).
+
+#### Mautic JS Tracking (Drop-in)
+Add visitor tracking to the landing page with zero build step:
+```html
+<script>(function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
+w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)};
+a=d.createElement(t);m=d.getElementsByTagName(t)[0];
+a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://your-mautic.example.com/mtc.js','mt');
+mt('send','pageview');</script>
+```
+
+#### Mautic API Calls (via Netlify Function proxy)
+- `POST /api/contacts/new` — Create lead from portal form
+- `POST /api/campaigns/{id}/contact/{contactId}/add` — Enroll in drip campaign
+- `GET /api/contacts/{id}` — Pull lead score and engagement history
+- `POST /api/emails/{id}/send/lead/{contactId}` — Trigger email from campaign
+
+### Integration Priority
+1. **Start with n8n** — one webhook can replace dozens of manual onboarding/lead routing steps
+2. **Add Mautic later** — for lead scoring, advanced segmentation, and multi-channel campaign orchestration
+3. **Keep API keys server-side** — all external calls route through Netlify Functions, NEVER from client
+
 ## Validation
 - Agent registers and starts without errors
 - Campaigns persist in localStorage across sessions
@@ -133,3 +188,4 @@ this.schedule(() => this._updateAnalytics(), 300000);        // Refresh metrics
 - Event Bus listeners fire correctly
 - UI renders in Command Center
 - Mobile-responsive layout
+- External webhook integrations route through Netlify Functions (no API keys in index.html)

@@ -40,5 +40,32 @@ Analyze the commission structure for potential business insights:
 - Are commission calculations automated or manual?
 - Suggest improvements that could help agents track their path to the next tier
 
+## 6. Double-Entry Audit Verification (from Akaunting / Firefly III)
+
+### Balanced Entry Check
+Every commission payout should be traceable as a balanced journal entry:
+```
+Debit:  Commission Expense    $4,500
+Credit: Cash / Payable        $4,500
+```
+If any entry is unbalanced, it indicates a calculation error or missing transaction.
+
+### Override Cascade Integrity
+Verify the full override chain sums correctly:
+```
+Deal AP: $10,000
+FA (65%):         $10,000 x 0.65 x 0.75 = $4,875
+Manager override: $10,000 x 0.35 x 0.75 = $2,625  (100% - 65% = 35% spread)
+Exec override:    $10,000 x 0.20 x 0.75 = $1,500  (120% - 100% = 20% spread)
+────────────────────────────────────────────────────
+Total payout:     $10,000 x 1.20 x 0.75 = $9,000  ← Must equal sum of all payouts
+```
+
+### Chargeback Reversal Verification
+Each chargeback must create a reversal entry debiting the correct agent:
+- Verify chargeback is deducted from the agent who wrote the deal (not the team lead)
+- Verify override reversals cascade up the hierarchy
+- Flag any chargeback where the agent's balance goes negative without a debt recovery plan
+
 ## Output
 Present a structured audit report with pass/fail for compliance checks and actionable recommendations for optimization.

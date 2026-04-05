@@ -62,6 +62,58 @@ Applications → Approved → Contracted → Licensed → Trained → Producing
 - Documents not signed after 5 days → Compliance Agent alert
 - No deals after 30 days → Retention Agent alert + manager notification
 
+## Enhanced Analytics & Persistence
+
+### PostHog Funnel Analytics (Drop-in Script)
+Track real onboarding dropout points with zero build step:
+```html
+<script src="https://us.i.posthog.com/static/array.js"></script>
+<script>posthog.init('your-project-key', { api_host: 'https://us.i.posthog.com' });</script>
+```
+
+#### Track Each Pipeline Stage
+```javascript
+posthog.capture('onboarding_stage', { stage: 'application_received', agent_id: id });
+posthog.capture('onboarding_stage', { stage: 'interview_approved', agent_id: id, days_since_apply: n });
+posthog.capture('onboarding_stage', { stage: 'contracted', agent_id: id });
+posthog.capture('onboarding_stage', { stage: 'licensed', agent_id: id });
+posthog.capture('onboarding_stage', { stage: 'training_started', agent_id: id });
+posthog.capture('onboarding_stage', { stage: 'first_deal', agent_id: id });
+```
+
+#### PostHog Funnel View
+Define a funnel in PostHog dashboard: Application → Approved → Contracted → Licensed → Trained → First Deal. PostHog automatically calculates conversion rates and time-between-steps — replacing manual pipeline math.
+
+#### Feature Flags for Onboarding Experiments
+```javascript
+if (posthog.isFeatureEnabled('fast-track-onboarding')) {
+  // Skip optional steps, accelerated training path
+}
+```
+
+### Supabase for Persistent Pipeline Data
+Replace fragile localStorage with durable Postgres:
+```javascript
+// CDN: <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+const supabase = supabase.createClient('https://your-project.supabase.co', 'anon-key');
+
+// Track pipeline stage changes
+await supabase.from('onboarding_pipeline').upsert({
+  agent_id: id, stage: 'contracted', updated_at: new Date().toISOString()
+});
+
+// Real-time bottleneck alerts
+supabase.channel('pipeline').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'onboarding_pipeline' },
+  (payload) => { if (payload.new.days_in_stage > 7) alertManager(payload.new); }
+).subscribe();
+```
+
+### n8n Automated Nudges
+Replace manual agent checks with n8n webhook workflows:
+- Training not started after 7 days → n8n → Training Coach alert + automated email
+- Documents not signed after 5 days → n8n → Compliance alert + SMS reminder
+- No deals after 30 days → n8n → Retention alert + manager notification + call scheduled
+
 ## Output
 Present pipeline funnel with conversion rates at each stage. List agents stuck at each bottleneck. Calculate avg time through full pipeline.
 

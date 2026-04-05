@@ -120,6 +120,56 @@ Example: Take the generated hero and add more money flying, change the lighting,
 - `/ai-generate refine [filename] [changes]` — Image-to-image refinement via kontext model
 - `/ai-generate compare` — Show all images in generated/ folder for comparison
 
+## AI Agent Integration (from Anthropic Cookbook + Vercel AI SDK)
+
+### Sub-Agent Pattern for AI Content
+The 12-agent command center can use Claude as a sub-agent for intelligent content generation:
+```javascript
+// Via Netlify Function — NEVER expose API keys client-side
+const response = await fetch('/.netlify/functions/ai-content', {
+  method: 'POST',
+  body: JSON.stringify({
+    type: 'social_post',
+    context: { platform: 'linkedin', topic: 'recruiting', tone: 'professional' }
+  })
+});
+const { content, imagePrompt } = await response.json();
+// imagePrompt feeds directly to Pollinations.ai for matching visuals
+```
+
+### Vercel AI SDK Streaming (via Netlify Functions)
+Stream AI-generated content for real-time typing effect in the portal:
+```javascript
+// netlify/functions/ai-content.js (server-side)
+import { anthropic } from '@ai-sdk/anthropic';
+import { streamText } from 'ai';
+
+export default async (req) => {
+  const result = streamText({
+    model: anthropic('claude-haiku-4-5-20251001'), // Fast + cheap for content gen
+    prompt: req.body.prompt,
+    system: 'You are an LLFG marketing copywriter. Write compelling insurance recruiting content.'
+  });
+  return result.toDataStreamResponse();
+};
+
+// Client-side: stream into content editor
+const response = await fetch('/.netlify/functions/ai-content', { method: 'POST', body: JSON.stringify({ prompt }) });
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  editor.innerHTML += decoder.decode(value);
+}
+```
+
+### Tool Use Pattern (from Anthropic Cookbook)
+Let Claude call tools to generate content with real data:
+- Tool: `get_team_stats` → Claude writes post citing real team metrics
+- Tool: `get_top_agent` → Claude writes success story featuring actual top producer
+- Tool: `get_carrier_list` → Claude writes carrier comparison content
+
 ## Upgrading to Paid (Optional)
 For video generation or higher quality, add API keys to `.claude/ai-config.json`:
 - **Runway** (runwayml.com) — cinematic video, ~$0.05/sec

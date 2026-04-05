@@ -50,5 +50,52 @@ Based on the analysis, suggest:
 - Ways to improve agent retention visibility (activity tracking, engagement metrics)
 - Team structure optimizations based on the hierarchy requirements
 
+## 6. Supabase Auth + RLS for Agent Management
+
+### Replace Hardcoded Accounts with Supabase Auth
+Move from client-side credentials to proper authentication:
+```javascript
+// CDN: <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+const supabase = supabase.createClient('https://your-project.supabase.co', 'anon-key');
+
+// Agent login
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'agent@llfg.us', password: 'xxx'
+});
+
+// Agent profile with role
+const { data: profile } = await supabase.from('agents')
+  .select('*, teams(*)')
+  .eq('auth_id', data.user.id)
+  .single();
+```
+
+### Row Level Security Enforces Hierarchy
+```sql
+-- FAs see only their own data
+CREATE POLICY "fa_own_data" ON agents FOR SELECT
+  USING (auth.uid() = auth_id);
+
+-- Managers see their team
+CREATE POLICY "manager_team" ON agents FOR SELECT
+  USING (team_id IN (SELECT id FROM teams WHERE lead_id = auth.uid()));
+
+-- Executives see their managers' teams
+CREATE POLICY "exec_org" ON agents FOR SELECT
+  USING (team_id IN (
+    SELECT t.id FROM teams t
+    JOIN teams parent ON t.parent_id = parent.id
+    WHERE parent.lead_id = auth.uid()
+  ));
+```
+
+### PostHog for Agent Activity Tracking
+```javascript
+posthog.capture('portal_login', { agent_id: id, role: role });
+posthog.capture('deal_logged', { agent_id: id, ap: amount });
+posthog.capture('training_completed', { agent_id: id, course: name });
+// Session replay shows exactly how agents navigate the portal
+```
+
 ## Output
 Present an organizational chart summary and actionable recommendations for team growth optimization.
