@@ -3640,6 +3640,24 @@
     }
 
     /* ─── Toast Upgrade ─── */
+    /* ═══ CRM PIPELINE STYLES ═══ */
+    .crm-pipeline-col { min-width:180px;flex:1;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);border-radius:4px; }
+    .crm-col-header { padding:0.8rem;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cream);font-weight:600;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04); }
+    .crm-col-count { background:rgba(201,168,76,0.1);color:var(--gold);font-size:0.55rem;padding:0.15rem 0.5rem;border-radius:50px; }
+    .crm-col-body { padding:0.5rem;min-height:200px;display:flex;flex-direction:column;gap:0.4rem; }
+    .crm-pipe-card { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:0.6rem;cursor:grab;transition:all 0.2s;font-size:0.68rem; }
+    .crm-pipe-card:hover { border-color:rgba(201,168,76,0.2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+    .crm-pipe-card .crm-card-name { color:var(--cream);font-weight:500;margin-bottom:0.2rem; }
+    .crm-pipe-card .crm-card-value { color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:0.9rem; }
+    .crm-pipe-card .crm-card-meta { color:var(--gray);font-size:0.55rem;margin-top:0.3rem; }
+    .crm-panel { transition:opacity 0.2s; }
+    .crm-activity-item { display:flex;gap:0.8rem;padding:0.8rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.72rem; }
+    .crm-activity-icon { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0; }
+    .crm-activity-text { flex:1; }
+    .crm-activity-text strong { color:var(--cream); }
+    .crm-activity-time { color:var(--gray);font-size:0.58rem;margin-top:0.2rem; }
+    @media(max-width:768px) { .crm-pipeline-col { min-width:160px; } #crmKPICards { grid-template-columns:repeat(2,1fr); } }
+
     .llfg-toast {
       position: fixed;
       bottom: 2rem;
@@ -5711,62 +5729,6 @@
               <p style="font-size:0.6rem;color:var(--gray);margin-top:0.5rem;text-align:center;line-height:1.5;">Opens Google Calendar pre-filled · Guest receives email invite to accept or decline · Event saves to your calendar.</p>
             </div>
 
-            <!-- Email Templates — separate from team chat -->
-            <div class="dash-section">
-              <div class="dash-section-title" style="display:flex;align-items:center;gap:0.5rem;">
-                <span>✉ Send Email Template</span>
-              </div>
-              <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.6rem 0.8rem;margin-bottom:0.8rem;">
-                <div style="font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.2rem;">Note</div>
-                <div style="font-size:0.65rem;color:var(--gray);line-height:1.5;">These are professional email templates for clients, interview prospects, and team communication. This is completely separate from the team chat feature in Messages.</div>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:0.6rem;">
-                <div class="cal-field">
-                  <label>Recipient Email</label>
-                  <input type="email" id="calTplRecipient" placeholder="recipient@email.com"/>
-                </div>
-                <div class="cal-field">
-                  <label>Recipient Name</label>
-                  <input type="text" id="calTplRecipientName" placeholder="Jane Smith" oninput="previewCalTemplate()"/>
-                </div>
-                <div class="cal-field">
-                  <label>Template</label>
-                  <select id="calTplSelect" onchange="previewCalTemplate()" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.75rem;font-family:'Raleway',sans-serif;font-size:0.82rem;outline:none;-webkit-appearance:none;width:100%;">
-                    <option value="">— Select Template —</option>
-                    <optgroup label="Interview & Prospects">
-                      <option value="int_invite">Interview Appointment Invite</option>
-                      <option value="int_confirm">Interview Confirmation</option>
-                      <option value="int_followup">Post-Interview Follow-Up</option>
-                      <option value="no_show">Missed Appointment Follow-Up</option>
-                    </optgroup>
-                    <optgroup label="Phone Calls">
-                      <option value="phone_invite">Phone Screen Invite</option>
-                      <option value="phone_reminder">Call Reminder</option>
-                    </optgroup>
-                    <optgroup label="Licensing">
-                      <option value="license_general">Licensing Instructions — General</option>
-                      <option value="license_state">Licensing Instructions — By State</option>
-                    </optgroup>
-                    <optgroup label="Welcome">
-                      <option value="welcome">Welcome to the Team</option>
-                    </optgroup>
-                    <optgroup label="Follow-Up">
-                      <option value="phone_reminder">Call Reminder</option>
-                    </optgroup>
-                  </select>
-                </div>
-                <div id="calTplPreviewWrap" style="display:none;">
-                  <div style="background:#0a0a0a;border:1px solid rgba(201,168,76,0.1);padding:0.7rem 0.9rem;max-height:140px;overflow-y:auto;margin-bottom:0.5rem;">
-                    <div style="font-size:0.56rem;color:var(--gold-dim);margin-bottom:0.4rem;letter-spacing:0.12em;text-transform:uppercase;">Preview</div>
-                    <div style="font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(255,255,255,0.04);"><strong style="color:var(--cream);">To:</strong> <span id="calTplToPreview">—</span></div>
-                    <div style="font-size:0.65rem;color:var(--gray);margin-bottom:0.3rem;"><strong style="color:var(--cream);">Subj:</strong> <span id="calTplSubjPreview"></span></div>
-                    <div style="font-size:0.63rem;color:var(--gray);white-space:pre-wrap;max-height:80px;overflow:hidden;line-height:1.5;" id="calTplBodyPreview"></div>
-                  </div>
-                </div>
-                <button onclick="sendCalEmailTemplate()" class="modal-btn" style="width:100%;padding:0.8rem;font-size:0.7rem;">✉ Open in Email Client</button>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -6289,6 +6251,123 @@
         </div>
       </div>
     </div>
+
+  <!-- TAB: CRM — Full Contact/Lead/Deal Tracking -->
+  <div class="admin-tab-content" id="ptab-crm" style="display:none;">
+    <div class="dash-body">
+      <div class="dash-welcome">
+        <h2><em class="gradient-text-dual">CRM</em> Command Center</h2>
+        <p>Full contact management, lead pipeline, deal tracking, and activity intelligence — all in one view.</p>
+      </div>
+
+      <!-- CRM Sub-Navigation -->
+      <div style="display:flex;gap:0;border-bottom:1px solid rgba(201,168,76,0.1);margin-bottom:1.5rem;overflow-x:auto;" id="crmSubTabs">
+        <button class="admin-tab active" onclick="showCRMTab('contacts',this)">Contacts</button>
+        <button class="admin-tab" onclick="showCRMTab('pipeline',this)">Pipeline</button>
+        <button class="admin-tab" onclick="showCRMTab('deals',this)">Deals</button>
+        <button class="admin-tab" onclick="showCRMTab('activity',this)">Activity</button>
+        <button class="admin-tab" onclick="showCRMTab('analytics',this)">Analytics</button>
+        <button class="admin-tab" onclick="showCRMTab('automations',this)">Automations</button>
+      </div>
+
+      <!-- CRM KPI Cards -->
+      <div class="dash-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:1.5rem;" id="crmKPICards">
+        <div class="dash-card glow-dual"><div class="dash-card-label">Total Contacts</div><div class="dash-card-value" id="crmTotalContacts">0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Active Leads</div><div class="dash-card-value" id="crmActiveLeads" style="color:var(--purple-light);">0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Open Deals</div><div class="dash-card-value" id="crmOpenDeals" style="color:var(--gold);">0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Won This Month</div><div class="dash-card-value" id="crmWonMonth" style="color:#6ecf6e;">$0</div></div>
+        <div class="dash-card"><div class="dash-card-label">Conversion Rate</div><div class="dash-card-value" id="crmConvRate">0%</div></div>
+      </div>
+
+      <!-- CRM: Contacts Sub-Tab -->
+      <div id="crm-contacts" class="crm-panel">
+        <div class="dash-section">
+          <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Contact Database</span>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="crmContactSearch" placeholder="Search contacts..." style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.5rem 1rem;font-family:'Raleway',sans-serif;font-size:0.72rem;outline:none;width:220px;" oninput="filterCRMContacts()"/>
+              <select id="crmContactFilter" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.5rem;font-family:'Raleway',sans-serif;font-size:0.68rem;" onchange="filterCRMContacts()">
+                <option value="all">All</option><option value="lead">Leads</option><option value="client">Clients</option><option value="prospect">Prospects</option><option value="partner">Partners</option>
+              </select>
+              <button class="modal-btn" style="width:auto;padding:0.5rem 1.2rem;font-size:0.65rem;" onclick="openCRMContactForm()">+ Add Contact</button>
+            </div>
+          </div>
+          <div class="app-table-wrap">
+            <table class="app-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Type</th><th>Stage</th><th>Source</th><th>Last Activity</th><th>Score</th><th></th></tr></thead>
+            <tbody id="crmContactsBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM: Pipeline Sub-Tab -->
+      <div id="crm-pipeline" class="crm-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title">Lead Pipeline</div>
+          <div style="display:flex;gap:1rem;overflow-x:auto;padding-bottom:1rem;" id="crmPipelineBoard">
+            <div class="crm-pipeline-col" data-stage="new"><div class="crm-col-header" style="border-top:3px solid var(--purple);">New <span class="crm-col-count" id="crmPipeNew">0</span></div><div class="crm-col-body" id="crmPipeNewBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="contacted"><div class="crm-col-header" style="border-top:3px solid var(--blue-trust);">Contacted <span class="crm-col-count" id="crmPipeContacted">0</span></div><div class="crm-col-body" id="crmPipeContactedBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="qualified"><div class="crm-col-header" style="border-top:3px solid var(--gold);">Qualified <span class="crm-col-count" id="crmPipeQualified">0</span></div><div class="crm-col-body" id="crmPipeQualifiedBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="proposal"><div class="crm-col-header" style="border-top:3px solid #ffa500;">Proposal <span class="crm-col-count" id="crmPipeProposal">0</span></div><div class="crm-col-body" id="crmPipeProposalBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="negotiation"><div class="crm-col-header" style="border-top:3px solid var(--purple-light);">Negotiation <span class="crm-col-count" id="crmPipeNegotiation">0</span></div><div class="crm-col-body" id="crmPipeNegotiationBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="won"><div class="crm-col-header" style="border-top:3px solid #6ecf6e;">Won <span class="crm-col-count" id="crmPipeWon">0</span></div><div class="crm-col-body" id="crmPipeWonBody"></div></div>
+            <div class="crm-pipeline-col" data-stage="lost"><div class="crm-col-header" style="border-top:3px solid #e05555;">Lost <span class="crm-col-count" id="crmPipeLost">0</span></div><div class="crm-col-body" id="crmPipeLostBody"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM: Deals Sub-Tab -->
+      <div id="crm-deals" class="crm-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Deal Tracker</span>
+            <button class="modal-btn" style="width:auto;padding:0.5rem 1.2rem;font-size:0.65rem;" onclick="openCRMDealForm()">+ New Deal</button>
+          </div>
+          <div class="app-table-wrap">
+            <table class="app-table"><thead><tr><th>Deal</th><th>Contact</th><th>Product</th><th>Carrier</th><th>AP Value</th><th>Probability</th><th>Stage</th><th>Expected Close</th><th>Agent</th><th></th></tr></thead>
+            <tbody id="crmDealsBody"></tbody></table>
+          </div>
+        </div>
+        <div class="dash-grid" style="grid-template-columns:repeat(4,1fr);margin-top:1.5rem;">
+          <div class="dash-card"><div class="dash-card-label">Pipeline Value</div><div class="dash-card-value" id="crmPipelineValue" style="color:var(--gold);">$0</div></div>
+          <div class="dash-card"><div class="dash-card-label">Weighted Pipeline</div><div class="dash-card-value" id="crmWeightedValue" style="color:var(--purple-light);">$0</div></div>
+          <div class="dash-card"><div class="dash-card-label">Avg Deal Size</div><div class="dash-card-value" id="crmAvgDeal">$0</div></div>
+          <div class="dash-card"><div class="dash-card-label">Avg Close Time</div><div class="dash-card-value" id="crmAvgClose">0 days</div></div>
+        </div>
+      </div>
+
+      <!-- CRM: Activity Sub-Tab -->
+      <div id="crm-activity" class="crm-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title">Activity Feed</div>
+          <div id="crmActivityFeed" style="max-height:600px;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <!-- CRM: Analytics Sub-Tab -->
+      <div id="crm-analytics" class="crm-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title">CRM Analytics</div>
+          <div class="dash-grid" style="grid-template-columns:1fr 1fr;gap:1.5rem;">
+            <div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.08);padding:1.5rem;"><div style="font-size:0.62rem;color:var(--gray);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">Pipeline by Stage</div><canvas id="crmChartPipeline" height="250"></canvas></div>
+            <div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.08);padding:1.5rem;"><div style="font-size:0.62rem;color:var(--gray);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">Revenue Trend</div><canvas id="crmChartRevenue" height="250"></canvas></div>
+            <div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.08);padding:1.5rem;"><div style="font-size:0.62rem;color:var(--gray);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">Lead Sources</div><canvas id="crmChartSources" height="250"></canvas></div>
+            <div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.08);padding:1.5rem;"><div style="font-size:0.62rem;color:var(--gray);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">Agent Performance</div><canvas id="crmChartAgents" height="250"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM: Automations Sub-Tab -->
+      <div id="crm-automations" class="crm-panel" style="display:none;">
+        <div class="dash-section">
+          <div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Automation Rules</span>
+            <button class="modal-btn" style="width:auto;padding:0.5rem 1.2rem;font-size:0.65rem;" onclick="openCRMAutomationForm()">+ New Rule</button>
+          </div>
+          <div id="crmAutomationsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   </div><!-- close agentDash -->
 
@@ -8496,10 +8575,10 @@ Object.defineProperty(window, "_llfgCurrentUser", {
 
       // Stats cards
       document.getElementById('portalOverviewCards').innerHTML =
-        `<div class="dash-card"><div class="dash-card-label">My Deals This Month</div><div class="dash-card-value" id="ovDealCount">0</div><div class="dash-card-sub">Active policies</div></div>
-        <div class="dash-card"><div class="dash-card-label">My AP</div><div class="dash-card-value" id="ovAP">$0</div><div class="dash-card-sub">Annual premium total</div></div>
-        <div class="dash-card"><div class="dash-card-label">Advanced Pay</div><div class="dash-card-value" id="ovPay" style="color:var(--gold-light);">$0</div><div class="dash-card-sub">Commission × 9-mo advance</div></div>`
-        + (isAgent ? `<div class="dash-card" style="border-color:rgba(110,207,110,0.3);"><div class="dash-card-label">Monthly Earnings</div><div class="dash-card-value" id="ovMonthlyEarnings" style="color:#6ecf6e;">$0</div><div class="dash-card-sub">This month\'s commission</div></div>` : '');
+        `<div class="dash-card" onclick="showPortalTab('deals',null,true)" style="cursor:pointer;"><div class="dash-card-label">My Deals This Month</div><div class="dash-card-value" id="ovDealCount">0</div><div class="dash-card-sub">Active policies</div></div>
+        <div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;"><div class="dash-card-label">My AP</div><div class="dash-card-value" id="ovAP">$0</div><div class="dash-card-sub">Annual premium total</div></div>
+        <div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;"><div class="dash-card-label">Advanced Pay</div><div class="dash-card-value" id="ovPay" style="color:var(--gold-light);">$0</div><div class="dash-card-sub">Commission × 9-mo advance</div></div>`
+        + (isAgent ? `<div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;border-color:rgba(110,207,110,0.3);"><div class="dash-card-label">Monthly Earnings</div><div class="dash-card-value" id="ovMonthlyEarnings" style="color:#6ecf6e;">$0</div><div class="dash-card-sub">This month\'s commission</div></div>` : '');
 
       // ── Gamification XP Bar on Dashboard ──
       if (!LLFG_Gamification.data) LLFG_Gamification.init();
@@ -9832,6 +9911,16 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     };
 
 
+
+    window.__R_toggleTrainingChapter = window.toggleTrainingChapter = function(header) {
+      var body = header.nextElementSibling;
+      var chevron = header.querySelector(".training-doc-chevron");
+      if (!body) return;
+      var isOpen = body.style.display !== "none";
+      body.style.display = isOpen ? "none" : "block";
+      if (chevron) chevron.style.transform = isOpen ? "" : "rotate(180deg)";
+      header.parentElement.classList.toggle("open", !isOpen);
+    };
 
     window.__R_toggleTrainingUnit = window.toggleTrainingUnit = function(header) {
       const body = header.nextElementSibling;
