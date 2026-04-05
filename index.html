@@ -233,12 +233,14 @@
 
     /* 250025002500 HERO 2014 3D LION SCROLL 250025002500 */
     #hero {
-      min-height: 300vh;
+      /* Fixed: was 300vh from lion scroll era */
+      min-height: 100vh;
       position: relative;
       background: var(--black);
     }
     .hero-sticky {
-      position: sticky; top: 0; height: 100vh;
+      /* No longer needed for scroll lock */
+      height: 100vh;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; background: var(--black);
     }
@@ -403,6 +405,30 @@
     .dash-body::-webkit-scrollbar-track { background: transparent; }
     .dash-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.15); border-radius: 4px; }
     .dash-body::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.3); }
+
+    /* ─── MESSAGING PREMIUM ─── */
+    .msg-contact { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); border-left: 2px solid transparent; }
+    .msg-contact:hover { background: rgba(201,168,76,0.04) !important; border-left-color: var(--gold); transform: translateX(3px); }
+    .msg-contact.active { background: rgba(201,168,76,0.06) !important; border-left-color: var(--gold); }
+    #msgThread > div { animation: msgFadeIn 0.25s ease both; }
+    @keyframes msgFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    #msgInput { transition: border-color 0.3s, box-shadow 0.3s; }
+    #msgInput:focus { border-color: rgba(201,168,76,0.3) !important; box-shadow: 0 0 12px rgba(201,168,76,0.06); }
+    .msg-tab { transition: all 0.25s; }
+    .msg-tab.active { background: rgba(201,168,76,0.12) !important; color: var(--gold) !important; border-color: rgba(201,168,76,0.3) !important; }
+
+    /* ─── TRAINING PREMIUM ─── */
+    .training-chapter { transition: all 0.3s; border-left: 3px solid transparent; margin-bottom: 0.5rem; }
+    .training-chapter:hover { border-left-color: var(--gold); }
+    .training-chapter.open { border-left-color: var(--gold); background: rgba(201,168,76,0.02); }
+    .training-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.25rem 0.6rem; border-radius: 50px; font-size: 0.55rem; letter-spacing: 0.08em; transition: all 0.3s; }
+    .training-badge:hover { transform: scale(1.1); }
+    .training-badge.earned { background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); color: var(--gold); }
+    .training-badge.locked { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: var(--gray); }
+    .xp-bar-wrap { background: rgba(201,168,76,0.06); height: 8px; overflow: hidden; position: relative; }
+    .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-light)); transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+    .xp-bar-fill::after { content: ''; position: absolute; top: 0; right: 0; width: 30px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4)); animation: xpShine 2.5s ease-in-out infinite; }
+    @keyframes xpShine { 0%,100% { opacity: 0; transform: translateX(-30px); } 50% { opacity: 1; transform: translateX(0); } }
 
     /* ─── LEADERBOARD PREMIUM ─── */
     .leaderboard-podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
@@ -2795,7 +2821,7 @@
     .reveal-scale.visible { opacity: 1; transform: scale(1); }
 
     /* ─── FLOATING CTA ─── */
-    #floatingCTA {
+    #floatingCTA { display:none !important; /*removed*/
       position: fixed; bottom: 2rem; right: 2rem; z-index: 98;
       background: var(--gold); color: var(--black); border: none;
       padding: 0.9rem 1.6rem; font-family: 'Raleway', sans-serif;
@@ -2882,7 +2908,7 @@
       .hero-content { padding: 0 1.2rem !important; }
 
 
-      #floatingCTA { bottom: 1rem; right: 1rem; padding: 0.7rem 1.2rem; font-size: 0.65rem; }
+      #floatingCTA { display:none !important; /*removed*/ bottom: 1rem; right: 1rem; padding: 0.7rem 1.2rem; font-size: 0.65rem; }
       #agency { padding: 3.5rem 1.2rem !important; }
       #agency .btn-primary, #agency .btn-ghost { display: block; width: 100%; margin: 0.4rem 0 !important; text-align: center; }
       #apply { padding: 3rem 1.2rem !important; }
@@ -3205,7 +3231,8 @@
 
     /* ── Extra small ≤ 480px ── */
     @media (max-width: 480px) {
-      #hero { padding: 5rem 1rem 8rem; }
+      #hero {
+      /* Fixed: was 300vh from lion scroll era */ padding: 5rem 1rem 8rem; }
       #hero h1 { font-size: clamp(1.7rem, 9vw, 2.4rem); }
       .carrier-grid { grid-template-columns: repeat(2,1fr) !important; }
       .about-right { grid-template-columns: 1fr !important; }
@@ -18325,6 +18352,16 @@ This request requires Managing Partner approval.`
       gsap.registerPlugin(ScrollTrigger);
 
 
+      // Hero entrance — staggered reveal
+      var hTL = gsap.timeline({ defaults: { ease: "power3.out" } });
+      var hBadge = document.querySelector("#hero .badge-pill");
+      var hH1 = document.querySelector("#hero h1");
+      var hP = document.querySelector("#hero h1 + p");
+      var hBtns = document.querySelector("#hero .btn-primary");
+      if (hBadge) hTL.from(hBadge, { y: 30, opacity: 0, duration: 0.8 }, 0.2);
+      if (hH1) hTL.from(hH1, { y: 50, opacity: 0, duration: 1, scale: 0.95 }, 0.4);
+      if (hP) hTL.from(hP, { y: 30, opacity: 0, duration: 0.8 }, 0.7);
+      if (hBtns) hTL.from(hBtns.parentElement, { y: 20, opacity: 0, duration: 0.7 }, 0.9);
       // Hero parallax (particles handle visuals)
       var heroBg = document.querySelector('#hero .hero-bg');
       var heroContent = document.querySelector('#hero > .hero-sticky > div:nth-child(4)');
@@ -19491,6 +19528,67 @@ This request requires Managing Partner approval.`
         obs.observe(s);
       });
     })();
+
+    // ─── NDA & DEBT ROLLUP DOWNLOADABLE FORMS ───────────────────────
+    window.downloadNDA = function() {
+      var user = currentUser || window._llfgCurrentUser || {};
+      var html = '<!DOCTYPE html><html><head><title>LLFG NDA</title><style>body{font-family:Georgia,serif;max-width:700px;margin:2rem auto;padding:2rem;color:#222;line-height:1.8}h1{font-size:1.4rem;text-align:center;margin-bottom:2rem}h2{font-size:1rem;margin-top:1.5rem;border-bottom:1px solid #ccc;padding-bottom:0.3rem}.sig{margin-top:3rem;display:flex;justify-content:space-between}.sig-line{width:45%;border-top:1px solid #333;padding-top:0.3rem;font-size:0.85rem}@media print{body{margin:0}}</style></head><body>'
+        + '<h1>NON-DISCLOSURE & NON-SOLICITATION AGREEMENT</h1>'
+        + '<p><strong>Legacy Life Financial Group, LLC</strong></p>'
+        + '<p>This Non-Disclosure and Non-Solicitation Agreement ("Agreement") is entered into by and between Legacy Life Financial Group, LLC ("LLFG") and the undersigned independent agent ("Agent").</p>'
+        + '<h2>1. Confidential Information</h2>'
+        + '<p>Agent acknowledges that during the course of their engagement with LLFG, they may have access to proprietary and confidential information including but not limited to: client lists, lead databases, commission structures, compensation plans, carrier contracts, training materials, agent rosters, business strategies, technology systems, and internal communications.</p>'
+        + '<h2>2. Non-Disclosure Obligations</h2>'
+        + '<p>Agent agrees to hold all Confidential Information in strict confidence and not to disclose, publish, or otherwise disseminate any Confidential Information to any third party without the prior written consent of LLFG. This obligation survives termination of the agent relationship.</p>'
+        + '<h2>3. Non-Solicitation</h2>'
+        + '<p>For a period of twelve (12) months following termination of engagement, Agent agrees not to directly or indirectly solicit, recruit, or attempt to recruit any agent, employee, or contractor of LLFG for the purpose of employment or engagement with any competing organization.</p>'
+        + '<h2>4. Return of Materials</h2>'
+        + '<p>Upon termination of engagement, Agent shall promptly return all materials, documents, data, and property belonging to LLFG, including all copies thereof.</p>'
+        + '<h2>5. Remedies</h2>'
+        + '<p>Agent acknowledges that any breach of this Agreement may cause irreparable harm to LLFG and that monetary damages may be insufficient. LLFG shall be entitled to seek equitable relief, including injunction and specific performance, in addition to any other remedies available at law.</p>'
+        + '<div class="sig"><div class="sig-line">Agent Signature / Date</div><div class="sig-line">LLFG Representative / Date</div></div>'
+        + '<p style="margin-top:2rem;font-size:0.8rem;color:#888;">Generated: ' + new Date().toLocaleDateString() + ' | Agent: ' + (user.name || '___________') + '</p>'
+        + '</body></html>';
+      var w = window.open('', '_blank');
+      w.document.write(html);
+      w.document.close();
+      w.print();
+    };
+
+    window.downloadDebtRollup = function() {
+      var user = currentUser || window._llfgCurrentUser || {};
+      var html = '<!DOCTYPE html><html><head><title>LLFG Debt Rollup Agreement</title><style>body{font-family:Georgia,serif;max-width:700px;margin:2rem auto;padding:2rem;color:#222;line-height:1.8}h1{font-size:1.4rem;text-align:center;margin-bottom:2rem}h2{font-size:1rem;margin-top:1.5rem;border-bottom:1px solid #ccc;padding-bottom:0.3rem}ol,ul{margin-left:1.5rem}.sig{margin-top:3rem;display:flex;justify-content:space-between}.sig-line{width:45%;border-top:1px solid #333;padding-top:0.3rem;font-size:0.85rem}@media print{body{margin:0}}</style></head><body>'
+        + '<h1>DEBT ROLLUP & FINANCIAL RESPONSIBILITY AGREEMENT</h1>'
+        + '<p><strong>Legacy Life Financial Group, LLC</strong></p>'
+        + '<p>This Debt Rollup and Financial Responsibility Agreement ("Agreement") is entered into by and between Legacy Life Financial Group, LLC ("LLFG") and the undersigned independent agent ("Agent").</p>'
+        + '<h2>1. Chargeback Responsibility</h2>'
+        + '<p>Agent acknowledges and agrees that they are personally responsible for all chargebacks resulting from policies written by Agent that lapse, cancel, or are returned within the applicable chargeback window (typically 9-12 months, as determined by each carrier).</p>'
+        + '<h2>2. Debt Rollup Mechanism</h2>'
+        + '<p>Any unpaid chargeback balances will be aggregated into a "Debt Rollup" balance. This balance:</p>'
+        + '<ul><li>Will be deducted from future commission payments until fully repaid</li><li>Must be repaid in full before any commission advances are resumed</li><li>Carries forward across commission periods until resolved</li><li>Accrues no interest but must be settled within 12 months of incurrence</li></ul>'
+        + '<h2>3. Upline Responsibility</h2>'
+        + '<p>For Agents holding a Manager role or above, the Debt Rollup balance may include chargebacks attributed to their downline agents when those agents are unable to cover their own chargeback obligations.</p>'
+        + '<h2>4. Reporting & Transparency</h2>'
+        + '<p>LLFG will provide monthly statements showing current debt rollup balance, chargeback details, and repayment progress. Agent may access this information through the LLFG Agent Portal at any time.</p>'
+        + '<h2>5. Termination</h2>'
+        + '<p>Upon termination of the agent relationship, any outstanding Debt Rollup balance becomes immediately due and payable. LLFG reserves the right to pursue collection through appropriate legal channels.</p>'
+        + '<div class="sig"><div class="sig-line">Agent Signature / Date</div><div class="sig-line">LLFG Representative / Date</div></div>'
+        + '<p style="margin-top:2rem;font-size:0.8rem;color:#888;">Generated: ' + new Date().toLocaleDateString() + ' | Agent: ' + (user.name || '___________') + '</p>'
+        + '</body></html>';
+      var w = window.open('', '_blank');
+      w.document.write(html);
+      w.document.close();
+      w.print();
+    };
+
+    window.sendAgreementToAgent = function(type) {
+      var email = prompt('Enter agent email to send ' + type + ':');
+      if (!email) return;
+      if (typeof LLFG_EventBus !== 'undefined') {
+        LLFG_EventBus.emit('email:sendAgreement', { type: type, to: email, sentBy: (currentUser || {}).name || 'Manager' });
+      }
+      LLFG_Brain._showToast(type + ' sent to ' + email, '#6ecf6e');
+    };
   </script>
 </body>
 </html>
