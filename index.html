@@ -368,6 +368,42 @@
     }
     .hero-btns { display: flex; gap: 1rem; margin-top: 2rem; }
 
+    /* ─── CRM PREMIUM PORTAL STYLING ─── */
+    .dash-body { animation: tabFadeIn 0.4s ease both; }
+    .dash-welcome h2 { background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--cream)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .dash-grid { perspective: 800px; }
+    .dash-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(201,168,76,0.08); backdrop-filter: blur(8px); position: relative; overflow: hidden; }
+    .dash-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent); opacity: 0; transition: opacity 0.4s; }
+    .dash-card:hover::before { opacity: 1; }
+    .dash-card-value { transition: transform 0.3s; }
+    .dash-card:hover .dash-card-value { transform: scale(1.05); }
+    .dash-section { background: rgba(255,255,255,0.015); border: 1px solid rgba(201,168,76,0.06); backdrop-filter: blur(4px); position: relative; }
+    .dash-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent); }
+    .dash-section-title { position: relative; display: inline-block; }
+    .dash-section-title::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); }
+    /* Portal form inputs premium */
+    .admin-tab-content input, .admin-tab-content select, .admin-tab-content textarea {
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .admin-tab-content input:focus, .admin-tab-content select:focus, .admin-tab-content textarea:focus {
+      border-color: rgba(201,168,76,0.4) !important;
+      box-shadow: 0 0 15px rgba(201,168,76,0.08);
+      outline: none;
+    }
+    /* Portal tab buttons */
+    .admin-tab { transition: all 0.3s; position: relative; }
+    .admin-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%; height: 2px; background: var(--gold); }
+    .admin-tab:hover { color: var(--gold-light); }
+    /* App table premium */
+    .app-table { border-collapse: separate; border-spacing: 0; }
+    .app-table tr { transition: background 0.2s; }
+    .app-table tr:hover { background: rgba(201,168,76,0.03) !important; }
+    /* Smooth scrollbar */
+    .dash-body::-webkit-scrollbar { width: 4px; }
+    .dash-body::-webkit-scrollbar-track { background: transparent; }
+    .dash-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.15); border-radius: 4px; }
+    .dash-body::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.3); }
+
     .hero-tag {
       display: inline-block;
       font-size: 0.7rem;
@@ -5283,10 +5319,10 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Performance Report -->
-          <div class="report-card" onclick="downloadReport('performance')">
+          <!-- Team Overview Report -->
+          <div class="report-card" onclick="downloadReport('overview')">
             <div class="report-card-icon">📈</div>
-            <div class="report-card-title">Performance Report</div>
+            <div class="report-card-title">Team Overview Report</div>
             <div class="report-card-desc">Leaderboard, comp percentages, top producers, activity ratios, and goals vs actuals.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
@@ -5299,11 +5335,11 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Retention Report -->
+          <!-- Team Health Report -->
           <div class="report-card" onclick="downloadReport('retention')">
             <div class="report-card-icon">🤝</div>
-            <div class="report-card-title">Retention Report</div>
-            <div class="report-card-desc">Persistency rates, chargeback exposure, policy lapse analysis, and at-risk policy flags per agent.</div>
+            <div class="report-card-title">Team Health Report</div>
+            <div class="report-card-desc">Team health overview with retention insights and coaching recommendations.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
 
@@ -5315,11 +5351,11 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Chargeback Risk Report -->
-          <div class="report-card" onclick="downloadReport('chargeback')">
+          <!-- Financial Health Report -->
+          <div class="report-card" onclick="downloadReport('health')">
             <div class="report-card-icon">⚠️</div>
-            <div class="report-card-title">Chargeback Risk Report</div>
-            <div class="report-card-desc">Agents at chargeback risk, debt rollup by team, projected exposure, and recommendations for at-risk policies.</div>
+            <div class="report-card-title">Financial Health Report</div>
+            <div class="report-card-desc">Financial health summary with recommendations for team growth.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
 
@@ -5350,7 +5386,7 @@
           <div style="overflow-x:auto;">
             <table class="app-table" style="min-width:700px;" id="reportSummaryTable">
               <thead>
-                <tr><th>Team</th><th>Total AP</th><th>Agents Active</th><th>Persistency</th><th>Chargeback %</th><th>Retention</th><th>Debt Risk</th></tr>
+                <tr><th>Team</th><th>Total AP</th><th>Agents Active</th><th>Debt Risk</th></tr>
               </thead>
               <tbody id="reportSummaryBody"></tbody>
             </table>
@@ -7583,8 +7619,8 @@ Legacy Life Financial Group`
           <div style="text-align:right;font-size:0.85rem;color:var(--gold-light);">$${advPay.toLocaleString()}</div>
           <div style="text-align:right;font-size:0.85rem;color:var(--cream);">$${team.moPremium.toLocaleString()}</div>
           <div style="text-align:right;font-size:0.85rem;color:var(--gold);">${team.leaderComm}%</div>
-          <div style="text-align:right;font-size:0.85rem;color:${persistColor(team.persistency)};">${team.persistency}%</div>
-          <div style="text-align:right;font-size:0.85rem;color:${cbColor(team.chargeback)};">${team.chargeback}%</div>
+          <!-- persistency removed -->
+          <!-- chargeback removed -->
           <div style="text-align:right;font-size:0.85rem;color:${persistColor(team.retention)};">${team.retention}%</div>
           <div style="text-align:right;font-size:0.8rem;font-weight:600;color:${debtColor(team.debtRisk)};">${team.debtRisk}</div>
         </div>
@@ -9611,8 +9647,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           <td><strong style="color:var(--cream);">${team.name}</strong><br><span style="font-size:0.6rem;color:var(--gray);">Lead: ${team.leader}</span></td>
           <td style="color:var(--gold);font-weight:600;">$${ap.toLocaleString()}</td>
           <td>${team.agents.length}</td>
-          <td style="color:${pc};">${team.persistency}%</td>
-          <td style="color:${cc};">${team.chargeback}%</td>
+          
+          
           <td style="color:${pc};">${team.retention}%</td>
           <td><span style="color:${dc};font-size:0.7rem;font-weight:600;">${team.debtRisk}</span></td>
         </tr>`;
@@ -9631,7 +9667,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
       const u = currentUser || window._llfgCurrentUser;
       const generatedBy = u?.name || 'Admin';
-      const titles = { ap:'Team AP Report', performance:'Performance Report', onboarding:'Onboarding Report', retention:'Retention Report', commission:'Commission Report', chargeback:'Chargeback Risk Report', full:'Full Organization Report' };
+      const titles = { ap:'Team AP Report', performance:'Team Overview Report', onboarding:'Onboarding Report', retention:'Team Health Report', commission:'Commission Report', chargeback:'Financial Health Report', full:'Full Organization Report' };
       const title = titles[type] || 'Report';
       const totalAP = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + Math.round(t.totalAP * m), 0) : 0;
       const totalAgents = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + t.agents.length, 0) : 0;
@@ -9656,13 +9692,13 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           <div class="kpi"><div class="kpi-label">Active Agents</div><div class="kpi-value">${totalAgents}</div></div>
           <div class="kpi"><div class="kpi-label">Avg Persistency</div><div class="kpi-value">${avgPersist}%</div></div>
         </div>
-        <table><thead><tr><th>Team</th><th>AP (${periodLabel})</th><th>Agents</th><th>Persistency</th><th>Chargeback</th><th>Debt Risk</th></tr></thead><tbody>
+        <table><thead><tr><th>Team</th><th>AP (${periodLabel})</th><th>Agents</th><th>Chargeback</th><th>Debt Risk</th></tr></thead><tbody>
         ${(typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.map(t => `<tr>
           <td><strong>${t.name}</strong> — ${t.leader}</td>
           <td>$${Math.round(t.totalAP*m).toLocaleString()}</td>
           <td>${t.agents.length}</td>
-          <td>${t.persistency}%</td>
-          <td>${t.chargeback}%</td>
+
+
           <td>${t.debtRisk}</td>
         </tr>`).join('') : ''}
         </tbody></table>
@@ -9719,12 +9755,12 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       if (!el || typeof TEAM_DATA === 'undefined') return;
       const m = PERIOD_MULTIPLIERS[currentReportPeriod] || 1;
       el.innerHTML = `<table class="app-table" style="min-width:600px;"><thead><tr>
-        <th>Team</th><th>AP</th><th>Agents</th><th>Persistency</th><th>Chargeback</th><th>Debt Risk</th>
+        <th>Team</th><th>AP</th><th>Agents</th><th>Chargeback</th><th>Debt Risk</th>
       </tr></thead><tbody>${TEAM_DATA.map(t => `<tr>
         <td><strong>${t.name}</strong></td>
         <td style="color:var(--gold);">$${Math.round(t.totalAP*m).toLocaleString()}</td>
         <td>${t.agents.length}</td>
-        <td>${t.persistency}%</td><td>${t.chargeback}%</td><td>${t.debtRisk}</td>
+        
       </tr>`).join('')}</tbody></table>`;
     };
 
@@ -12539,7 +12575,7 @@ contact\u0040llfg.us`
 
       // Team Breakdown
       html += '<div class="dash-section" style="margin-bottom:1.2rem;"><div class="dash-section-title">\uD83C\uDFC6 Team Revenue Breakdown</div>';
-      html += '<div style="overflow-x:auto;"><table class="app-table"><thead><tr><th>Team</th><th>Leader</th><th>Agents</th><th>AP</th><th>Persistency</th><th>Chargeback</th></tr></thead><tbody>';
+      html += '<div style="overflow-x:auto;"><table class="app-table"><thead><tr><th>Team</th><th>Leader</th><th>Agents</th><th>AP</th><th>Chargeback</th></tr></thead><tbody>';
       snap.teams.sort(function(a, b) { return b.ap - a.ap; }).forEach(function(t) {
         html += '<tr><td style="font-weight:600;color:var(--cream);">' + t.name + '</td><td>' + t.leader + '</td><td>' + t.agents + '</td>';
         html += '<td style="color:var(--gold);font-weight:600;">$' + t.ap.toLocaleString() + '</td>';
@@ -14152,9 +14188,9 @@ This request requires Managing Partner approval.`
                 </div>
                 <div style="text-align:right;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);">$${team.totalAP.toLocaleString()}</div>
                 <div style="text-align:right;font-size:0.84rem;color:var(--cream);">$${team.moPremium.toLocaleString()}</div>
-                <div style="text-align:right;font-size:0.84rem;color:${team.persistency>=85?'#6ecf6e':team.persistency>=78?'#ffa500':'#e05555'};">${team.persistency}%</div>
-                <div style="text-align:right;font-size:0.84rem;color:${team.chargeback<4?'#6ecf6e':team.chargeback<7?'#ffa500':'#e05555'};">${team.chargeback}%</div>
-                <div style="text-align:right;font-size:0.8rem;font-weight:600;color:${team.debtRisk==='Low'?'#6ecf6e':team.debtRisk==='Medium'?'#ffa500':'#e05555'};">${team.debtRisk}</div>
+                <!-- removed -->
+                <!-- removed -->
+                <!-- removed -->
               </div>
               <div style="display:none;">
                 <div style="display:grid;grid-template-columns:${cols};padding:0.3rem 1rem 0.3rem 2.5rem;background:rgba(0,0,0,0.4);">
