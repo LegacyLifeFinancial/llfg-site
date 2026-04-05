@@ -404,6 +404,37 @@
     .dash-body::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.15); border-radius: 4px; }
     .dash-body::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.3); }
 
+    /* ─── LEADERBOARD PREMIUM ─── */
+    .leaderboard-podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .podium-card { text-align: center; padding: 1rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(201,168,76,0.08); transition: all 0.4s; transform-style: preserve-3d; }
+    .podium-card:hover { transform: translateY(-4px); border-color: rgba(201,168,76,0.25); box-shadow: 0 12px 30px rgba(201,168,76,0.1); }
+    .podium-card.gold { border-color: rgba(201,168,76,0.3); background: rgba(201,168,76,0.04); }
+    .podium-rank { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .podium-rank.first { color: var(--gold); text-shadow: 0 0 20px rgba(201,168,76,0.3); }
+    .podium-rank.second { color: #c0c0c0; }
+    .podium-rank.third { color: #cd7f32; }
+    .podium-name { font-size: 0.72rem; color: var(--cream); margin-top: 0.3rem; font-weight: 500; }
+    .podium-stat { font-size: 0.6rem; color: var(--gold-dim); margin-top: 0.2rem; }
+    /* Commission scale premium */
+    .comm-tier { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem 0.8rem; border-left: 3px solid transparent; transition: all 0.3s; }
+    .comm-tier:hover { background: rgba(201,168,76,0.03); border-left-color: var(--gold); }
+    .comm-tier.current { background: rgba(201,168,76,0.06); border-left-color: var(--gold); box-shadow: 0 0 20px rgba(201,168,76,0.05); }
+    .comm-tier .tier-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; transition: transform 0.3s; }
+    .comm-tier:hover .tier-dot { transform: scale(1.4); }
+    /* Book of business */
+    .bob-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(201,168,76,0.06); padding: 0.8rem; transition: all 0.3s; display: flex; justify-content: space-between; align-items: center; }
+    .bob-card:hover { border-color: rgba(201,168,76,0.2); transform: translateX(4px); }
+    /* Training progress bar premium */
+    .training-progress { height: 6px; background: rgba(201,168,76,0.08); overflow: hidden; position: relative; }
+    .training-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-light)); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); position: relative; }
+    .training-progress-fill::after { content: ''; position: absolute; top: 0; right: 0; width: 20px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3)); animation: progressShine 2s ease-in-out infinite; }
+    @keyframes progressShine { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+    /* Training unit card */
+    .training-unit { transition: all 0.3s; border-left: 2px solid transparent; }
+    .training-unit:hover { border-left-color: var(--gold); background: rgba(201,168,76,0.02); transform: translateX(4px); }
+    .training-unit.completed { opacity: 0.7; }
+    .training-unit.completed::after { content: '\u2713'; position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: #6ecf6e; font-size: 0.8rem; }
+
     .hero-tag {
       display: inline-block;
       font-size: 0.7rem;
@@ -14423,6 +14454,8 @@ This request requires Managing Partner approval.`
         this.register(new LLFG_TrainingCoachAgent());
         this.register(new LLFG_PreflightAgent());
         this.register(new LLFG_MarketingAgent());
+        this.register(new LLFG_MobileAgent());
+        this.register(new LLFG_DesktopAgent());
         this.register(new LLFG_ReconciliationAgent());
         this.register(new LLFG_DocumentAgent());
         this.register(new LLFG_BackupAgent());
@@ -17382,6 +17415,105 @@ This request requires Managing Partner approval.`
         body:'YOU ARE INVITED\n\nLegacy Life Financial Group\nCareer Opportunity Event\n\nDate: {{date}}\nTime: {{time}}\nLocation: {{location}}\n\nLearn how to earn $10K-$15K in your first month in the insurance industry.\n\n- No experience required\n- Full training provided\n- Work from anywhere\n- Unlimited income potential\n\nRSVP: {{sender}} | {{phone}}\nApply online: llfg.us\n\nRefreshments provided. Bring a friend!' },
     ];
 
+
+    // ─── 16. MOBILE COMPATIBILITY AGENT ──────────────────────────────
+    class LLFG_MobileAgent extends LLFG_AgentBase {
+      constructor() {
+        super('mobile', 'Mobile Agent', '\uD83D\uDCF1', 'Mobile viewport optimization, touch targets, responsive layout validation, orientation handling');
+        this.issues = [];
+        this.score = 100;
+      }
+      onStart() {
+        this._audit();
+        this.schedule(function() { this._audit(); }.bind(this), 120000);
+      }
+      _audit() {
+        this.issues = [];
+        this.score = 100;
+        var vw = window.innerWidth;
+        // Check touch target sizes
+        if (vw < 768) {
+          var small = 0;
+          document.querySelectorAll('[id^="ptab-"].active button, [id^="ptab-"].active a, [id^="ptab-"].active [onclick]').forEach(function(el) {
+            var r = el.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0 && (r.width < 36 || r.height < 36)) small++;
+          });
+          if (small > 5) { this.issues.push(small + ' touch targets below 36px'); this.score -= 10; }
+        }
+        // Check horizontal overflow
+        var overflows = 0;
+        document.querySelectorAll('[id^="ptab-"].active *').forEach(function(el) {
+          if (el.scrollWidth > el.clientWidth + 5 && el.clientWidth > 50) overflows++;
+        });
+        if (overflows > 0) { this.issues.push(overflows + ' elements overflow horizontally'); this.score -= overflows * 2; }
+        // Check font readability
+        var tinyText = 0;
+        document.querySelectorAll('[id^="ptab-"].active *').forEach(function(el) {
+          var fs = parseFloat(window.getComputedStyle(el).fontSize);
+          if (fs > 0 && fs < 10 && el.textContent.trim()) tinyText++;
+        });
+        if (tinyText > 10) { this.issues.push(tinyText + ' elements with font <10px'); this.score -= 5; }
+        this.score = Math.max(0, this.score);
+        if (this.issues.length > 0) this.alert('Mobile score: ' + this.score + '/100 — ' + this.issues.length + ' issue(s)', this.score < 70 ? 'warning' : 'info');
+        LLFG_EventBus.emit('mobile:audited', { score: this.score, issues: this.issues });
+      }
+      getReport() { return { score: this.score, issues: this.issues, viewport: window.innerWidth + 'x' + window.innerHeight, dpr: window.devicePixelRatio }; }
+    }
+
+    // ─── 17. LAPTOP/DESKTOP ENHANCEMENT AGENT ────────────────────────
+    class LLFG_DesktopAgent extends LLFG_AgentBase {
+      constructor() {
+        super('desktop', 'Desktop Agent', '\uD83D\uDCBB', 'Desktop layout optimization, widescreen support, keyboard navigation, performance monitoring');
+        this.issues = [];
+        this.score = 100;
+      }
+      onStart() {
+        this._audit();
+        this._setupKeyboardNav();
+        this.schedule(function() { this._audit(); }.bind(this), 120000);
+      }
+      _audit() {
+        this.issues = [];
+        this.score = 100;
+        var vw = window.innerWidth;
+        // Check for ultra-wide support
+        if (vw > 1920) {
+          var unconstrained = 0;
+          document.querySelectorAll('[id^="ptab-"].active > *').forEach(function(el) {
+            if (el.clientWidth > 1400) unconstrained++;
+          });
+          if (unconstrained > 0) { this.issues.push(unconstrained + ' sections exceed 1400px — add max-width'); this.score -= 5; }
+        }
+        // Check for empty visible areas
+        var emptyCards = 0;
+        document.querySelectorAll('[id^="ptab-"].active .dash-card').forEach(function(el) {
+          if (!el.textContent.trim()) emptyCards++;
+        });
+        if (emptyCards > 0) { this.issues.push(emptyCards + ' empty dashboard cards'); this.score -= emptyCards * 3; }
+        // Performance check
+        var perf = window.performance;
+        if (perf && perf.memory) {
+          var mb = Math.round(perf.memory.usedJSHeapSize / 1048576);
+          if (mb > 200) { this.issues.push('Memory usage: ' + mb + 'MB (high)'); this.score -= 10; }
+        }
+        var domNodes = document.querySelectorAll('*').length;
+        if (domNodes > 10000) { this.issues.push('DOM: ' + domNodes + ' nodes (heavy)'); this.score -= 5; }
+        this.score = Math.max(0, this.score);
+        if (this.issues.length > 0) this.alert('Desktop score: ' + this.score + '/100 — ' + this.issues.length + ' issue(s)', this.score < 70 ? 'warning' : 'info');
+        LLFG_EventBus.emit('desktop:audited', { score: this.score, issues: this.issues });
+      }
+      _setupKeyboardNav() {
+        document.addEventListener('keydown', function(e) {
+          // Alt+1-9 for quick tab switching
+          if (e.altKey && e.key >= '1' && e.key <= '9') {
+            var tabs = document.querySelectorAll('#portalTabs .admin-tab');
+            var idx = parseInt(e.key) - 1;
+            if (tabs[idx]) { tabs[idx].click(); e.preventDefault(); }
+          }
+        });
+      }
+      getReport() { return { score: this.score, issues: this.issues, viewport: window.innerWidth + 'x' + window.innerHeight, domNodes: document.querySelectorAll('*').length }; }
+    }
     // ─── COMMAND CENTER UI RENDERER ──────────────────────────────────
     window.__R_renderCommandCenter = window.renderCommandCenter = function() {
       const el = document.getElementById('ptab-commandcenter');
