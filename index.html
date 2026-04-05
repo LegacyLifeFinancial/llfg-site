@@ -3883,7 +3883,7 @@
     };
 
     var LLFG_TAB_LABELS = {
-      overview:'Overview', mydeals:'My Deals ▾', tools:'Tools ▾', management:'Management ▾',
+      overview:'Overview', mydeals:'My Deals ▾', tools:'Resources ▾', management:'Management ▾',
       deals:'Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', recruiting:'Recruiting', bizcard:'Business Card',
       addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
@@ -5810,11 +5810,10 @@
         <div class="msg-sidebar">
           <!-- 4 Main Tabs -->
           <div class="msg-tabs">
-            <button class="msg-tab active" id="msgtab-chat"      onclick="switchMsgTab('chat',this)">Chat</button>
-            <button class="msg-tab"        id="msgtab-groups"    onclick="switchMsgTab('groups',this)">Groups</button>
-            
-            <button class="msg-tab"        id="msgtab-dataforms" onclick="switchMsgTab('dataforms',this)">Data Forms</button>
-            <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email & Templates</button>
+            <button class="msg-tab"        id="msgtab-dataforms" onclick="switchMsgTab('dataforms',this)">Data Collection</button>
+            <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email</button>
+            <button class="msg-tab"        id="msgtab-leaderboard" onclick="switchMsgTab('leaderboard',this)">Leaderboard</button>
+            <button class="msg-tab active" id="msgtab-chat"      onclick="switchMsgTab('chat',this)">Internal Chats</button>
           </div>
 
           <!-- Search bar -->
@@ -8174,7 +8173,7 @@ Legacy Life Financial Group`
     };
 
     const TAB_LABELS = {
-      overview:'Overview', mydeals:'My Deals ▾', tools:'Tools ▾', management:'Management ▾',
+      overview:'Overview', mydeals:'My Deals ▾', tools:'Resources ▾', management:'Management ▾',
       deals:'Deals', commissions:'Commissions', teammetrics:'Team Metrics',
       training:'Training', recruiting:'Recruiting', bizcard:'Business Card',
       addagents:'Add Agents', agreements:'Agreements', agentapprovals:'Agent Approvals', contracting:'Send Contracts',
@@ -8728,253 +8727,81 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     ];
 
     function buildPortalOverview(user) {
-      const role      = user.role || 'financial_advisor';
-      const isOwner   = user.isOwner || user.email === 'lorenzoparenza@llfg.us';
-      const isAgent   = role === 'financial_advisor' || role === 'agent';
-      const isManager = role === 'manager';
-      const isExec    = role === 'executive' || role === 'managing_partner' || role === 'admin' || isOwner;
+      const el = document.getElementById('portalOverview');
+      if (!el) return;
+      const isAgent = user.role === 'financial_advisor' || user.role === 'agent';
+      const isManager = user.role === 'manager';
+      const isManagerPlus = ['manager','executive','director','managing_partner','admin'].includes(user.role);
+      const isOwner = user.isOwner || user.email === 'lorenzoparenza\u0040llfg.us';
+      const comm = user.comm || 65;
 
-      document.getElementById('portalWelcomeSub').textContent =
-        isAgent   ? "Your portal overview \u2014 integrity first, always." :
-        isManager ? 'Manager portal — your team and deals.' :
-        'Executive portal — full access.';
+      // Greeting + quote
+      const quotes = [
+        {text:"The only way to do great work is to love what you do.", author:"Steve Jobs"},
+        {text:"Success is not final, failure is not fatal: it is the courage to continue that counts.", author:"Winston Churchill"},
+        {text:"Your limitation—it's only your imagination.", author:"Unknown"},
+        {text:"The harder you work for something, the greater you'll feel when you achieve it.", author:"Unknown"},
+        {text:"Don't stop when you're tired. Stop when you're done.", author:"Unknown"}
+      ];
+      const q = quotes[Math.floor(Date.now() / 43200000) % quotes.length];
+      const firstName = (user.name || 'Agent').split(' ')[0];
 
-      // Stats cards
-      document.getElementById('portalOverviewCards').innerHTML =
-        `<div class="dash-card" onclick="showPortalTab('deals',null,true)" style="cursor:pointer;"><div class="dash-card-label">My Deals This Month</div><div class="dash-card-value" id="ovDealCount">0</div><div class="dash-card-sub">Active policies</div></div>
-        <div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;"><div class="dash-card-label">My AP</div><div class="dash-card-value" id="ovAP">$0</div><div class="dash-card-sub">Annual premium total</div></div>
-        <div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;"><div class="dash-card-label">Advanced Pay</div><div class="dash-card-value" id="ovPay" style="color:var(--gold-light);">$0</div><div class="dash-card-sub">Commission × 9-mo advance</div></div>`
-        + (isAgent ? `<div class="dash-card" onclick="showPortalTab('commissions',null,true)" style="cursor:pointer;border-color:rgba(110,207,110,0.3);"><div class="dash-card-label">Monthly Earnings</div><div class="dash-card-value" id="ovMonthlyEarnings" style="color:#6ecf6e;">$0</div><div class="dash-card-sub">This month\'s commission</div></div>` : '');
+      // Promotion progress
+      const promoReqs = { manager:150000, executive:500000, director:1500000, managing_partner:6000000 };
+      const roleOrder = ['financial_advisor','agent','manager','executive','director','managing_partner'];
+      const currentIdx = roleOrder.indexOf(user.role === 'agent' ? 'financial_advisor' : user.role);
+      const nextRole = roleOrder[Math.min(currentIdx + 1, roleOrder.length - 1)];
+      const nextReq = promoReqs[nextRole] || 0;
+      const currentAP = typeof TEAM_DATA !== 'undefined' ? TEAM_DATA.reduce(function(s,t){return s+t.totalAP;},0) : 0;
+      const promoPct = nextReq > 0 ? Math.min(100, Math.round((currentAP / nextReq) * 100)) : 100;
+      const nextLabel = nextRole === 'manager' ? 'Manager' : nextRole === 'executive' ? 'Executive' : nextRole === 'director' ? 'Director' : nextRole === 'managing_partner' ? 'Managing Partner' : 'Max Level';
 
-      // ── Gamification XP Bar on Dashboard ──
-      if (!LLFG_Gamification.data) LLFG_Gamification.init();
-      const xpBarEl = document.getElementById('portalOverviewCards');
-      if (xpBarEl) {
-        const level = LLFG_Gamification.getLevel();
-        const next = LLFG_Gamification.getNextLevel();
-        const pct = LLFG_Gamification.getLevelProgress();
-        const streak = LLFG_Gamification.data.streak;
-        const challenges = LLFG_Gamification.getDailyChallenges();
-        const doneChallenges = challenges.filter(c => c.completed).length;
-        xpBarEl.innerHTML += `<div class="dash-card" style="border-color:${level.color}40;grid-column:1/-1;">
-          <div style="display:flex;align-items:center;gap:1rem;">
-            <div style="text-align:center;"><span style="font-size:1.6rem;">${level.icon}</span><div style="font-size:0.5rem;color:var(--gray);margin-top:0.1rem;">Lvl ${level.level}</div></div>
-            <div style="flex:1;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
-                <span style="font-size:0.72rem;color:${level.color};font-weight:600;">${level.name}</span>
-                <span style="font-size:0.55rem;color:var(--gray);">${LLFG_Gamification.data.xp.toLocaleString()} XP</span>
-              </div>
-              <div style="background:rgba(255,255,255,0.06);height:8px;"><div style="height:100%;background:linear-gradient(90deg,${level.color},${next.color||level.color});width:${pct}%;transition:width 0.6s;"></div></div>
-              <div style="display:flex;justify-content:space-between;margin-top:0.2rem;">
-                <span style="font-size:0.48rem;color:var(--gray);">${pct}% to ${next.name}</span>
-                <span style="font-size:0.48rem;color:var(--gray);">\uD83D\uDD25 ${streak}-day streak \u00b7 \uD83C\uDFAF ${doneChallenges}/3 daily challenges</span>
-              </div>
-            </div>
-          </div>
-        </div>`;
+      // Quick stats
+      var dealCount = typeof myDeals !== 'undefined' ? myDeals.length : 0;
+      var totalAP = typeof myDeals !== 'undefined' ? myDeals.reduce(function(s,d){return s+(d.premium||0)*12;},0) : 0;
+      var advancePay = Math.round(totalAP * 0.75);
+      var netEarn = Math.round(advancePay * (comm / 100));
+
+      // Leaderboard data
+      var lbHTML = '';
+      if (typeof LEADERBOARD_AGENTS !== 'undefined') {
+        var sorted = LEADERBOARD_AGENTS.slice().sort(function(a,b){return b.ap - a.ap;});
+        lbHTML = '<div class="dash-section" style="margin-top:1rem;"><div class="dash-section-title">Leaderboard</div>';
+        lbHTML += '<table class="app-table" style="width:100%;margin-top:0.6rem;"><thead><tr><th>#</th><th>Agent</th><th>Team</th><th style="text-align:right;">AP</th></tr></thead><tbody>';
+        sorted.slice(0, 10).forEach(function(a, i) {
+          var color = i === 0 ? 'var(--gold)' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'var(--cream)';
+          lbHTML += '<tr><td style="color:' + color + ';font-weight:700;font-family:Cormorant Garamond,serif;font-size:1.1rem;">' + (i+1) + '</td><td style="color:var(--cream);">' + a.name + '</td><td style="color:var(--gray);font-size:0.7rem;">' + a.team + '</td><td style="text-align:right;color:var(--gold);font-weight:600;">$' + a.ap.toLocaleString() + '</td></tr>';
+        });
+        lbHTML += '</tbody></table></div>';
       }
 
-      // ── Core Values Strip ──
-      var welcomeEl = document.querySelector('#ptab-overview .dash-welcome');
-      if (welcomeEl && !document.getElementById('coreValuesStrip')) {
-        var strip = document.createElement('div');
-        strip.id = 'coreValuesStrip';
-        strip.style.cssText = 'display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;';
-        var values = [
-          {icon:'\u2696\uFE0F',label:'Integrity First'},
-          {icon:'\uD83C\uDF31',label:'Agent-Centered Growth'},
-          {icon:'\uD83D\uDCCB',label:'Compliance & Accountability'},
-          {icon:'\u2B50',label:'Service Excellence'},
-          {icon:'\uD83D\uDD04',label:'Continuous Improvement'},
-          {icon:'\uD83E\uDD1D',label:'Collaboration Over Competition'}
-        ];
-        strip.innerHTML = values.map(function(v) {
-          return '<div style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.65rem;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.08);font-size:0.58rem;color:var(--gray);white-space:nowrap;"><span style="font-size:0.7rem;">' + v.icon + '</span>' + v.label + '</div>';
-        }).join('');
-        welcomeEl.appendChild(strip);
-      }
+      el.innerHTML =
+        '<div style="margin-bottom:1.5rem;">'
+        + '<h2 style="font-family:Cormorant Garamond,serif;font-size:1.6rem;color:var(--cream);margin-bottom:0.3rem;">Good to see you, <em style="color:var(--gold);">' + firstName + '</em></h2>'
+        + '<p style="font-size:0.72rem;color:var(--gray);font-style:italic;line-height:1.6;">"' + q.text + '" — ' + q.author + '</p>'
+        + '</div>'
 
-      const q = getQuoteOfTheDay();
+        // Promotion progress bar
+        + '<div style="margin-bottom:1.5rem;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">'
+        + '<span style="font-size:0.6rem;color:var(--gray);letter-spacing:0.12em;text-transform:uppercase;">Progress to Next Promotion</span>'
+        + '<span style="font-size:0.6rem;color:var(--gold);">' + promoPct + '% → ' + nextLabel + '</span>'
+        + '</div>'
+        + '<div style="height:8px;background:rgba(124,58,237,0.08);overflow:hidden;">'
+        + '<div style="height:100%;width:' + promoPct + '%;background:linear-gradient(90deg,var(--gold),var(--purple));transition:width 1s ease;"></div>'
+        + '</div>'
+        + '</div>'
 
-      // ── Populate top-right corner quote ──
-      document.getElementById('overviewQuote').innerHTML = `
-        <div class="qotd-mark">\u201C</div>
-        <div class="qotd-text">${q.text}</div>
-        <div class="qotd-author">\u2014 ${q.author}</div>`;
+        // Quick stats
+        + '<div class="dash-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;" id="portalOverviewCards">'
+        + '<div class="dash-card" onclick="showPortalTab(\'deals\',null,true)" style="cursor:pointer;padding:1.2rem;"><div class="dash-card-label">Deals This Month</div><div class="dash-card-value" id="ovDealCount" style="font-family:Cormorant Garamond,serif;font-size:2rem;color:var(--cream);">' + dealCount + '</div></div>'
+        + '<div class="dash-card" onclick="showPortalTab(\'commissions\',null,true)" style="cursor:pointer;padding:1.2rem;"><div class="dash-card-label">Annual Premium</div><div class="dash-card-value" id="ovAP" style="font-family:Cormorant Garamond,serif;font-size:2rem;color:var(--gold);">$' + totalAP.toLocaleString() + '</div></div>'
+        + '<div class="dash-card" onclick="showPortalTab(\'commissions\',null,true)" style="cursor:pointer;padding:1.2rem;"><div class="dash-card-label">Advanced Pay</div><div class="dash-card-value" id="ovPay" style="font-family:Cormorant Garamond,serif;font-size:2rem;color:var(--purple-light);">$' + advancePay.toLocaleString() + '</div></div>'
+        + '<div class="dash-card" onclick="showPortalTab(\'commissions\',null,true)" style="cursor:pointer;padding:1.2rem;"><div class="dash-card-label">Net Earnings</div><div class="dash-card-value" id="ovMonthlyEarnings" style="font-family:Cormorant Garamond,serif;font-size:2rem;color:#6ecf6e;">$' + netEarn.toLocaleString() + '</div></div>'
+        + '</div>'
 
-      // ── Hierarchy Leaderboard — gamified with podium for top 5 ──
-      const isDirectorPlus = ['director','managing_partner','admin'].includes(role) || isOwner;
-      const isExecPlus     = ['executive','director','managing_partner','admin'].includes(role) || isOwner;
-
-      let lbHTML = '';
-      if (isAgent || isManager) {
-        const sorted = [...LEADERBOARD_AGENTS].sort((a,b) => b.ap - a.ap);
-        const maxAP  = sorted[0]?.ap || 1;
-        const top3   = sorted.slice(0, 3);
-        const rest   = sorted.slice(3, 5);
-        const remaining = sorted.slice(5);
-        // Podium order: 2nd, 1st, 3rd for visual hierarchy
-        const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-        const podiumRanks = [2, 1, 3];
-
-        lbHTML = `
-          <div class="lb-header">
-            <div>
-              <div class="lb-header-title">Agent Leaderboard</div>
-              <div class="lb-header-sub">This month's top producers</div>
-            </div>
-            <div style="font-size:0.6rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;">&#9679; LIVE</div>
-          </div>
-          <div class="lb-podium">
-            ${podiumOrder.map((a, idx) => {
-              const rank = podiumRanks[idx];
-              const pct = Math.round((a.ap / maxAP) * 100);
-              return '<div class="lb-podium-slot" data-rank="' + rank + '">'
-                + (rank === 1 ? '<div class="lb-podium-crown">&#x1F451;</div>' : '')
-                + '<div class="lb-podium-avatar">' + a.init + '</div>'
-                + '<div class="lb-podium-name">' + a.name.split(' ')[0] + '</div>'
-                + '<div class="lb-podium-ap">$' + a.ap.toLocaleString() + '</div>'
-                + '<div style="font-size:0.5rem;color:var(--gray);margin-top:0.1rem;">' + a.role + '</div>'
-                + '<div class="lb-podium-bar"><div class="lb-podium-bar-fill" style="width:' + pct + '%;"></div></div>'
-                + '</div>';
-            }).join('')}
-          </div>`
-          + (rest.length ? '<div class="lb-divider">Top 5</div>' +
-            rest.map(function(a, idx) {
-              var rank = idx + 4;
-              return '<div class="lb-row-game">'
-                + '<div class="lb-rank-badge" style="color:var(--gray);">' + rank + '</div>'
-                + '<div class="lb-row-avatar">' + a.init + '</div>'
-                + '<div class="lb-row-info">'
-                + '<div class="lb-row-name">' + a.name + '</div>'
-                + '<div class="lb-row-role">' + a.role + ' &middot; ' + a.comm + '%</div>'
-                + '</div>'
-                + '<div class="lb-row-ap">$' + a.ap.toLocaleString() + '</div>'
-                + '</div>';
-            }).join('') : '')
-          + (remaining.length ? '<div class="lb-divider">Others</div>' +
-            remaining.map(function(a, idx) {
-              var rank = idx + 6;
-              return '<div class="lb-row-game" style="opacity:0.7;">'
-                + '<div class="lb-rank-badge" style="color:var(--gray);font-size:0.85rem;">' + rank + '</div>'
-                + '<div class="lb-row-avatar">' + a.init + '</div>'
-                + '<div class="lb-row-info">'
-                + '<div class="lb-row-name">' + a.name + '</div>'
-                + '<div class="lb-row-role">' + a.role + ' &middot; ' + a.comm + '%</div>'
-                + '</div>'
-                + '<div class="lb-row-ap" style="font-size:0.88rem;">$' + a.ap.toLocaleString() + '</div>'
-                + '</div>';
-            }).join('') : '');
-      } else {
-        // Manager+ sees team leaderboard — expandable to agents
-        const sorted = [...LEADERBOARD_TEAMS].sort((a,b) => b.totalAP - a.totalAP);
-        const maxAP  = sorted[0]?.totalAP || 1;
-        const medals = ['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
-        lbHTML = `
-          <div class="lb-header">
-            <div>
-              <div class="lb-header-title">Team Leaderboard</div>
-              <div class="lb-header-sub">This month's team performance</div>
-            </div>
-            <div style="font-size:0.6rem;color:var(--gold);letter-spacing:0.12em;text-transform:uppercase;">&#9679; LIVE</div>
-          </div>`
-          + sorted.map((t,i) => {
-            const pct = Math.round((t.totalAP/maxAP)*100);
-            const medal = i < 3 ? medals[i] : '';
-            const agents = LEADERBOARD_AGENTS.filter(a=>a.team===t.name).sort((a,b)=>b.ap-a.ap);
-            const agentBreakdown = agents.map(a=>`
-              <div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 1rem 0.45rem 3rem;border-bottom:1px solid rgba(255,255,255,0.02);">
-                <div style="width:24px;height:24px;background:rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--gold);flex-shrink:0;">${a.init}</div>
-                <div style="flex:1;font-size:0.74rem;color:var(--cream);">${a.name}</div>
-                <div style="font-size:0.6rem;color:var(--gray);">${a.comm}%</div>
-                <div style="font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:var(--gold);">$${a.ap.toLocaleString()}</div>
-              </div>`).join('');
-            return `<div style="border-bottom:1px solid rgba(255,255,255,0.04);">
-              <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'" style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;cursor:pointer;" onmouseover="this.style.background='rgba(201,168,76,0.03)'" onmouseout="this.style.background=''">
-                <div style="font-size:1.1rem;min-width:28px;text-align:center;">${medal || '<span style="font-family:Cormorant Garamond,serif;font-weight:700;color:var(--gray);">' + (i+1) + '</span>'}</div>
-                <div style="flex:1;">
-                  <div style="font-size:0.8rem;color:var(--cream);font-weight:500;">${t.name}</div>
-                  <div style="font-size:0.58rem;color:var(--gray);">Lead: ${t.leader} &middot; ${t.agents} agents</div>
-                </div>
-                <div style="flex:1;max-width:80px;background:rgba(255,255,255,0.04);height:4px;overflow:hidden;">
-                  <div style="height:100%;background:${i===0?'var(--gold)':i===1?'#aaa':i===2?'#cd7f32':'var(--gray)'};width:${pct}%;opacity:0.7;"></div>
-                </div>
-                <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);min-width:72px;text-align:right;">$${t.totalAP.toLocaleString()}</div>
-              </div>
-              <div style="display:none;">${agentBreakdown}</div>
-            </div>`;
-          }).join('');
-      }
-
-      // ── Promotion Progress ──
-      const promoData = {
-        financial_advisor: { next:'Manager (100%)', req:'Achieve $150K monthly team AP with 3 teams of 4+ producing agents', color:'#6ea8fe', progress: 12 },
-        manager:           { next:'Executive (120%)', req:'$500K monthly team AP \u00b7 3 Managers with 3\u20134 generations of downlines', color:'#c084fc', progress: 34 },
-        executive:         { next:'Director (135%)', req:'$1.5M monthly team AP \u00b7 3 Executives producing', color:'#ff9f43', progress: 22 },
-        director:          { next:'Managing Partner (150%)', req:'$6M monthly team AP \u00b7 3+ Directors operating', color:'var(--gold)', progress: 45 },
-        managing_partner:  { next:'Elite Tier', req:'You have achieved the highest published tier.', color:'var(--gold)', progress: 100 },
-      };
-      const pd = promoData[role] || promoData.financial_advisor;
-      const promoHTML = role !== 'admin' && !isOwner ? `
-        <div class="dash-section" style="border-color:rgba(${pd.color.includes('--gold')?'201,168,76':pd.color.includes('6ea8fe')?'110,168,254':pd.color.includes('c084fc')?'192,132,252':'255,159,67'},0.2);">
-          <div class="dash-section-title" style="margin-bottom:0.6rem;">Promotion Path</div>
-          <div style="font-size:0.68rem;color:var(--gray);margin-bottom:0.3rem;">Next tier: <strong style="color:var(--cream);">${pd.next}</strong></div>
-          <div style="font-size:0.62rem;color:var(--gray);line-height:1.6;margin-bottom:0.8rem;">${pd.req}</div>
-          <div style="background:rgba(255,255,255,0.05);height:6px;overflow:hidden;margin-bottom:0.4rem;">
-            <div style="height:100%;background:${pd.color};width:${pd.progress}%;transition:width 0.6s ease;"></div>
-          </div>
-          <div style="font-size:0.6rem;color:var(--gray);">Progress toward next promotion threshold</div>
-        </div>` : '';
-
-      // Customer Book of Business
-      const customerBookHTML = isAgent ? `
-        <div class="dash-section">
-          <div class="dash-section-title">Book of Business <span id="ovBobCount" style="color:var(--gray);font-size:0.7rem;font-weight:400;">0 clients</span></div>
-          <div id="ovBobList"><p style="font-size:0.75rem;color:var(--gray);padding:0.5rem 0;">No policies logged yet.</p></div>
-        </div>` : '';
-
-      document.getElementById('portalOverviewSections').innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:1rem;">
-          <!-- Quick Actions -->
-          <div class="dash-section">
-            <div class="dash-section-title" style="margin-bottom:0.8rem;">Quick Actions</div>
-            <div class="qa-grid">
-              <div class="qa-btn" onclick="selectSubTab('deals')">
-                <span class="qa-icon">\uD83D\uDCDD</span>
-                <div class="qa-label">Log a Deal</div>
-                <div class="qa-sub">AP &amp; commission</div>
-              </div>
-              <div class="qa-btn" onclick="selectSubTab('commissions')">
-                <span class="qa-icon">\uD83D\uDCB0</span>
-                <div class="qa-label">Commissions</div>
-                <div class="qa-sub">Earnings &amp; statements</div>
-              </div>
-              <div class="qa-btn" onclick="selectSubTab('training')">
-                <span class="qa-icon">\uD83C\uDF93</span>
-                <div class="qa-label">Training</div>
-                <div class="qa-sub">Curriculum &amp; resources</div>
-              </div>
-              <div class="qa-btn" onclick="showPortalTab('calendar',null)">
-                <span class="qa-icon">\uD83D\uDCC5</span>
-                <div class="qa-label">Schedule Event</div>
-                <div class="qa-sub">Calendar &amp; invites</div>
-              </div>
-              <div class="qa-btn" onclick="selectSubTab('addagents')">
-                <span class="qa-icon">\uD83D\uDC65</span>
-                <div class="qa-label">Add an Agent</div>
-                <div class="qa-sub">Recruit to downline</div>
-              </div>
-              <div class="qa-btn" onclick="showPortalTab('messages',null)">
-                <span class="qa-icon">\uD83D\uDCAC</span>
-                <div class="qa-label">Messages</div>
-                <div class="qa-sub">Team chat &amp; groups</div>
-              </div>
-            </div>
-          </div>
-          ${promoHTML}
-          ${customerBookHTML}
-        </div>
-        <div class="dash-section">${lbHTML}</div>`;
+        // Leaderboard
+        + lbHTML;
     }
 
     window.__R_toggleDoc = window.toggleDoc = function(header) {
@@ -9790,99 +9617,90 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     };
 
     function renderTrainingCurriculum() {
-      const el = document.getElementById('trainingCurriculum');
+      var el = document.getElementById('trainingCurriculum');
       if (!el) return;
-      if (!LLFG_Gamification.data) LLFG_Gamification.init();
-      const u = currentUser || window._llfgCurrentUser;
-      const role = u?.role || 'financial_advisor';
-      const isOwner = u?.isOwner || u?.email === 'lorenzoparenza\u0040llfg.us';
-      const isAdmin = role === 'admin' || isOwner;
+      var u = currentUser || window._llfgCurrentUser;
+      var role = u ? u.role : 'financial_advisor';
+      var isOwner = u && (u.isOwner || u.email === 'lorenzoparenza\u0040llfg.us');
+      var isAdmin = role === 'admin' || isOwner;
       if (typeof TRAINING_CURRICULUM === 'undefined') { el.innerHTML = '<p style="color:var(--gray);">Loading...</p>'; return; }
 
-      const roleOrder = ['financial_advisor','agent','manager','executive','director','managing_partner','admin'];
-      const userRoleIdx = roleOrder.indexOf(role === 'agent' ? 'financial_advisor' : role);
-      const overall = LLFG_Gamification.getOverallProgress();
-      const challenges = LLFG_Gamification.getDailyChallenges();
+      var roleOrder = ['financial_advisor','agent','manager','executive','director','managing_partner','admin'];
+      var userRoleIdx = roleOrder.indexOf(role === 'agent' ? 'financial_advisor' : role);
 
-      const challengesHTML = challenges.map((c, i) => '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.03);"><span style="font-size:0.9rem;">' + (c.completed ? '\u2705' : c.icon) + '</span><span style="flex:1;font-size:0.68rem;color:' + (c.completed ? '#6ecf6e' : 'var(--cream)') + ';' + (c.completed ? 'text-decoration:line-through;opacity:0.6;' : '') + '">' + c.text + '</span><span style="font-size:0.55rem;color:' + (c.completed ? '#6ecf6e' : 'var(--gold)') + ';">' + (c.completed ? 'Done' : '+' + c.xp + ' XP') + '</span>' + (!c.completed ? '<button onclick="LLFG_Gamification.completeChallenge(' + i + ');renderTrainingCurriculum();" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.15rem 0.5rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;letter-spacing:0.08em;text-transform:uppercase;">Done</button>' : '') + '</div>').join('');
+      // Count completed units
+      var completedUnits = 0;
+      var totalUnits = 0;
+      TRAINING_CURRICULUM.forEach(function(s) {
+        s.chapters.forEach(function(ch) {
+          ch.units.forEach(function(u) {
+            totalUnits++;
+            var done = localStorage.getItem('llfg_training_' + u.id);
+            if (done) completedUnits++;
+          });
+        });
+      });
+      var overallPct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
 
-      const earnedBadges = LLFG_Gamification.BADGES.filter(b => LLFG_Gamification.hasBadge(b.id));
-      const badgesHTML = earnedBadges.length > 0 ? earnedBadges.map(b => '<span title="' + b.name + ': ' + b.desc + '" style="font-size:1.2rem;cursor:help;">' + b.icon + '</span>').join(' ') : '<span style="font-size:0.6rem;color:var(--gray);">Complete courses to earn badges</span>';
-
-      let html = LLFG_Gamification.renderXPBar();
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">';
-      html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.8rem;"><div style="font-size:0.7rem;color:var(--gold);font-weight:500;margin-bottom:0.4rem;">\uD83C\uDFAF Daily Challenges</div>' + challengesHTML + '</div>';
-      html += '<div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);padding:0.8rem;"><div style="font-size:0.7rem;color:var(--gold);font-weight:500;margin-bottom:0.4rem;">\uD83C\uDFC5 Badges (' + earnedBadges.length + '/' + LLFG_Gamification.BADGES.length + ')</div><div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.6rem;">' + badgesHTML + '</div><div style="font-size:0.65rem;color:var(--cream);margin-top:0.4rem;">Overall: <strong>' + overall.completed + '/' + overall.total + '</strong> units (' + overall.pct + '%)</div><div style="background:rgba(255,255,255,0.06);height:6px;margin-top:0.3rem;"><div style="height:100%;background:var(--gold);width:' + overall.pct + '%;"></div></div></div>';
+      // Progress bar
+      var html = '<div style="margin-bottom:1.5rem;">';
+      html += '<div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;"><span style="font-size:0.6rem;color:var(--gray);letter-spacing:0.12em;text-transform:uppercase;">Training Progress</span><span style="font-size:0.6rem;color:var(--gold);">' + completedUnits + '/' + totalUnits + ' units (' + overallPct + '%)</span></div>';
+      html += '<div style="height:6px;background:rgba(124,58,237,0.08);overflow:hidden;"><div style="height:100%;width:' + overallPct + '%;background:linear-gradient(90deg,var(--gold),var(--purple));transition:width 0.8s;"></div></div>';
       html += '</div>';
 
-      const courses = TRAINING_CURRICULUM.filter(s => s.isCourse);
-      const tiers = TRAINING_CURRICULUM.filter(s => !s.isCourse);
+      // Render each curriculum section
+      TRAINING_CURRICULUM.forEach(function(section) {
+        var sectionRoleIdx = roleOrder.indexOf(section.role === 'agent' ? 'financial_advisor' : section.role);
+        if (sectionRoleIdx > userRoleIdx && !isAdmin) return;
 
-      // ── Learning Paths ──
-      var paths = [
-        { name:'Start Here', icon:'\uD83D\uDE80', desc:'Your first 30 days. Master the fundamentals before anything else.', ids:['fa','compliance_cert'], color:'var(--gold)' },
-        { name:'Sales Mastery', icon:'\uD83D\uDCA5', desc:'From objection handling to high-ticket closes. Become uncloseable.', ids:['objection_mastery','100k_blueprint','phone_virtual_sales'], color:'#ffa500' },
-        { name:'Product Expert', icon:'\uD83E\uDDE0', desc:'Deep product knowledge — IUL, whole life, annuities, riders, mortgage protection, income replacement.', ids:['advanced_products','whole_life_mastery','underwriting_mastery'], color:'#c084fc' },
-        { name:'Protect Your Income', icon:'\uD83D\uDEE1\uFE0F', desc:'Keep what you earn. Zero chargebacks, perfect persistency.', ids:['zero_chargeback'], color:'#e05555' },
-        { name:'Build Your Brand', icon:'\uD83D\uDCF1', desc:'Generate inbound leads while you sleep. Digital-first growth.', ids:['digital_marketing'], color:'#ff6b9d' }
-      ];
-      var allCourses = TRAINING_CURRICULUM.filter(function(s){return s.isCourse;});
-      var totalCourseUnits = allCourses.reduce(function(s,c){return s+c.chapters.reduce(function(s2,ch){return s2+ch.units.length;},0);},0);
-      var completedCourseUnits = allCourses.reduce(function(s,c){return s+LLFG_Gamification.getCourseProgress(c.id).completed;},0);
-      var overallCoursePct = totalCourseUnits > 0 ? Math.round(completedCourseUnits/totalCourseUnits*100) : 0;
+        html += '<div style="border:1px solid rgba(124,58,237,0.1);margin-bottom:0.8rem;overflow:hidden;">';
+        html += '<div style="display:flex;align-items:center;gap:0.8rem;padding:1rem 1.2rem;background:rgba(124,58,237,0.03);border-bottom:1px solid rgba(124,58,237,0.06);">';
+        html += '<div style="flex:1;"><div style="font-size:0.88rem;font-weight:600;color:var(--cream);">' + section.roleLabel + '</div>';
+        if (section.description) html += '<div style="font-size:0.6rem;color:var(--gray);margin-top:2px;">' + section.description + '</div>';
+        html += '</div></div>';
 
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;"><div style="font-size:0.82rem;color:var(--gold);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">\uD83D\uDCDA Learning Paths</div><div style="display:flex;align-items:center;gap:0.6rem;"><span style="font-size:0.55rem;color:var(--gray);">' + completedCourseUnits + '/' + totalCourseUnits + ' units across ' + allCourses.length + ' courses</span><div style="width:80px;background:rgba(255,255,255,0.06);height:6px;"><div style="height:100%;background:var(--gold);width:' + overallCoursePct + '%;"></div></div><span style="font-size:0.55rem;color:var(--gold);">' + overallCoursePct + '%</span></div></div>';
+        // Chapters
+        html += '<div style="padding:0.5rem;">';
+        section.chapters.forEach(function(ch, ci) {
+          var chCompleted = 0;
+          ch.units.forEach(function(u) { if (localStorage.getItem('llfg_training_' + u.id)) chCompleted++; });
 
-      paths.forEach(function(path) {
-        var pathCourses = path.ids.map(function(cid){ return TRAINING_CURRICULUM.find(function(s){return s.id===cid;}); }).filter(Boolean);
-        var pathUnits = pathCourses.reduce(function(s,c){return s+c.chapters.reduce(function(s2,ch){return s2+ch.units.length;},0);},0);
-        var pathDone = pathCourses.reduce(function(s,c){return s+LLFG_Gamification.getCourseProgress(c.id).completed;},0);
-        var pathPct = pathUnits > 0 ? Math.round(pathDone/pathUnits*100) : 0;
-        var pathStatus = pathPct === 100 ? '\u2705 Complete' : pathPct > 0 ? 'In Progress' : 'Not Started';
-        var statusColor = pathPct === 100 ? '#6ecf6e' : pathPct > 0 ? path.color : 'var(--gray)';
+          html += '<div style="border:1px solid rgba(124,58,237,0.06);margin-bottom:0.4rem;">';
+          html += '<div onclick="toggleTrainingChapter(this)" style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1rem;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(124,58,237,0.04)\'" onmouseout="this.style.background=\'\'">';
+          html += '<div style="font-size:0.55rem;color:var(--purple-light);font-weight:700;min-width:28px;">M.' + (ci+1) + '</div>';
+          html += '<div style="flex:1;font-size:0.78rem;color:var(--cream);">' + ch.title + '</div>';
+          html += '<div style="font-size:0.52rem;color:' + (chCompleted === ch.units.length ? '#6ecf6e' : 'var(--gray)') + ';">' + chCompleted + '/' + ch.units.length + '</div>';
+          html += '<div class="training-doc-chevron" style="color:var(--gray);font-size:0.8rem;">&#9662;</div></div>';
 
-        html += '<div style="border:1px solid ' + path.color + '18;margin-bottom:1rem;background:rgba(0,0,0,0.1);">';
-        html += '<div style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1.1rem;background:rgba(201,168,76,0.02);border-bottom:1px solid rgba(255,255,255,0.04);">';
-        html += '<span style="font-size:1.3rem;">' + path.icon + '</span>';
-        html += '<div style="flex:1;"><div style="font-size:0.82rem;color:var(--cream);font-weight:600;">' + path.name + '</div>';
-        html += '<div style="font-size:0.55rem;color:var(--gray);line-height:1.4;">' + path.desc + '</div></div>';
-        html += '<div style="text-align:right;flex-shrink:0;"><div style="font-size:0.6rem;color:' + statusColor + ';font-weight:500;">' + pathStatus + '</div>';
-        html += '<div style="font-size:0.48rem;color:var(--gray);margin-top:0.15rem;">' + pathDone + '/' + pathUnits + ' units</div></div></div>';
-
-        html += '<div style="padding:0.6rem 1rem;display:grid;grid-template-columns:repeat(' + Math.min(pathCourses.length, 3) + ',1fr);gap:0.6rem;">';
-        pathCourses.forEach(function(s) {
-          var p = LLFG_Gamification.getCourseProgress(s.id);
-          var modules = s.chapters.length;
-          html += '<div style="border:1px solid ' + s.color + '25;background:rgba(0,0,0,0.15);padding:0.7rem;transition:all 0.15s;" onmouseover="this.style.borderColor=\'' + s.color + '50\';this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.borderColor=\'' + s.color + '25\';this.style.transform=\'\'">';
-          html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;"><span style="font-size:1rem;">' + s.icon + '</span><span style="font-size:0.48rem;background:' + s.color + '15;color:' + s.color + ';padding:0.1rem 0.35rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid ' + s.color + '25;">' + s.courseTag + '</span></div>';
-          html += '<div style="font-size:0.72rem;color:var(--cream);font-weight:600;margin-bottom:0.15rem;">' + s.roleLabel + '</div>';
-          html += '<div style="font-size:0.5rem;color:var(--gray);margin-bottom:0.4rem;">' + modules + ' modules \u00b7 ' + p.total + ' units \u00b7 ' + s.chapters.reduce(function(t,ch){return t+ch.units.reduce(function(t2,u){var m=parseInt(u.duration);return t2+(isNaN(m)?15:m);},0);},0) + ' min</div>';
-          html += '<div style="background:rgba(255,255,255,0.06);height:5px;margin-bottom:0.25rem;"><div style="height:100%;background:' + s.color + ';width:' + p.pct + '%;transition:width 0.4s;"></div></div>';
-          html += '<div style="display:flex;justify-content:space-between;font-size:0.48rem;"><span style="color:var(--gray);">' + p.completed + '/' + p.total + '</span><span style="color:' + (p.pct === 100 ? '#6ecf6e' : s.color) + ';">' + (p.pct === 100 ? '\u2705 Complete' : p.pct > 0 ? p.pct + '% \u2014 Keep going' : 'Start course \u2192') + '</span></div></div>';
+          // Units inside chapter
+          html += '<div class="training-chapter-body" style="display:' + (ci === 0 ? 'block' : 'none') + ';border-top:1px solid rgba(124,58,237,0.04);">';
+          ch.units.forEach(function(unit) {
+            var done = localStorage.getItem('llfg_training_' + unit.id);
+            html += '<div style="border-bottom:1px solid rgba(255,255,255,0.02);">';
+            html += '<div onclick="toggleTrainingUnit(this)" style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 1rem 0.6rem 2.5rem;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(124,58,237,0.02)\'" onmouseout="this.style.background=\'\'">';
+            html += '<span style="font-size:0.7rem;flex-shrink:0;">' + (done ? '\u2705' : '\u25CB') + '</span>';
+            html += '<div style="flex:1;"><div style="font-size:0.72rem;color:' + (done ? '#6ecf6e' : 'var(--cream)') + ';">' + unit.title + '</div>';
+            html += '<div style="font-size:0.52rem;color:var(--gray);">&#9201; ' + unit.duration + '</div></div>';
+            html += '<div class="training-doc-chevron" style="color:var(--gray);font-size:0.7rem;">&#9662;</div></div>';
+            html += '<div class="training-unit-body" style="display:none;padding:1.2rem 1.2rem 1.2rem 3rem;border-top:1px solid rgba(124,58,237,0.03);background:rgba(0,0,0,0.15);">';
+            html += '<div class="training-doc-body" style="font-size:0.85rem;line-height:1.8;color:rgba(255,255,255,0.8);">' + (unit.content || '<p style="color:var(--gray);">Content loading...</p>') + '</div>';
+            html += '<div style="margin-top:1rem;text-align:right;">';
+            html += '<button onclick="markTrainingDone(\'' + unit.id + '\',this)" ' + (done ? 'disabled' : '') + ' style="background:' + (done ? 'rgba(110,207,110,0.08)' : 'rgba(124,58,237,0.08)') + ';border:1px solid ' + (done ? 'rgba(110,207,110,0.2)' : 'rgba(124,58,237,0.2)') + ';color:' + (done ? '#6ecf6e' : 'var(--purple-light)') + ';padding:0.4rem 1.2rem;font-family:Raleway,sans-serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;cursor:' + (done ? 'default' : 'pointer') + ';">' + (done ? '\u2705 Completed' : 'Mark Complete') + '</button></div></div></div>';
+          });
+          html += '</div></div>';
         });
         html += '</div></div>';
       });
 
-      if (tiers.length > 0) html += '<div style="font-size:0.82rem;color:var(--gold);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid rgba(201,168,76,0.15);">\uD83C\uDF93 Role Training</div>';
-
-      tiers.forEach(function(section) {
-        var sectionRoleIdx = roleOrder.indexOf(section.role);
-        var isUnlocked = isAdmin || userRoleIdx >= sectionRoleIdx;
-        var isCurr = !isAdmin && (section.role === role || (section.role === 'financial_advisor' && (role === 'agent' || role === 'financial_advisor')));
-        var p = LLFG_Gamification.getCourseProgress(section.id);
-        var badge = isCurr ? '<span style="font-size:0.52rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.2);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Current Tier</span>' : isAdmin ? '<span style="font-size:0.52rem;background:rgba(201,168,76,0.06);color:var(--gold-dim);padding:0.15rem 0.5rem;border:1px solid rgba(201,168,76,0.1);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Full Access</span>' : isUnlocked ? '<span style="font-size:0.52rem;background:rgba(110,207,110,0.1);color:#6ecf6e;padding:0.15rem 0.5rem;border:1px solid rgba(110,207,110,0.15);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">Unlocked</span>' : '<span style="font-size:0.52rem;background:rgba(255,255,255,0.04);color:var(--gray);padding:0.15rem 0.5rem;border:1px solid rgba(255,255,255,0.08);margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">&#128274; Locked</span>';
-        if (!isUnlocked) { var t = section.chapters.reduce(function(s,c){return s+c.units.length;},0); html += '<div style="border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.15);padding:1.1rem 1.4rem;opacity:0.5;margin-bottom:0.8rem;"><div style="display:flex;align-items:center;gap:0.8rem;"><div style="flex:1;"><div style="font-size:0.86rem;color:var(--gray);">' + section.roleLabel + ' Training ' + badge + '</div><div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:3px;">' + t + ' units \u2014 Unlocked upon promotion</div></div><div style="font-size:1.3rem;opacity:0.3;">&#128274;</div></div></div>'; return; }
-        html += _renderTrainingSection(section, isCurr, badge, p);
-      });
-
-      courses.forEach(function(section) {
-        var p = LLFG_Gamification.getCourseProgress(section.id);
-        var badge = '<span style="font-size:0.52rem;background:' + section.color + '20;color:' + section.color + ';padding:0.15rem 0.5rem;border:1px solid ' + section.color + '30;margin-left:0.5rem;letter-spacing:0.1em;text-transform:uppercase;">' + section.courseTag + '</span>';
-        html += _renderTrainingSection(section, false, badge, p);
-      });
-
       el.innerHTML = html;
     }
+
+    // Simple training completion (no gamification)
+    window.markTrainingDone = function(unitId, btn) {
+      localStorage.setItem('llfg_training_' + unitId, Date.now());
+      if (btn) { btn.textContent = '\u2705 Completed'; btn.disabled = true; btn.style.color = '#6ecf6e'; btn.style.borderColor = 'rgba(110,207,110,0.2)'; btn.style.background = 'rgba(110,207,110,0.08)'; }
+      renderTrainingCurriculum();
+    };
 
     function _renderTrainingSection(section, isCurrentTier, tierBadge, progress) {
       var out = '';
@@ -11548,6 +11366,25 @@ contact\u0040llfg.us`
         if(title) title.textContent = 'Email';
         if(role)  role.textContent  = 'contact@llfg.us';
         initGmailConnection();
+      } else if (tab === 'leaderboard') {
+        if(filterRow) filterRow.style.display = 'none';
+        if(msgThread) msgThread.style.display = 'flex';
+        if(msgInputWrap) msgInputWrap.style.display = 'none';
+        if(title) title.textContent = 'Leaderboard';
+        if(role) role.textContent = 'Agent rankings by production';
+        // Render leaderboard table
+        var lbData = typeof LEADERBOARD_AGENTS !== 'undefined' ? LEADERBOARD_AGENTS.slice().sort(function(a,b){return b.ap-a.ap;}) : [];
+        var lbRows = lbData.map(function(a,i){
+          var c = i===0?'var(--gold)':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--cream)';
+          return '<tr style="transition:background 0.2s;" onmouseover="this.style.background=\'rgba(124,58,237,0.04)\'" onmouseout="this.style.background=\'\'">'
+            +'<td style="color:'+c+';font-weight:700;font-family:Cormorant Garamond,serif;font-size:1.1rem;width:40px;">'+(i+1)+'</td>'
+            +'<td style="color:var(--cream);font-weight:500;">'+a.name+'</td>'
+            +'<td style="color:var(--gray);font-size:0.7rem;">'+a.team+'</td>'
+            +'<td style="text-align:right;color:var(--gold);font-weight:600;font-family:Cormorant Garamond,serif;font-size:1rem;">$'+a.ap.toLocaleString()+'</td></tr>';
+        }).join('');
+        if(msgThread) msgThread.innerHTML = '<div style="width:100%;padding:1rem;overflow-y:auto;">'
+          +'<table class="app-table" style="width:100%;"><thead><tr><th>#</th><th>Agent</th><th>Team</th><th style="text-align:right;">AP</th></tr></thead>'
+          +'<tbody>'+lbRows+'</tbody></table></div>';
       }
     };
 
