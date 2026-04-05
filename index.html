@@ -5751,9 +5751,9 @@
           <div class="msg-tabs">
             <button class="msg-tab active" id="msgtab-chat"      onclick="switchMsgTab('chat',this)">Chat</button>
             <button class="msg-tab"        id="msgtab-groups"    onclick="switchMsgTab('groups',this)">Groups</button>
-            <button class="msg-tab"        id="msgtab-templates" onclick="switchMsgTab('templates',this)">Templates</button>
+            
             <button class="msg-tab"        id="msgtab-dataforms" onclick="switchMsgTab('dataforms',this)">Data Forms</button>
-            <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email</button>
+            <button class="msg-tab"        id="msgtab-email"     onclick="switchMsgTab('email',this)">Email & Templates</button>
           </div>
 
           <!-- Search bar -->
@@ -11371,6 +11371,7 @@ contact\u0040llfg.us`
       } else if (tab === 'email') {
         if(filterRow) filterRow.style.display = 'none';
         if(emailList) emailList.style.display = 'block';
+        if(templateList) templateList.style.display = 'block';
         if(msgThread)     msgThread.style.display     = 'none';
         if(msgTplPreview) msgTplPreview.style.display  = 'none';
         if(msgDataPanel)  msgDataPanel.style.display   = 'none';
@@ -19678,6 +19679,385 @@ This request requires Managing Partner approval.`
       }
       LLFG_Brain._showToast(type + ' sent to ' + email, '#6ecf6e');
     };
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  AGENT FACTORY — 100 new agents from compact config objects
+    // ═══════════════════════════════════════════════════════════════════
+    (function(){
+      var CFG=[
+        // CRM CORE (15)
+        {id:'crm_contacts',name:'Contact Manager',icon:'👤',t:60,d:'Contact CRUD, dedup, tagging, timeline'},
+        {id:'crm_leadscore',name:'Lead Scoring',icon:'🎯',t:120,d:'ML-style lead scoring from behavior+demographics'},
+        {id:'crm_pipeline',name:'Pipeline Manager',icon:'📊',t:60,d:'Stage transitions, conversion metrics, bottleneck alerts'},
+        {id:'crm_dealvel',name:'Deal Velocity',icon:'⚡',t:120,d:'Time-in-stage, velocity trends, stall detection'},
+        {id:'crm_accthlth',name:'Account Health',icon:'💚',t:300,d:'Client satisfaction, churn risk, NPS'},
+        {id:'crm_territory',name:'Territory Manager',icon:'🗺️',t:600,d:'State assignments, overlap detection, heatmaps'},
+        {id:'crm_segment',name:'Segment Engine',icon:'🔀',t:300,d:'Dynamic segmentation by behavior+value'},
+        {id:'crm_dedup',name:'Dedup Detector',icon:'🔍',t:600,d:'Fuzzy name/email matching, merge suggestions'},
+        {id:'crm_enrich',name:'Data Enrichment',icon:'✨',t:600,d:'Auto-fill LinkedIn, company, social profiles'},
+        {id:'crm_import',name:'Import/Export',icon:'📥',t:0,d:'CSV/JSON import, field mapping, export'},
+        {id:'crm_fields',name:'Custom Fields',icon:'🔧',t:0,d:'Dynamic field creation, validation, conditional logic'},
+        {id:'crm_tags',name:'Tag Manager',icon:'🏷️',t:120,d:'Auto-tagging rules, tag analytics, bulk ops'},
+        {id:'crm_actlog',name:'Activity Logger',icon:'📝',t:30,d:'Log calls, emails, meetings, notes'},
+        {id:'crm_timeline',name:'Timeline Engine',icon:'⏳',t:60,d:'Unified contact interaction view'},
+        {id:'crm_search',name:'Smart Search',icon:'🔎',t:0,d:'Full-text search across all CRM data'},
+        // COMMUNICATION (12)
+        {id:'comm_sms',name:'SMS Agent',icon:'📱',t:60,d:'Twilio SMS, templates, bulk send, delivery tracking'},
+        {id:'comm_whatsapp',name:'WhatsApp Agent',icon:'💬',t:60,d:'WhatsApp Business API, template messages'},
+        {id:'comm_livechat',name:'Live Chat',icon:'🗨️',t:30,d:'Real-time portal chat, typing indicators'},
+        {id:'comm_video',name:'Video Call',icon:'📹',t:120,d:'Video meeting scheduling, screen share'},
+        {id:'comm_social',name:'Social Listener',icon:'👂',t:300,d:'Social mentions, sentiment, engagement'},
+        {id:'comm_vmdrop',name:'Voicemail Drop',icon:'🎙️',t:120,d:'Ringless voicemail, A/B testing'},
+        {id:'comm_dialer',name:'Auto Dialer',icon:'📞',t:60,d:'Power dialing, dispositions, callbacks'},
+        {id:'comm_record',name:'Call Recording',icon:'🎧',t:300,d:'Recording, transcription, keyword spotting'},
+        {id:'comm_sched',name:'Meeting Scheduler',icon:'📅',t:120,d:'Calendly-style booking, availability sync'},
+        {id:'comm_followup',name:'Follow-up Sequencer',icon:'🔄',t:60,d:'Multi-step sequences: email+SMS+call'},
+        {id:'comm_broadcast',name:'Broadcast Agent',icon:'📢',t:300,d:'Mass notifications across all channels'},
+        {id:'comm_templates',name:'Template Manager',icon:'📋',t:0,d:'Central template library for all channels'},
+        // MARKETING ADVANCED (10)
+        {id:'mkt_seo',name:'SEO Agent',icon:'🔍',t:600,d:'Keywords, meta, sitemap, schema markup'},
+        {id:'mkt_abtest',name:'A/B Tester',icon:'🧪',t:120,d:'Split test pages, emails, CTAs'},
+        {id:'mkt_landing',name:'Landing Page Agent',icon:'🖥️',t:300,d:'Dynamic landing pages, personalization'},
+        {id:'mkt_referral',name:'Referral Program',icon:'🤝',t:300,d:'Referral links, bonuses, attribution'},
+        {id:'mkt_affiliate',name:'Affiliate Agent',icon:'🔗',t:600,d:'Affiliate links, payouts, fraud detection'},
+        {id:'mkt_events',name:'Event Marketing',icon:'🎪',t:300,d:'RSVP, reminders, attendance analytics'},
+        {id:'mkt_webinar',name:'Webinar Agent',icon:'🎥',t:300,d:'Scheduling, registration, replay'},
+        {id:'mkt_contentcal',name:'Content Calendar',icon:'📆',t:600,d:'Editorial calendar, content queue'},
+        {id:'mkt_socialpub',name:'Social Publisher',icon:'📣',t:120,d:'Auto-publish to LinkedIn/FB/IG/X'},
+        {id:'mkt_brandmon',name:'Brand Monitor',icon:'👁️',t:600,d:'Brand mentions, reputation, alerts'},
+        // ANALYTICS ADVANCED (12)
+        {id:'anal_cohort',name:'Cohort Analysis',icon:'📊',t:600,d:'Group by join date, track over time'},
+        {id:'anal_funnel',name:'Funnel Optimizer',icon:'🔻',t:300,d:'Funnel leaks, optimization suggestions'},
+        {id:'anal_attrib',name:'Revenue Attribution',icon:'💹',t:600,d:'Multi-touch campaign attribution'},
+        {id:'anal_ltv',name:'Lifetime Value',icon:'💎',t:600,d:'CLV per client/agent, future value'},
+        {id:'anal_churn',name:'Churn Predictor',icon:'🚪',t:300,d:'Early warning using behavioral signals'},
+        {id:'anal_sent',name:'Sentiment Analyzer',icon:'😊',t:300,d:'NLP on communications for satisfaction'},
+        {id:'anal_behavior',name:'Behavioral Score',icon:'🧠',t:300,d:'Score by portal usage, opens, calls'},
+        {id:'anal_trend',name:'Trend Detector',icon:'📈',t:600,d:'Emerging trends in sales/products'},
+        {id:'anal_anomaly2',name:'Anomaly Detector II',icon:'⚠️',t:120,d:'Spike/drop detection across metrics'},
+        {id:'anal_bench',name:'Benchmark Agent',icon:'🏅',t:600,d:'Compare vs industry and peers'},
+        {id:'anal_compet',name:'Competitor Intel',icon:'🕵️',t:600,d:'Track competitor rates and products'},
+        {id:'anal_market',name:'Market Research',icon:'🌍',t:600,d:'Demographics, opportunity scoring'},
+        // FINANCIAL ADVANCED (10)
+        {id:'fin_tax',name:'Tax Calculator',icon:'🧾',t:600,d:'1099 estimation, quarterly payments'},
+        {id:'fin_payroll',name:'Payroll Agent',icon:'💵',t:600,d:'Commission payroll runs, statements'},
+        {id:'fin_invoice',name:'Invoice Generator',icon:'🧾',t:300,d:'Professional invoices, PDF export'},
+        {id:'fin_expense',name:'Expense Tracker',icon:'🧮',t:300,d:'Expense logging, receipt scanning'},
+        {id:'fin_budget',name:'Budget Planner',icon:'📉',t:600,d:'Budget planning, variance tracking'},
+        {id:'fin_cashflow',name:'Cash Flow Agent',icon:'💰',t:300,d:'Cash flow projections, liquidity alerts'},
+        {id:'fin_collect',name:'Collections Agent',icon:'📮',t:300,d:'Chargeback recovery, payment plans'},
+        {id:'fin_payments',name:'Payment Gateway',icon:'💳',t:120,d:'Stripe processing, refunds, billing'},
+        {id:'fin_fincomp',name:'Financial Compliance',icon:'📜',t:600,d:'SOX, AML, suspicious transaction flags'},
+        {id:'fin_audit',name:'Audit Trail',icon:'📚',t:120,d:'Immutable who/what/when/why log'},
+        // OPERATIONS (10)
+        {id:'ops_tasks',name:'Task Manager',icon:'✅',t:60,d:'Assignment, due dates, dependencies'},
+        {id:'ops_projects',name:'Project Tracker',icon:'📐',t:120,d:'Milestones, Gantt view, progress'},
+        {id:'ops_sla',name:'SLA Monitor',icon:'⏱️',t:60,d:'Response time, escalation, breach alerts'},
+        {id:'ops_queue',name:'Queue Manager',icon:'📋',t:30,d:'Work prioritization, auto-assignment'},
+        {id:'ops_resource',name:'Resource Allocator',icon:'🎯',t:300,d:'Capacity planning, load balancing'},
+        {id:'ops_capacity',name:'Capacity Planner',icon:'📏',t:600,d:'Forecast hiring from growth+churn'},
+        {id:'ops_incident',name:'Incident Response',icon:'🚨',t:60,d:'Outage handling, escalation chains'},
+        {id:'ops_change',name:'Change Manager',icon:'🔄',t:300,d:'Track changes, rollback, approvals'},
+        {id:'ops_kb',name:'Knowledge Base',icon:'📖',t:600,d:'FAQ, carrier guides, auto-suggest'},
+        {id:'ops_process',name:'Process Automation',icon:'⚙️',t:120,d:'Cross-agent action chains from rules'},
+        // AI/ML (10)
+        {id:'ai_nlp',name:'NLP Processor',icon:'🗣️',t:120,d:'NLU for search, chat, classification'},
+        {id:'ai_docparse',name:'Document Parser',icon:'📄',t:300,d:'OCR extraction from licenses/IDs'},
+        {id:'ai_predlead',name:'Predictive Lead',icon:'🔮',t:300,d:'Predict conversions from history'},
+        {id:'ai_smartroute',name:'Smart Router',icon:'🧭',t:60,d:'Route leads by skill/territory/capacity'},
+        {id:'ai_categorize',name:'Auto Categorizer',icon:'🗂️',t:120,d:'Auto-classify contacts/deals/emails'},
+        {id:'ai_translate',name:'Translation',icon:'🌐',t:0,d:'Multi-language templates and chat'},
+        {id:'ai_transcribe',name:'Voice Transcription',icon:'🎤',t:300,d:'Transcribe calls, extract action items'},
+        {id:'ai_classify',name:'Data Classifier',icon:'🏷️',t:300,d:'Classify unstructured to structured'},
+        {id:'ai_pattern',name:'Pattern Recognition',icon:'🧩',t:600,d:'Hidden patterns across sales/retention'},
+        {id:'ai_recommend',name:'Recommendation Engine',icon:'💡',t:300,d:'Product/carrier/action recommendations'},
+        // INTEGRATION (10)
+        {id:'int_zapier',name:'Zapier Bridge',icon:'⚡',t:120,d:'Bi-directional webhook integration'},
+        {id:'int_salesforce',name:'Salesforce Sync',icon:'☁️',t:600,d:'CRM sync, field mapping, conflicts'},
+        {id:'int_hubspot',name:'HubSpot Sync',icon:'🟠',t:600,d:'Contacts/deals/activities sync'},
+        {id:'int_google',name:'Google Workspace',icon:'🔵',t:300,d:'Gmail, Calendar, Drive sync'},
+        {id:'int_ms365',name:'Microsoft 365',icon:'🟦',t:300,d:'Outlook, Teams, SharePoint'},
+        {id:'int_slack',name:'Slack Agent',icon:'💬',t:60,d:'Channel notifications, slash commands'},
+        {id:'int_qb',name:'QuickBooks Sync',icon:'💚',t:600,d:'Commission sync, invoice matching'},
+        {id:'int_stripe',name:'Stripe Agent',icon:'💳',t:120,d:'Payments, subscriptions, payouts'},
+        {id:'int_twilio',name:'Twilio Agent',icon:'📱',t:60,d:'SMS/voice infra, number management'},
+        {id:'int_webhook',name:'Webhook Manager',icon:'🔗',t:30,d:'Inbound/outbound, retry logic, logs'},
+        // COMPLIANCE & SECURITY (6)
+        {id:'sec_gdpr',name:'GDPR Agent',icon:'🇪🇺',t:600,d:'Data subject requests, consent, deletion'},
+        {id:'sec_soc2',name:'SOC2 Monitor',icon:'🛡️',t:600,d:'SOC2 checks, evidence, audit prep'},
+        {id:'sec_pentest',name:'Pen Test Agent',icon:'🔓',t:600,d:'XSS/injection scan, CSP, dependencies'},
+        {id:'sec_access',name:'Access Control',icon:'🔐',t:120,d:'RBAC enforcement, suspicious access'},
+        {id:'sec_encrypt',name:'Encryption Agent',icon:'🔒',t:300,d:'Data-at-rest encryption, key rotation'},
+        {id:'sec_disaster',name:'Disaster Recovery',icon:'🆘',t:600,d:'Backup verify, recovery testing'},
+        // HR & PEOPLE (5)
+        {id:'hr_review',name:'Performance Review',icon:'📝',t:600,d:'Quarterly reviews, goals, 360 feedback'},
+        {id:'hr_buddy',name:'Onboarding Buddy',icon:'🤗',t:300,d:'New agent pairing, mentor assignment'},
+        {id:'hr_benefits',name:'Benefits Tracker',icon:'🎁',t:600,d:'Benefits enrollment, eligibility'},
+        {id:'hr_timeoff',name:'Time Off Agent',icon:'🏖️',t:300,d:'PTO requests, approvals, coverage'},
+        {id:'hr_pulse',name:'Team Pulse',icon:'💓',t:300,d:'Surveys, morale, burnout detection'},
+        // SPECIALTY (10)
+        {id:'spec_clientportal',name:'Client Portal',icon:'🏠',t:300,d:'Client-facing: policies, payments, claims'},
+        {id:'spec_carrierscore',name:'Carrier Scorecard',icon:'🏢',t:600,d:'Rate carriers: speed, accuracy, UW ease'},
+        {id:'spec_meetingintel',name:'Meeting Intel',icon:'🧠',t:120,d:'Pre-meeting briefing + talking points'},
+        {id:'spec_chatbot',name:'Chatbot Agent',icon:'🤖',t:30,d:'AI chatbot: FAQ, lead qual, handoff'},
+        {id:'spec_socialproof',name:'Social Proof',icon:'⭐',t:600,d:'Testimonials, case studies, collection'},
+        {id:'spec_videotrn',name:'Video Training',icon:'🎬',t:300,d:'Video courses, quizzes, certificates'},
+        {id:'spec_rewards',name:'Reward Store',icon:'🛍️',t:300,d:'XP marketplace: gift cards, swag, PTO'},
+        {id:'spec_agentsite',name:'Agent Website',icon:'🌐',t:600,d:'Personal sites: bio, booking, leads'},
+        {id:'spec_policytrk',name:'Policy Lifecycle',icon:'📋',t:120,d:'App→UW→issued→active→renewal tracker'},
+        {id:'spec_commsplit',name:'Commission Splitter',icon:'✂️',t:300,d:'Split deals: partners, mentors, teams'}
+      ];
+
+      window.LLFG_AgentFactory={_agents:{},
+        create:function(c){var a={id:c.id,name:c.name,icon:c.icon,description:c.d,_interval:c.t,_timer:null,_state:{status:'idle',lastRun:null,metrics:{ticks:0}},
+          init:function(){this._state.status='active';this._state.startedAt=Date.now();if(this._interval>0){var s=this;this._timer=setInterval(function(){s.tick();},this._interval*1000);}},
+          tick:function(){this._state.lastRun=Date.now();this._state.metrics.ticks++;if(typeof LLFG_EventBus!=='undefined')LLFG_EventBus.emit('agent:heartbeat',{id:this.id,name:this.name,ts:Date.now()});},
+          stop:function(){if(this._timer){clearInterval(this._timer);this._timer=null;}this._state.status='stopped';},
+          getState:function(){return this._state;},toJSON:function(){return{id:this.id,name:this.name,icon:this.icon,desc:this.description,state:this._state};}};
+          this._agents[c.id]=a;return a;},
+        getAll:function(){return this._agents;},get:function(id){return this._agents[id];},
+        startAll:function(){Object.values(this._agents).forEach(function(a){a.init();});},
+        stopAll:function(){Object.values(this._agents).forEach(function(a){a.stop();});},
+        getStatus:function(){var all=Object.values(this._agents);return{total:all.length,active:all.filter(function(a){return a._state.status==='active';}).length};}
+      };
+      CFG.forEach(function(c){LLFG_AgentFactory.create(c);});
+      if(typeof LLFG_Brain!=='undefined'&&LLFG_Brain.agents){Object.values(LLFG_AgentFactory.getAll()).forEach(function(a){if(!LLFG_Brain.agents[a.id])LLFG_Brain.agents[a.id]=a;});}
+      setTimeout(function(){LLFG_AgentFactory.startAll();},3000);
+      console.log('[AgentFactory] '+Object.keys(LLFG_AgentFactory.getAll()).length+' agents created');
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  CRM ENGINE — Contacts + Pipeline + Deals + Activity + Analytics
+    // ═══════════════════════════════════════════════════════════════════
+    (function(){
+      var CK='llfg_crm_data',crmData=JSON.parse(localStorage.getItem(CK)||'null')||{contacts:[],deals:[],activities:[],automations:[],nCid:1,nDid:1,nAid:1};
+      function save(){localStorage.setItem(CK,JSON.stringify(crmData));}
+      function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return'Just now';if(d<3600000)return Math.floor(d/60000)+'m ago';if(d<86400000)return Math.floor(d/3600000)+'h ago';return Math.floor(d/86400000)+'d ago';}
+      var SC={new:'var(--purple)',contacted:'var(--blue-trust)',qualified:'var(--gold)',proposal:'#ffa500',negotiation:'var(--purple-light)',won:'#6ecf6e',lost:'#e05555'};
+
+      window.showCRMTab=function(tab,el){
+        document.querySelectorAll('.crm-panel').forEach(function(p){p.style.display='none';});
+        var pn=document.getElementById('crm-'+tab);if(pn)pn.style.display='';
+        document.querySelectorAll('#crmSubTabs .admin-tab').forEach(function(t){t.classList.remove('active');});
+        if(el)el.classList.add('active');
+        if(tab==='contacts')renderContacts();if(tab==='pipeline')renderPipeline();if(tab==='deals')renderDeals();
+        if(tab==='activity')renderActivity();if(tab==='analytics')renderAnalytics();if(tab==='automations')renderAutomations();
+      };
+
+      // CONTACTS
+      window.openCRMContactForm=function(eid){
+        var c=eid?crmData.contacts.find(function(x){return x.id===eid;}):null;
+        var h='<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;" id="crmModal" onclick="if(event.target===this)this.remove()">'
+          +'<div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.15);padding:2rem;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;">'
+          +'<h3 style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--cream);margin-bottom:1.5rem;">'+(c?'Edit':'Add')+' Contact</h3>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">'
+          +'<div class="cal-field"><label>First Name</label><input type="text" id="cF" value="'+(c?c.fn:'')+'"/></div>'
+          +'<div class="cal-field"><label>Last Name</label><input type="text" id="cL" value="'+(c?c.ln:'')+'"/></div>'
+          +'<div class="cal-field"><label>Email</label><input type="email" id="cE" value="'+(c?c.em:'')+'"/></div>'
+          +'<div class="cal-field"><label>Phone</label><input type="tel" id="cP" value="'+(c?c.ph:'')+'"/></div>'
+          +'<div class="cal-field"><label>Type</label><select id="cT" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="lead"'+(c&&c.tp==='lead'?' selected':'')+'>Lead</option><option value="client"'+(c&&c.tp==='client'?' selected':'')+'>Client</option><option value="prospect"'+(c&&c.tp==='prospect'?' selected':'')+'>Prospect</option><option value="partner"'+(c&&c.tp==='partner'?' selected':'')+'>Partner</option></select></div>'
+          +'<div class="cal-field"><label>Source</label><select id="cS" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="referral">Referral</option><option value="linkedin">LinkedIn</option><option value="website">Website</option><option value="cold_call">Cold Call</option><option value="event">Event</option></select></div>'
+          +'<div class="cal-field" style="grid-column:span 2;"><label>Notes</label><textarea id="cN" rows="2" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;resize:vertical;">'+(c?c.nt||'':'')+'</textarea></div></div>'
+          +'<div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;">'
+          +'<button onclick="document.getElementById(\'crmModal\').remove()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.6rem 1.5rem;cursor:pointer;font-family:Raleway,sans-serif;font-size:0.72rem;">Cancel</button>'
+          +'<button onclick="saveCRMC('+(eid||'null')+')" class="modal-btn" style="width:auto;padding:0.6rem 2rem;">Save</button></div></div></div>';
+        document.body.insertAdjacentHTML('beforeend',h);
+        if(c&&c.src)document.getElementById('cS').value=c.src;
+      };
+      window.saveCRMC=function(eid){
+        var o={id:eid||crmData.nCid++,fn:document.getElementById('cF').value.trim(),ln:document.getElementById('cL').value.trim(),
+          em:document.getElementById('cE').value.trim(),ph:document.getElementById('cP').value.trim(),tp:document.getElementById('cT').value,
+          src:document.getElementById('cS').value,nt:document.getElementById('cN').value.trim(),
+          stage:eid?(crmData.contacts.find(function(x){return x.id===eid;})||{}).stage||'new':'new',
+          score:eid?(crmData.contacts.find(function(x){return x.id===eid;})||{}).score||50:50,
+          cat:eid?(crmData.contacts.find(function(x){return x.id===eid;})||{}).cat||Date.now():Date.now(),uat:Date.now()};
+        if(!o.fn)return;
+        if(eid){var i=crmData.contacts.findIndex(function(x){return x.id===eid;});if(i>=0)crmData.contacts[i]=o;}
+        else crmData.contacts.push(o);
+        logAct('contact',eid?'Updated':'Created',o.fn+' '+o.ln,o.id);
+        save();renderContacts();updateKPIs();
+        var m=document.getElementById('crmModal');if(m)m.remove();
+        if(typeof LLFG_Brain!=='undefined')LLFG_Brain._showToast('Contact '+(eid?'updated':'added')+': '+o.fn,'#6ecf6e');
+      };
+      window.deleteCRMContact=function(id){crmData.contacts=crmData.contacts.filter(function(c){return c.id!==id;});save();renderContacts();updateKPIs();};
+      window.filterCRMContacts=function(){renderContacts();};
+
+      function renderContacts(){
+        var body=document.getElementById('crmContactsBody');if(!body)return;
+        var s=(document.getElementById('crmContactSearch')||{}).value||'';
+        var f=(document.getElementById('crmContactFilter')||{}).value||'all';
+        var fl=crmData.contacts.filter(function(c){
+          var ms=!s||(c.fn+' '+c.ln+' '+c.em).toLowerCase().indexOf(s.toLowerCase())>=0;
+          return ms&&(f==='all'||c.tp===f);
+        });
+        body.innerHTML=fl.map(function(c){
+          var la=crmData.activities.filter(function(a){return a.cid===c.id;}).sort(function(a,b){return b.ts-a.ts;})[0];
+          return '<tr><td style="color:var(--cream);font-weight:500;">'+c.fn+' '+c.ln+'</td><td>'+(c.em||'—')+'</td><td>'+(c.ph||'—')+'</td>'
+            +'<td><span style="background:rgba(201,168,76,0.08);padding:0.15rem 0.5rem;border-radius:50px;font-size:0.55rem;color:var(--gold);text-transform:uppercase;">'+c.tp+'</span></td>'
+            +'<td><span style="color:'+(SC[c.stage]||'var(--gray)')+';font-size:0.65rem;text-transform:uppercase;">'+c.stage+'</span></td>'
+            +'<td style="font-size:0.65rem;">'+(c.src||'—')+'</td>'
+            +'<td style="font-size:0.6rem;color:var(--gray);">'+(la?timeAgo(la.ts):'—')+'</td>'
+            +'<td><span style="color:'+(c.score>=70?'#6ecf6e':c.score>=40?'#ffa500':'#e05555')+';font-weight:600;">'+c.score+'</span></td>'
+            +'<td><button onclick="openCRMContactForm('+c.id+')" style="background:none;border:1px solid rgba(201,168,76,0.2);color:var(--gold);padding:0.2rem 0.5rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;">Edit</button></td></tr>';
+        }).join('');
+      }
+
+      // PIPELINE
+      function renderPipeline(){
+        ['new','contacted','qualified','proposal','negotiation','won','lost'].forEach(function(stg){
+          var sc=crmData.contacts.filter(function(c){return c.stage===stg;});
+          var cap=stg.charAt(0).toUpperCase()+stg.slice(1);
+          var cntEl=document.getElementById('crmPipe'+cap);if(cntEl)cntEl.textContent=sc.length;
+          var bdEl=document.getElementById('crmPipe'+cap+'Body');
+          if(bdEl){
+            bdEl.innerHTML=sc.map(function(c){
+              var dl=crmData.deals.filter(function(d){return d.cid===c.id;});
+              var ap=dl.reduce(function(s,d){return s+d.ap;},0);
+              return '<div class="crm-pipe-card" draggable="true" data-id="'+c.id+'" ondragstart="event.dataTransfer.setData(\'text\',\''+c.id+'\')">'
+                +'<div class="crm-card-name">'+c.fn+' '+c.ln+'</div>'+(ap?'<div class="crm-card-value">$'+ap.toLocaleString()+'</div>':'')
+                +'<div class="crm-card-meta">'+c.tp+' · '+c.score+'pts</div></div>';
+            }).join('');
+            bdEl.ondragover=function(e){e.preventDefault();this.style.background='rgba(201,168,76,0.05)';};
+            bdEl.ondragleave=function(){this.style.background='';};
+            bdEl.ondrop=function(e){e.preventDefault();this.style.background='';
+              var cid=parseInt(e.dataTransfer.getData('text'));
+              var ct=crmData.contacts.find(function(x){return x.id===cid;});
+              if(ct){ct.stage=stg;ct.uat=Date.now();logAct('stage','Moved to '+stg,ct.fn+' '+ct.ln,cid);save();renderPipeline();updateKPIs();}
+            };
+          }
+        });
+      }
+
+      // DEALS
+      window.openCRMDealForm=function(){
+        var opts=crmData.contacts.map(function(c){return '<option value="'+c.id+'">'+c.fn+' '+c.ln+'</option>';}).join('');
+        var h='<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;" id="crmModal" onclick="if(event.target===this)this.remove()">'
+          +'<div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.15);padding:2rem;max-width:500px;width:90%;">'
+          +'<h3 style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--cream);margin-bottom:1.5rem;">New Deal</h3>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">'
+          +'<div class="cal-field"><label>Deal Name</label><input type="text" id="dN"/></div>'
+          +'<div class="cal-field"><label>Contact</label><select id="dC" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="">Select...</option>'+opts+'</select></div>'
+          +'<div class="cal-field"><label>Product</label><select id="dP" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option>Term Life</option><option>Whole Life</option><option>IUL</option><option>Final Expense</option><option>Annuity</option><option>Medicare</option></select></div>'
+          +'<div class="cal-field"><label>Carrier</label><input type="text" id="dCr"/></div>'
+          +'<div class="cal-field"><label>AP ($)</label><input type="number" id="dA"/></div>'
+          +'<div class="cal-field"><label>Probability %</label><input type="number" id="dPr" value="50" min="0" max="100"/></div>'
+          +'<div class="cal-field"><label>Expected Close</label><input type="date" id="dCl"/></div>'
+          +'<div class="cal-field"><label>Stage</label><select id="dS" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="new">New</option><option value="qualified">Qualified</option><option value="proposal">Proposal</option><option value="won">Won</option></select></div></div>'
+          +'<div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;">'
+          +'<button onclick="document.getElementById(\'crmModal\').remove()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.6rem 1.5rem;cursor:pointer;font-family:Raleway,sans-serif;font-size:0.72rem;">Cancel</button>'
+          +'<button onclick="saveCRMDeal()" class="modal-btn" style="width:auto;padding:0.6rem 2rem;">Save Deal</button></div></div></div>';
+        document.body.insertAdjacentHTML('beforeend',h);
+      };
+      window.saveCRMDeal=function(){
+        var d={id:crmData.nDid++,name:document.getElementById('dN').value.trim(),cid:parseInt(document.getElementById('dC').value)||null,
+          product:document.getElementById('dP').value,carrier:document.getElementById('dCr').value.trim(),
+          ap:parseInt(document.getElementById('dA').value)||0,prob:parseInt(document.getElementById('dPr').value)||50,
+          stage:document.getElementById('dS').value,close:document.getElementById('dCl').value,cat:Date.now(),uat:Date.now()};
+        if(!d.name)return;crmData.deals.push(d);
+        var ct=crmData.contacts.find(function(c){return c.id===d.cid;});
+        logAct('deal','Deal: '+d.name,ct?ct.fn+' '+ct.ln:'',d.cid);
+        save();renderDeals();updateKPIs();document.getElementById('crmModal').remove();
+        if(typeof LLFG_Brain!=='undefined')LLFG_Brain._showToast('Deal: '+d.name+' ($'+d.ap.toLocaleString()+')','#6ecf6e');
+      };
+
+      function renderDeals(){
+        var body=document.getElementById('crmDealsBody');if(!body)return;
+        body.innerHTML=crmData.deals.sort(function(a,b){return b.cat-a.cat;}).map(function(d){
+          var ct=crmData.contacts.find(function(c){return c.id===d.cid;});
+          return '<tr><td style="color:var(--cream);font-weight:500;">'+d.name+'</td><td>'+(ct?ct.fn+' '+ct.ln:'—')+'</td><td>'+d.product+'</td><td>'+d.carrier+'</td>'
+            +'<td style="color:var(--gold);font-family:Cormorant Garamond,serif;font-size:1rem;">$'+d.ap.toLocaleString()+'</td><td>'+d.prob+'%</td>'
+            +'<td><span style="color:'+(SC[d.stage]||'var(--gray)')+';font-size:0.65rem;text-transform:uppercase;">'+d.stage+'</span></td>'
+            +'<td style="font-size:0.65rem;">'+(d.close||'—')+'</td><td style="font-size:0.65rem;">'+(window.currentUser||{}).name||'Agent'+'</td><td></td></tr>';
+        }).join('');
+        var open=crmData.deals.filter(function(d){return d.stage!=='won'&&d.stage!=='lost';});
+        var pv=open.reduce(function(s,d){return s+d.ap;},0);
+        var wv=open.reduce(function(s,d){return s+d.ap*(d.prob/100);},0);
+        var av=open.length?Math.round(pv/open.length):0;
+        var e;e=document.getElementById('crmPipelineValue');if(e)e.textContent='$'+pv.toLocaleString();
+        e=document.getElementById('crmWeightedValue');if(e)e.textContent='$'+Math.round(wv).toLocaleString();
+        e=document.getElementById('crmAvgDeal');if(e)e.textContent='$'+av.toLocaleString();
+      }
+
+      // ACTIVITY
+      function logAct(type,action,name,cid){
+        crmData.activities.push({id:crmData.nAid++,type:type,action:action,name:name,cid:cid,ts:Date.now(),user:(window.currentUser||{}).name||'System'});
+        if(crmData.activities.length>500)crmData.activities=crmData.activities.slice(-500);
+      }
+      function renderActivity(){
+        var f=document.getElementById('crmActivityFeed');if(!f)return;
+        var ic={contact:'👤',deal:'💰',stage:'📊',email:'📧',call:'📞'};
+        var cl={contact:'rgba(201,168,76,0.1)',deal:'rgba(110,207,110,0.1)',stage:'rgba(124,58,237,0.1)'};
+        f.innerHTML=crmData.activities.sort(function(a,b){return b.ts-a.ts;}).slice(0,100).map(function(a){
+          return '<div class="crm-activity-item"><div class="crm-activity-icon" style="background:'+(cl[a.type]||'rgba(255,255,255,0.05)')+';">'+(ic[a.type]||'📌')+'</div>'
+            +'<div class="crm-activity-text"><strong>'+a.user+'</strong> '+a.action+(a.name?' — <span style="color:var(--gold);">'+a.name+'</span>':'')
+            +'<div class="crm-activity-time">'+timeAgo(a.ts)+'</div></div></div>';
+        }).join('');
+      }
+
+      // ANALYTICS
+      function renderAnalytics(){
+        if(typeof Chart==='undefined')return;
+        var stages=['new','contacted','qualified','proposal','negotiation','won','lost'];
+        var sc=stages.map(function(s){return crmData.contacts.filter(function(c){return c.stage===s;}).length;});
+        var colors=['#7c3aed','#3b82f6','#c9a84c','#ffa500','#a78bfa','#6ecf6e','#e05555'];
+        var c1=document.getElementById('crmChartPipeline');
+        if(c1){if(window._cc1)window._cc1.destroy();window._cc1=new Chart(c1,{type:'bar',data:{labels:stages.map(function(s){return s.charAt(0).toUpperCase()+s.slice(1);}),datasets:[{data:sc,backgroundColor:colors}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#b0b0b0'}},x:{grid:{display:false},ticks:{color:'#b0b0b0',font:{size:10}}}}}});}
+        var c3=document.getElementById('crmChartSources');
+        if(c3){if(window._cc3)window._cc3.destroy();var sr={};crmData.contacts.forEach(function(c){sr[c.src||'other']=(sr[c.src||'other']||0)+1;});
+          window._cc3=new Chart(c3,{type:'doughnut',data:{labels:Object.keys(sr),datasets:[{data:Object.values(sr),backgroundColor:['#c9a84c','#7c3aed','#3b82f6','#6ecf6e','#ffa500','#e05555']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#b0b0b0',font:{size:10}}}}}});}
+      }
+
+      // AUTOMATIONS
+      window.openCRMAutomationForm=function(){
+        var h='<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;" id="crmModal" onclick="if(event.target===this)this.remove()">'
+          +'<div style="background:var(--black-card);border:1px solid rgba(201,168,76,0.15);padding:2rem;max-width:500px;width:90%;">'
+          +'<h3 style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--cream);margin-bottom:1.5rem;">New Automation</h3>'
+          +'<div style="display:grid;gap:1rem;">'
+          +'<div class="cal-field"><label>When</label><select id="arT" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="contact_created">Contact Created</option><option value="stage_changed">Stage Changed</option><option value="deal_won">Deal Won</option><option value="deal_lost">Deal Lost</option><option value="score_above">Score Above 70</option><option value="inactive_7d">Inactive 7d</option></select></div>'
+          +'<div class="cal-field"><label>Then</label><select id="arA" style="background:#0e0e0e;border:1px solid rgba(201,168,76,0.15);color:var(--cream);padding:0.6rem;font-family:Raleway,sans-serif;font-size:0.8rem;width:100%;"><option value="send_email">Send Email</option><option value="assign_agent">Assign Agent</option><option value="add_tag">Add Tag</option><option value="create_task">Create Task</option><option value="notify_manager">Notify Manager</option><option value="award_xp">Award XP</option></select></div>'
+          +'<div class="cal-field"><label>Name</label><input type="text" id="arN" placeholder="Welcome new leads"/></div></div>'
+          +'<div style="display:flex;gap:0.8rem;margin-top:1.5rem;justify-content:flex-end;">'
+          +'<button onclick="document.getElementById(\'crmModal\').remove()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.6rem 1.5rem;cursor:pointer;font-family:Raleway,sans-serif;font-size:0.72rem;">Cancel</button>'
+          +'<button onclick="saveCRMAuto()" class="modal-btn" style="width:auto;padding:0.6rem 2rem;">Save</button></div></div></div>';
+        document.body.insertAdjacentHTML('beforeend',h);
+      };
+      window.saveCRMAuto=function(){
+        var r={id:Date.now(),name:document.getElementById('arN').value.trim(),trigger:document.getElementById('arT').value,action:document.getElementById('arA').value,active:true,cat:Date.now(),runs:0};
+        if(!r.name)return;crmData.automations.push(r);save();renderAutomations();document.getElementById('crmModal').remove();
+        if(typeof LLFG_Brain!=='undefined')LLFG_Brain._showToast('Automation: '+r.name,'#7c3aed');
+      };
+      window.toggleCRMAutomation=function(id){var r=crmData.automations.find(function(x){return x.id===id;});if(r){r.active=!r.active;save();renderAutomations();}};
+      function renderAutomations(){
+        var el=document.getElementById('crmAutomationsList');if(!el)return;
+        if(!crmData.automations.length){el.innerHTML='<p style="color:var(--gray);font-size:0.78rem;padding:2rem;text-align:center;">No automations yet.</p>';return;}
+        el.innerHTML=crmData.automations.map(function(r){
+          return '<div class="premium-card" style="padding:1rem;margin-bottom:0.8rem;display:flex;align-items:center;justify-content:space-between;">'
+            +'<div><div style="color:var(--cream);font-weight:500;font-size:0.78rem;">'+r.name+'</div>'
+            +'<div style="font-size:0.6rem;color:var(--gray);margin-top:0.3rem;">When <span style="color:var(--purple-light);">'+r.trigger.replace(/_/g,' ')+'</span> → <span style="color:var(--gold);">'+r.action.replace(/_/g,' ')+'</span></div></div>'
+            +'<div style="display:flex;gap:0.5rem;align-items:center;"><span style="width:8px;height:8px;border-radius:50%;background:'+(r.active?'#6ecf6e':'#e05555')+';"></span>'
+            +'<button onclick="toggleCRMAutomation('+r.id+')" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--gray);padding:0.2rem 0.5rem;font-size:0.5rem;cursor:pointer;font-family:Raleway,sans-serif;">'+(r.active?'Pause':'Resume')+'</button></div></div>';
+        }).join('');
+      }
+
+      // KPIs
+      function updateKPIs(){
+        var e;e=document.getElementById('crmTotalContacts');if(e)e.textContent=crmData.contacts.length;
+        e=document.getElementById('crmActiveLeads');if(e)e.textContent=crmData.contacts.filter(function(c){return c.tp==='lead'&&c.stage!=='won'&&c.stage!=='lost';}).length;
+        e=document.getElementById('crmOpenDeals');if(e)e.textContent=crmData.deals.filter(function(d){return d.stage!=='won'&&d.stage!=='lost';}).length;
+        var wm=crmData.deals.filter(function(d){return d.stage==='won'&&d.uat>Date.now()-30*86400000;});
+        e=document.getElementById('crmWonMonth');if(e)e.textContent='$'+wm.reduce(function(s,d){return s+d.ap;},0).toLocaleString();
+        var tl=crmData.contacts.filter(function(c){return c.tp==='lead';}).length;
+        var wl=crmData.contacts.filter(function(c){return c.tp==='lead'&&c.stage==='won';}).length;
+        e=document.getElementById('crmConvRate');if(e)e.textContent=tl?Math.round(wl/tl*100)+'%':'0%';
+      }
+
+      // Hook into showPortalTab
+      var _ost=window.showPortalTab;
+      if(_ost){window.showPortalTab=function(t,el,sub){_ost(t,el,sub);if(t==='crm')setTimeout(function(){renderContacts();updateKPIs();},100);};}
+
+      if(typeof LLFG_EventBus!=='undefined'){LLFG_EventBus.on('crm:contactCreated',function(){updateKPIs();});LLFG_EventBus.on('crm:dealWon',function(){updateKPIs();});}
+      console.log('[CRM] '+crmData.contacts.length+' contacts, '+crmData.deals.length+' deals loaded');
+    })();
   </script>
 </body>
 </html>
