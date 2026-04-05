@@ -5350,10 +5350,10 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Team Overview Report -->
-          <div class="report-card" onclick="downloadReport('overview')">
+          <!-- Performance Report -->
+          <div class="report-card" onclick="downloadReport('performance')">
             <div class="report-card-icon">📈</div>
-            <div class="report-card-title">Team Overview Report</div>
+            <div class="report-card-title">Performance Report</div>
             <div class="report-card-desc">Leaderboard, comp percentages, top producers, activity ratios, and goals vs actuals.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
@@ -5366,11 +5366,11 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Team Health Report -->
+          <!-- Retention Report -->
           <div class="report-card" onclick="downloadReport('retention')">
             <div class="report-card-icon">🤝</div>
-            <div class="report-card-title">Team Health Report</div>
-            <div class="report-card-desc">Team health overview with retention insights and coaching recommendations.</div>
+            <div class="report-card-title">Retention Report</div>
+            <div class="report-card-desc">Persistency rates, chargeback exposure, policy lapse analysis, and at-risk policy flags per agent.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
 
@@ -5382,11 +5382,11 @@
             <div class="report-card-action">Download PDF</div>
           </div>
 
-          <!-- Financial Health Report -->
-          <div class="report-card" onclick="downloadReport('health')">
+          <!-- Chargeback Risk Report -->
+          <div class="report-card" onclick="downloadReport('chargeback')">
             <div class="report-card-icon">⚠️</div>
-            <div class="report-card-title">Financial Health Report</div>
-            <div class="report-card-desc">Financial health summary with recommendations for team growth.</div>
+            <div class="report-card-title">Chargeback Risk Report</div>
+            <div class="report-card-desc">Agents at chargeback risk, debt rollup by team, projected exposure, and recommendations for at-risk policies.</div>
             <div class="report-card-action">Download PDF</div>
           </div>
 
@@ -5417,7 +5417,7 @@
           <div style="overflow-x:auto;">
             <table class="app-table" style="min-width:700px;" id="reportSummaryTable">
               <thead>
-                <tr><th>Team</th><th>Total AP</th><th>Agents Active</th><th>Debt Risk</th></tr>
+                <tr><th>Team</th><th>Total AP</th><th>Agents Active</th><th>Persistency</th><th>Chargeback %</th><th>Retention</th><th>Debt Risk</th></tr>
               </thead>
               <tbody id="reportSummaryBody"></tbody>
             </table>
@@ -7650,8 +7650,8 @@ Legacy Life Financial Group`
           <div style="text-align:right;font-size:0.85rem;color:var(--gold-light);">$${advPay.toLocaleString()}</div>
           <div style="text-align:right;font-size:0.85rem;color:var(--cream);">$${team.moPremium.toLocaleString()}</div>
           <div style="text-align:right;font-size:0.85rem;color:var(--gold);">${team.leaderComm}%</div>
-          <!-- persistency removed -->
-          <!-- chargeback removed -->
+          <div style="text-align:right;font-size:0.85rem;color:${persistColor(team.persistency)};">${team.persistency}%</div>
+          <div style="text-align:right;font-size:0.85rem;color:${cbColor(team.chargeback)};">${team.chargeback}%</div>
           <div style="text-align:right;font-size:0.85rem;color:${persistColor(team.retention)};">${team.retention}%</div>
           <div style="text-align:right;font-size:0.8rem;font-weight:600;color:${debtColor(team.debtRisk)};">${team.debtRisk}</div>
         </div>
@@ -8744,11 +8744,11 @@ Object.defineProperty(window, "_llfgCurrentUser", {
     const MANAGEMENT_TABS = {
       financial_advisor: ['commreq'],
       agent:             ['commreq'],
-      manager:           ['commreq','reports','emailtemplates','commandcenter'],
-      executive:         ['commreq','teammetrics','reports','emailtemplates','commandcenter'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','commandcenter'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','integrations','commandcenter'],
+      manager:           ['commreq','reports','commandcenter'],
+      executive:         ['commreq','teammetrics','reports','commandcenter'],
+      director:          ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
@@ -8866,7 +8866,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
           tools:      ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-          management: ['commreq','permissions','teammetrics','downlineclients','reports','emailtemplates','creativestudio','integrations','commandcenter'],
+          management: ['commreq','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentGroups)) {
@@ -9002,7 +9002,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           if (typeof renderTeamHierarchy === 'function') renderTeamHierarchy();
         }
 
-        if (tab === 'emailtemplates')  { if (typeof renderEmailTemplates === 'function') renderEmailTemplates(); }
+        if (tab === 'emailtemplates') { showPortalTab('messages', null, true); setTimeout(function(){ var tb = document.getElementById('msgtab-templates'); if(tb) switchMsgTab('templates', tb); }, 100); return; }
 
         if (tab === 'creativestudio') { if (typeof renderCreativeStudio === 'function') renderCreativeStudio(); }
         if (tab === 'commandcenter') {
@@ -9678,8 +9678,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
           <td><strong style="color:var(--cream);">${team.name}</strong><br><span style="font-size:0.6rem;color:var(--gray);">Lead: ${team.leader}</span></td>
           <td style="color:var(--gold);font-weight:600;">$${ap.toLocaleString()}</td>
           <td>${team.agents.length}</td>
-          
-          
+          <td style="color:${pc};">${team.persistency}%</td>
+          <td style="color:${cc};">${team.chargeback}%</td>
           <td style="color:${pc};">${team.retention}%</td>
           <td><span style="color:${dc};font-size:0.7rem;font-weight:600;">${team.debtRisk}</span></td>
         </tr>`;
@@ -9698,7 +9698,7 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       const now = new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
       const u = currentUser || window._llfgCurrentUser;
       const generatedBy = u?.name || 'Admin';
-      const titles = { ap:'Team AP Report', performance:'Team Overview Report', onboarding:'Onboarding Report', retention:'Team Health Report', commission:'Commission Report', chargeback:'Financial Health Report', full:'Full Organization Report' };
+      const titles = { ap:'Team AP Report', performance:'Performance Report', onboarding:'Onboarding Report', retention:'Retention Report', commission:'Commission Report', chargeback:'Chargeback Risk Report', full:'Full Organization Report' };
       const title = titles[type] || 'Report';
       const totalAP = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + Math.round(t.totalAP * m), 0) : 0;
       const totalAgents = (typeof TEAM_DATA !== 'undefined') ? TEAM_DATA.reduce((s,t) => s + t.agents.length, 0) : 0;
@@ -14219,9 +14219,9 @@ This request requires Managing Partner approval.`
                 </div>
                 <div style="text-align:right;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);">$${team.totalAP.toLocaleString()}</div>
                 <div style="text-align:right;font-size:0.84rem;color:var(--cream);">$${team.moPremium.toLocaleString()}</div>
-                <!-- removed -->
-                <!-- removed -->
-                <!-- removed -->
+                <div style="text-align:right;font-size:0.84rem;color:${team.persistency>=85?'#6ecf6e':team.persistency>=78?'#ffa500':'#e05555'};"><span style="font-size:0.5rem;color:var(--gray);display:block;">Persist</span>${team.persistency}%</div>
+                <div style="text-align:right;font-size:0.84rem;color:${team.chargeback<4?'#6ecf6e':team.chargeback<7?'#ffa500':'#e05555'};"><span style="font-size:0.5rem;color:var(--gray);display:block;">CB</span>${team.chargeback}%</div>
+                <div style="text-align:right;font-size:0.8rem;font-weight:600;color:${team.debtRisk==='Low'?'#6ecf6e':team.debtRisk==='Medium'?'#ffa500':'#e05555'};"><span style="font-size:0.5rem;color:var(--gray);display:block;">Debt</span>${team.debtRisk}</div>
               </div>
               <div style="display:none;">
                 <div style="display:grid;grid-template-columns:${cols};padding:0.3rem 1rem 0.3rem 2.5rem;background:rgba(0,0,0,0.4);">
