@@ -8830,13 +8830,13 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       admin:             ['deals','commissions','teammetrics'],
     };
     const TOOLS_TABS = {
-      financial_advisor: ['training','addagents','agreements','bizcard','portals'],
-      agent:             ['training','addagents','agreements','bizcard','portals'],
-      manager:           ['training','addagents','agreements','agentapprovals','bizcard','portals'],
-      executive:         ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-      director:          ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-      managing_partner:  ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-      admin:             ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
+      financial_advisor: ['training','bizcard','portals'],
+      agent:             ['training','bizcard','portals'],
+      manager:           ['training','bizcard','portals'],
+      executive:         ['training','bizcard','portals'],
+      director:          ['training','bizcard','portals'],
+      managing_partner:  ['training','bizcard','portals'],
+      admin:             ['training','bizcard','portals'],
     };
     const RECRUITING_TABS = {
       financial_advisor: ['addagents','agreements'],
@@ -8848,13 +8848,13 @@ Object.defineProperty(window, "_llfgCurrentUser", {
       admin:             ['addagents','agreements','agentapprovals','contracting','applications'],
     };
     const MANAGEMENT_TABS = {
-      financial_advisor: ['commreq'],
-      agent:             ['commreq'],
-      manager:           ['commreq','reports','commandcenter'],
-      executive:         ['commreq','teammetrics','reports','commandcenter'],
-      director:          ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
-      managing_partner:  ['commreq','permissions','teammetrics','downlineclients','reports','commandcenter'],
-      admin:             ['commreq','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
+      financial_advisor: ['commreq','addagents','agreements'],
+      agent:             ['commreq','addagents','agreements'],
+      manager:           ['commreq','addagents','agreements','agentapprovals','reports','commandcenter'],
+      executive:         ['commreq','addagents','agreements','agentapprovals','contracting','applications','teammetrics','reports','commandcenter'],
+      director:          ['commreq','addagents','agreements','agentapprovals','contracting','applications','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      managing_partner:  ['commreq','addagents','agreements','agentapprovals','contracting','applications','permissions','teammetrics','downlineclients','reports','commandcenter'],
+      admin:             ['commreq','addagents','agreements','agentapprovals','contracting','applications','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
     };
     const SUBTAB_LABELS = {
       deals:'My Deals', commissions:'Commissions', teammetrics:'Team Metrics',
@@ -8971,8 +8971,8 @@ Object.defineProperty(window, "_llfgCurrentUser", {
         // Find which parent group this tab belongs to and highlight it
         const parentGroups = {
           mydeals:    ['deals','commissions','teammetrics'],
-          tools:      ['training','addagents','agreements','agentapprovals','contracting','applications','bizcard','portals'],
-          management: ['commreq','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
+          tools:      ['training','bizcard','portals'],
+          management: ['commreq','addagents','agreements','agentapprovals','contracting','applications','permissions','teammetrics','downlineclients','reports','creativestudio','integrations','commandcenter'],
         };
         const labelMap = { mydeals:'Deals', tools:'Tools', management:'Management' };
         for (const [parent, subs] of Object.entries(parentGroups)) {
@@ -14269,6 +14269,18 @@ This request requires Managing Partner approval.`
 
       // Render carrier training
       renderCarrierTraining();
+      // Auto-expand first chapter in each course section
+      setTimeout(function() {
+        document.querySelectorAll(".training-chapter-body").forEach(function(body, i) {
+          // Expand first chapter of each course (every course starts fresh)
+          var header = body.previousElementSibling;
+          if (header && !body.previousElementSibling.previousElementSibling) {
+            body.style.display = "block";
+            var chevron = header.querySelector(".training-doc-chevron");
+            if (chevron) chevron.style.transform = "rotate(180deg)";
+          }
+        });
+      }, 100);
 
       // Create ptab-downlineclients content div without adding orphan nav buttons
       if (isManagerPlus) {
